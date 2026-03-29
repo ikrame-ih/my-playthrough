@@ -1,23 +1,53 @@
-import { useState } from 'react'
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import GameForm from "./components/GameForm";
+import GameList from "./components/GameList";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-      <div className="bg-white rounded-lg shadow-2xl p-8 max-w-md">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">
-          Tailwind funciona! 🎉
-        </h1>
-        <button 
-          onClick={() => setCount(count + 1)}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"
-        >
-          Contador: {count}
-        </button>
+    <BrowserRouter>
+      <div className="min-h-screen bg-slate-900 text-slate-200 font-sans">
+        {/* Barra de navegación */}
+        <nav className="bg-slate-800 p-4 shadow-md flex justify-between items-center border-b border-teal-500">
+          <h1 className="text-2xl font-bold text-white tracking-widest">
+            MY<span className="text-teal-400">PLAYTHROUGH</span>
+          </h1>
+          <div className="flex gap-6">
+            <Link to="/" className="hover:text-teal-400 transition-colors">
+              Mis juegos
+            </Link>
+            <Link
+              to="/add"
+              className="hover:text-teal-400 transition-colors font-bold"
+            >
+              Añadir juego
+            </Link>
+          </div>
+        </nav>
+
+        {/* Contenedor de pantallas (rutas) */}
+        <main className="p-8">
+          <Routes>
+            {/* Pantalla principal: Lista de juegos */}
+            <Route
+              path="/"
+              element={
+                <div>
+                  <h2 className="text-3xl font-bold mb-8 text-white border-b border-slate-700 pb-4">
+                    Mi colección
+                  </h2>
+                  <GameList />
+                </div>
+              }
+            />
+
+            {/* Pantalla secundaria: Formulario */}
+            <Route path="/add" element={<GameForm />} />
+            <Route path="/edit/:id" element={<GameForm />} />
+          </Routes>
+        </main>
       </div>
-    </div>
-  )
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
