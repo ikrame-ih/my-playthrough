@@ -5,8 +5,7 @@ export default function GameList() {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. Sacamos la función de carga fuera del useEffect para poder
-  // llamarla de nuevo cada vez que borremos un juego.
+  // La dejo fuera del useEffect para poder reutilizarla tras borrar.
   const fetchGames = async () => {
     try {
       const response = await fetch("http://localhost:3000/api/games");
@@ -25,7 +24,6 @@ export default function GameList() {
     fetchGames();
   }, []);
 
-  // Función para borrar un juego por su ID
   const eliminarJuego = async (id, titulo) => {
     if (window.confirm(`¿Seguro que quieres eliminar "${titulo}"?`)) {
       try {
@@ -34,7 +32,7 @@ export default function GameList() {
         });
 
         if (response.ok) {
-          // Si el servidor confirma el borrado, refrescamos la lista
+          // Recargo la lista para reflejar el cambio al instante.
           fetchGames();
         }
       } catch (error) {
@@ -72,7 +70,7 @@ export default function GameList() {
           >
             ✎
           </Link>
-          {/* Botón para eliminar (esquina superior derecha) */}
+          {/* Borrado rápido desde cada tarjeta */}
           <button
             onClick={() => eliminarJuego(game.id, game.titulo)}
             className="absolute top-3 right-3 text-slate-500 hover:text-red-500 transition-colors font-bold"

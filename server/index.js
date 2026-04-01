@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Prueba de conexión
+// Ruta de diagnóstico rápida para comprobar que PostgreSQL responde.
 app.get("/api/test-db", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
@@ -19,7 +19,8 @@ app.get("/api/test-db", async (req, res) => {
   }
 });
 
-// Obtener todos los juegos (READ -R de CRUD-)
+// Por ahora devuelve todos los juegos.
+// Cuando añadamos auth con JWT, aquí filtraremos por usuario_id del token.
 app.get("/api/games", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM JUEGOS ORDER BY id DESC");
@@ -29,12 +30,12 @@ app.get("/api/games", async (req, res) => {
   }
 });
 
-// AÑADIR UN JUEGO (CREATE -C de CRUD-) con control de duplicados
+// Crear juego con una validación básica de duplicado por título.
 app.post("/api/games", async (req, res) => {
   try {
     const { titulo, estado, plataforma, puntuacion, horas_jugadas } = req.body;
 
-    // 1. Comprobamos si el juego ya existe para este usuario (id 1 por ahora)
+    // Nota de esta fase: usuario_id fijo (1) hasta cerrar autenticación.
     const checkJuego = await pool.query(
       "SELECT * FROM JUEGOS WHERE titulo = $1",
       [titulo],
@@ -48,7 +49,6 @@ app.post("/api/games", async (req, res) => {
       });
     }
 
-    // 2. Si no existe, lo insertamos
     const nuevoJuego = await pool.query(
       "INSERT INTO JUEGOS (usuario_id, titulo, estado, plataforma, puntuacion, horas_jugadas) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
       [1, titulo, estado, plataforma, puntuacion, horas_jugadas],
@@ -61,7 +61,7 @@ app.post("/api/games", async (req, res) => {
   }
 });
 
-// Eliminar un juego (DELETE -D de CRUD-)
+// Eliminar juego por ID.
 app.delete("/api/games/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -77,7 +77,7 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-// Obtener un solo juego (necesario para rellenar el formulario de edición)
+// Obtener un juego concreto para el formulario de edición.
 app.get("/api/games/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -93,7 +93,7 @@ app.get("/api/games/:id", async (req, res) => {
   }
 });
 
-// Actualizar un juego (UPDATE -U de CRUD-)
+// Actualizar juego por ID.
 app.put("/api/games/:id", async (req, res) => {
   try {
     const { id } = req.params;

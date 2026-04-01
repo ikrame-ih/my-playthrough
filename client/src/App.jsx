@@ -6,7 +6,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-slate-900 text-slate-200 font-sans">
-        {/* Barra de navegación */}
+        {/* Navegación principal visible en toda la app */}
         <nav className="bg-slate-800 p-4 shadow-md flex justify-between items-center border-b border-teal-500">
           <h1 className="text-2xl font-bold text-white tracking-widest">
             MY<span className="text-teal-400">PLAYTHROUGH</span>
@@ -24,10 +24,10 @@ function App() {
           </div>
         </nav>
 
-        {/* Contenedor de pantallas (rutas) */}
+        {/* Zona que cambia según la ruta */}
         <main className="p-8">
           <Routes>
-            {/* Pantalla principal: Lista de juegos */}
+            {/* Inicio: listado completo de la colección */}
             <Route
               path="/"
               element={
@@ -40,7 +40,7 @@ function App() {
               }
             />
 
-            {/* Pantalla secundaria: Formulario */}
+            {/* Añadir y editar comparten componente */}
             <Route path="/add" element={<GameForm />} />
             <Route path="/edit/:id" element={<GameForm />} />
           </Routes>

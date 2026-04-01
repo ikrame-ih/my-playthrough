@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"; // Añadimos useEffect
-import { useParams, useNavigate } from "react-router-dom"; // Añadimos los hooks de navegación
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function GameForm() {
   const [formData, setFormData] = useState({
@@ -12,9 +12,10 @@ export default function GameForm() {
 
   const { id } = useParams(); // Obtenemos el ID de la URL si existe
   const navigate = useNavigate();
-  const isEditing = Boolean(id); // Si hay ID, estamos en modo edición
+  const isEditing = Boolean(id);
 
-  // 1. Efecto para cargar los datos si estamos editando
+  // Si entramos por /edit/:id, cargamos el juego para rellenar el formulario.
+  // Así reutilizamos este componente tanto para crear como para editar.
   useEffect(() => {
     if (isEditing) {
       fetch(`http://localhost:3000/api/games/${id}`)
@@ -40,7 +41,7 @@ export default function GameForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 2. Decidimos la URL y el método (POST para nuevo, PUT para editar)
+    // Misma pantalla, dos comportamientos: POST para crear y PUT para actualizar.
     const url = isEditing
       ? `http://localhost:3000/api/games/${id}`
       : "http://localhost:3000/api/games";
@@ -67,7 +68,7 @@ export default function GameForm() {
             ? "¡Juego actualizado con éxito!"
             : "¡Juego guardado con éxito!",
         );
-        navigate("/"); // Después de guardar, volvemos a la lista principal
+        navigate("/");
       }
     } catch (error) {
       console.error("Error en la operación:", error);
@@ -77,7 +78,6 @@ export default function GameForm() {
 
   return (
     <div className="max-w-md mx-auto bg-slate-800 p-6 rounded-lg shadow-xl text-white">
-      {/* El título cambia según el modo */}
       <h2 className="text-2xl font-bold mb-6 text-teal-400">
         {isEditing ? "Editar juego" : "Añadir nuevo juego"}
       </h2>
@@ -152,7 +152,6 @@ export default function GameForm() {
           {isEditing ? "Actualizar cambios" : "Guardar juego"}
         </button>
 
-        {/* Botón opcional para cancelar si estamos editando */}
         {isEditing && (
           <button
             type="button"

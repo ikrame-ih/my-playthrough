@@ -1,6 +1,7 @@
 const { Pool } = require("pg");
 require("dotenv").config();
 
+// Conexión centralizada para reutilizar el pool en todas las rutas.
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
