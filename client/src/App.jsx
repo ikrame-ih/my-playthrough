@@ -1,52 +1,96 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {
+  BrowserRouter,
+  Navigate,
+  Routes,
+  Route,
+  Link,
+} from "react-router-dom";
+import { API_BASE, authHeaders } from "./api";
+import { SearchProvider } from "./SearchContext";
+import AppShell from "./components/AppShell";
+import AuthPage from "./components/AuthPage";
 import GameForm from "./components/GameForm";
 import GameList from "./components/GameList";
+import Community from "./components/Community";
+import UserPublicProfile from "./components/UserPublicProfile";
+import AdminUsers from "./components/AdminUsers";
+
+function HomePage() {
+  return (
+    <>
+      <header className="mb-10 flex flex-col gap-6 sm:mb-12 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Mi colección
+          </h1>
+          <p className="mt-2 max-w-xl text-base leading-relaxed text-slate-400">
+            Gestiona tu biblioteca personal de videojuegos.
+          </p>
+        </div>
+        <Link
+          to="/game/new"
+          className="figma-btn-primary shrink-0 self-start whitespace-nowrap"
+        >
+          + Añadir juego
+        </Link>
+      </header>
+      <GameList />
+    </>
+  );
+}
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
+
+    if (token && savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+
+    if (!token) return;
+
+    fetch(`${API_BASE}/api/auth/me`, { headers: authHeaders() })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.user) {
+          setUser(data.user);
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+  };
+
+  if (!user) {
+    return <AuthPage onAuthSuccess={setUser} />;
+  }
+
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-slate-900 text-slate-200 font-sans">
-        {/* Navegación principal visible en toda la app */}
-        <nav className="bg-slate-800 p-4 shadow-md flex justify-between items-center border-b border-teal-500">
-          <h1 className="text-2xl font-bold text-white tracking-widest">
-            MY<span className="text-teal-400">PLAYTHROUGH</span>
-          </h1>
-          <div className="flex gap-6">
-            <Link to="/" className="hover:text-teal-400 transition-colors">
-              Mis juegos
-            </Link>
-            <Link
-              to="/add"
-              className="hover:text-teal-400 transition-colors font-bold"
-            >
-              Añadir juego
-            </Link>
-          </div>
-        </nav>
-
-        {/* Zona que cambia según la ruta */}
-        <main className="p-8">
+    <SearchProvider>
+      <BrowserRouter>
+        <AppShell user={user} onLogout={handleLogout}>
           <Routes>
-            {/* Inicio: listado completo de la colección */}
-            <Route
-              path="/"
-              element={
-                <div>
-                  <h2 className="text-3xl font-bold mb-8 text-white border-b border-slate-700 pb-4">
-                    Mi colección
-                  </h2>
-                  <GameList />
-                </div>
-              }
-            />
-
-            {/* Añadir y editar comparten componente */}
+            <Route path="/" element={<HomePage />} />
             <Route path="/add" element={<GameForm />} />
+            <Route path="/game/new" element={<GameForm />} />
             <Route path="/edit/:id" element={<GameForm />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/user/:userId" element={<UserPublicProfile />} />
+            <Route path="/admin" element={<AdminUsers />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </main>
-      </div>
-    </BrowserRouter>
+        </AppShell>
+      </BrowserRouter>
+    </SearchProvider>
   );
 }
 
