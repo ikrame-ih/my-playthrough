@@ -6,5 +6,6 @@ UPDATE usuarios
 SET rol = 'admin'
 WHERE email = 'tu_email@ejemplo.com';
 
--- Tras esto, cierra sesión en la app y vuelve a entrar
--- (o recarga la página) para que el JWT traiga el rol actualizado.
+-- El servidor comprueba el rol en la base de datos en rutas de admin,
+-- así que suele bastar con recargar la página. Si algo falla, cierra sesión
+-- y vuelve a entrar para alinear también el objeto `user` del cliente.

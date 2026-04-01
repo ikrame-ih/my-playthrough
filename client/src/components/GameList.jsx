@@ -116,6 +116,7 @@ export default function GameList() {
           game={game}
           showActions
           onDelete={eliminarJuego}
+          discussionTo={`/juego/${game.id}/discussion`}
         />
       ))}
     </div>

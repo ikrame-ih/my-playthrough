@@ -1,11 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  BrowserRouter,
-  Navigate,
-  Routes,
-  Route,
-  Link,
-} from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route, Link } from "react-router-dom";
 import { API_BASE, authHeaders } from "./api";
 import { SearchProvider } from "./SearchContext";
 import AppShell from "./components/AppShell";
@@ -15,6 +9,7 @@ import GameList from "./components/GameList";
 import Community from "./components/Community";
 import UserPublicProfile from "./components/UserPublicProfile";
 import AdminUsers from "./components/AdminUsers";
+import GameDiscussion from "./components/GameDiscussion";
 
 function HomePage() {
   return (
@@ -86,6 +81,10 @@ function App() {
             <Route path="/community" element={<Community />} />
             <Route path="/user/:userId" element={<UserPublicProfile />} />
             <Route path="/admin" element={<AdminUsers />} />
+            <Route
+              path="/juego/:gameId/discussion"
+              element={<GameDiscussion />}
+            />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AppShell>

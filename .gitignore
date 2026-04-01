@@ -18,3 +18,9 @@ Thumbs.db
 # Configuración de editores
 .vscode/
 .idea/
+
+# Enunciados / PDFs de la tarea (solo en local; no subir a GitHub)
+docs/**/*.pdf
+
+# Cursor (reglas y ajustes locales; no subir)
+.cursor/

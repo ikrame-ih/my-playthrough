@@ -1,12 +1,19 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { displayCoverUrl } from "../coverUrl";
 import { estadoBadgeClass, labelEstado } from "../gameLabels";
 import { IconImage, IconPencil, IconTrash } from "./icons";
 
-export default function GameCard({ game, showActions = false, onDelete }) {
+export default function GameCard({
+  game,
+  showActions = false,
+  onDelete,
+  discussionTo,
+}) {
   const initial = (game.titulo || "?").trim().charAt(0).toUpperCase();
   const [imgError, setImgError] = useState(false);
-  const coverUrl = game.url_imagen?.trim();
+  const rawCover = game.url_imagen?.trim();
+  const coverUrl = rawCover ? displayCoverUrl(rawCover) : "";
   const showCover = Boolean(coverUrl) && !imgError;
 
   return (
@@ -20,6 +27,7 @@ export default function GameCard({ game, showActions = false, onDelete }) {
           <img
             src={coverUrl}
             alt=""
+            referrerPolicy="no-referrer"
             className="absolute inset-0 h-full w-full object-cover"
             onError={() => setImgError(true)}
           />
@@ -50,6 +58,17 @@ export default function GameCard({ game, showActions = false, onDelete }) {
             {labelEstado(game.estado)}
           </span>
         </div>
+
+        {discussionTo && (
+          <div className="border-t border-white/[0.06] pt-3">
+            <Link
+              to={discussionTo}
+              className="text-xs font-semibold text-brand-accent transition hover:text-teal-300"
+            >
+              Ver discusión →
+            </Link>
+          </div>
+        )}
 
         <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] pt-4 text-sm">
           <span className="flex items-center gap-1.5 text-slate-400">

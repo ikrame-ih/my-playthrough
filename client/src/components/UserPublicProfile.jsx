@@ -107,7 +107,12 @@ export default function UserPublicProfile() {
       ) : (
         <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-3">
           {games.map((game) => (
-            <GameCard key={game.id} game={game} showActions={false} />
+            <GameCard
+              key={game.id}
+              game={game}
+              showActions={false}
+              discussionTo={`/juego/${game.id}/discussion`}
+            />
           ))}
         </div>
       )}
