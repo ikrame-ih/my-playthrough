@@ -192,4 +192,4 @@ Run these scripts in PostgreSQL — Query Tool in pgAdmin works fine:
 
 ## Status
 
-Delivery 4 — all core requirements implemented: authentication, personal collection (CRUD), catalogue-backed cover art, community profiles, aggregated statistics, discussion threads, and admin moderation panel.
+All core requirements implemented: authentication, personal collection (CRUD), catalogue-backed cover art, community profiles, aggregated statistics, discussion threads, and admin moderation panel.
