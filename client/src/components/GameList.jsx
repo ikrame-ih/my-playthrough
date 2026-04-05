@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { API_BASE, authHeaders } from "../api";
 import { useSearch } from "../SearchContext";
 import GameCard from "./GameCard";
+import { GameCardSkeleton } from "./Skeletons";
 
 export default function GameList() {
   const [games, setGames] = useState([]);
@@ -72,9 +73,21 @@ export default function GameList() {
   };
 
   if (loading) {
+    /*
+     * Mostramos 6 esqueletos en el mismo grid que usarán las cards reales.
+     * Así el layout no "salta" cuando llegan los datos (evita el CLS).
+     * El atributo aria-busy le dice a los lectores de pantalla que el
+     * contenido todavía está cargando.
+     */
     return (
-      <div className="figma-panel py-20 text-center text-lg font-medium text-brand-accent animate-pulse">
-        Cargando tu colección...
+      <div
+        aria-busy="true"
+        aria-label="Cargando colección"
+        className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+      >
+        {Array.from({ length: 6 }).map((_, i) => (
+          <GameCardSkeleton key={i} />
+        ))}
       </div>
     );
   }

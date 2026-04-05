@@ -24,3 +24,8 @@ docs/**/*.pdf
 
 # Cursor (reglas y ajustes locales; no subir)
 .cursor/
+ESTUDIO_EXPOSICION.md
+
+# Cursor internal files
+.agents/
+skills-lock.json

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { API_BASE, authHeaders } from "../api";
 import { useSearch } from "../SearchContext";
 import { IconUsers } from "./icons";
+import { CommunityMemberSkeleton } from "./Skeletons";
 
 export default function Community() {
   const [users, setUsers] = useState([]);
@@ -56,9 +57,29 @@ export default function Community() {
   }, [users, query]);
 
   if (loading) {
+    /*
+     * Skeleton de la vista de miembros (tab por defecto).
+     * Mostramos 8 tarjetas placeholder en el mismo grid de 4 columnas
+     * que usará la lista real, para evitar saltos de layout.
+     */
     return (
-      <div className="figma-panel py-16 text-center text-lg font-medium text-brand-accent animate-pulse">
-        Cargando comunidad...
+      <div className="space-y-8">
+        <header>
+          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Comunidad
+          </h1>
+        </header>
+        <ul
+          aria-busy="true"
+          aria-label="Cargando miembros"
+          className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        >
+          {Array.from({ length: 8 }).map((_, i) => (
+            <li key={i}>
+              <CommunityMemberSkeleton />
+            </li>
+          ))}
+        </ul>
       </div>
     );
   }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { API_BASE, authHeaders } from "../api";
 import GameCard from "./GameCard";
+import { GameCardSkeleton, ProfileHeaderSkeleton } from "./Skeletons";
 
 export default function UserPublicProfile() {
   const { userId } = useParams();
@@ -49,9 +50,18 @@ export default function UserPublicProfile() {
   }, [userId]);
 
   if (loading) {
+    /*
+     * Mostramos el skeleton del encabezado (nombre del usuario) y 3 cards
+     * placeholder mientras la API responde, manteniendo el layout estable.
+     */
     return (
-      <div className="figma-panel py-20 text-center text-lg font-medium text-brand-accent animate-pulse">
-        Cargando perfil...
+      <div aria-busy="true" aria-label="Cargando perfil">
+        <ProfileHeaderSkeleton />
+        <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <GameCardSkeleton key={i} />
+          ))}
+        </div>
       </div>
     );
   }

@@ -75,7 +75,6 @@ function App() {
         <AppShell user={user} onLogout={handleLogout}>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/add" element={<GameForm />} />
             <Route path="/game/new" element={<GameForm />} />
             <Route path="/edit/:id" element={<GameForm />} />
             <Route path="/community" element={<Community />} />
