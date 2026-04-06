@@ -25,12 +25,14 @@ Platforms like HowLongToBeat or Backloggd are useful, but they tend to get clutt
 ## Features
 
 - **Personal collection** — add, edit, and delete games (status, platform, score, hours played).
-- **Cover art search** — combines Steam and [RAWG](https://rawg.io/apidocs) (`RAWG_API_KEY` optional but recommended for non-Steam titles like Nintendo games). Images are served through a server-side proxy to avoid Steam CDN hotlink blocks in the browser.
-- **Shared catalogue** — a `catalogo_juegos` table links each user entry to a canonical RAWG/Steam ID so the same title shares artwork across users when picked from the search.
-- **Community** — member list, read-only public profiles, aggregated stats (average score per title via SQL `GROUP BY`).
+- **Cover art search** — combines Steam and [RAWG](https://rawg.io/apidocs) (`RAWG_API_KEY` optional but recommended for non-Steam titles). Images are served through a server-side proxy to avoid CDN hotlink blocks in the browser.
+- **Shared catalogue** — `catalogo_juegos` links each entry to a canonical RAWG/Steam ID so the same title shares artwork across users when picked from the search.
+- **Community** — member list with colour-coded avatars, read-only public profiles, and aggregated average scores per title (SQL `GROUP BY`, visible to admins).
 - **Discussion threads** — threaded comments per game entry (`/juego/:id/discussion`). Authors, game owners, and admins can delete comments.
-- **Admin panel** — list users, delete accounts, and moderate any game entry. Role is verified against the database on every request (not just the JWT payload), so SQL promotions take effect immediately after re-login.
+- **Admin panel** — list users, delete accounts, and moderate any game entry. Role is verified against the database on every request, so promotions take effect immediately after re-login.
 - **Roles** — visitor (login wall), registered user, administrator.
+- **Skeleton loading screens** — animated placeholders while data loads, preventing layout shifts.
+- **Centralised session handling** — `apiFetch()` wraps all authenticated requests; a single place handles token expiry across the whole frontend.
 
 ---
 
@@ -84,7 +86,7 @@ MyPlaythrough/
 docker compose up --build
 ```
 
-This starts the API on port 3000 and PostgreSQL on port 5432. Then run the SQL migrations (see below) in pgAdmin or `psql`.
+This starts the API on port 3000 and PostgreSQL on port 5432. The database schema is initialised automatically from `docs/schema.sql` the first time the volume is empty — no manual steps required.
 
 ### Option B — Manual setup
 
@@ -134,62 +136,58 @@ If the API is not at the default address, create `client/.env`:
 VITE_API_URL=http://localhost:3000
 ```
 
-### Database migrations (run in order)
+### Database setup
 
-Run these scripts in PostgreSQL — Query Tool in pgAdmin works fine:
+**Docker (Option A):** no manual steps — the schema is applied automatically.
 
-1. `docs/add-url-imagen-juegos.sql` — `url_imagen` column on `juegos`
-2. `docs/add-catalogo-juegos.sql` — `catalogo_juegos` table + FK on `juegos`
-3. `docs/add-juego-comentarios.sql` — `juego_comentarios` table for discussion threads
-4. `docs/fix-juegos-titulo-unique.sql` — only needed if an old `UNIQUE` on `titulo` blocks edits
-5. `docs/promover-admin.sql` — promote a user to `admin` by email (optional)
+**Manual setup (Option B):** run `docs/schema.sql` once against your PostgreSQL instance (Query Tool in pgAdmin works fine). It uses `CREATE TABLE IF NOT EXISTS` so it is safe to re-run.
 
-> After changing a user's `rol` in SQL, the user must sign in again to get a fresh token with the new role.
+> To promote a user to `admin`, run `docs/promover-admin.sql` and update the email at the top of the file. The user must sign in again to get a fresh token with the new role.
 
 ---
 
 ## API reference
 
-| Method       | Route                                         | Description                             | Auth  |
-| ------------ | --------------------------------------------- | --------------------------------------- | ----- |
-| GET          | `/api/test-db`                                | DB health check (dev only)              | —     |
-| POST         | `/api/auth/register`                          | Create account                          | —     |
-| POST         | `/api/auth/login`                             | Sign in, returns JWT                    | —     |
-| GET          | `/api/auth/me`                                | Current user (role from DB)             | ✓     |
-| GET          | `/api/games`                                  | Logged-in user's collection             | ✓     |
-| GET          | `/api/games/:id`                              | Single game detail (owner only)         | ✓     |
-| POST         | `/api/games`                                  | Add game                                | ✓     |
-| PUT          | `/api/games/:id`                              | Update game                             | ✓     |
-| DELETE       | `/api/games/:id`                              | Delete own game                         | ✓     |
-| GET          | `/api/games/cover-search?q=`                  | Cover art search (Steam + RAWG)         | ✓     |
-| GET          | `/api/covers/proxy?u=`                        | Image proxy (allowlisted CDN hosts)     | —     |
-| GET          | `/api/users`                                  | Community member list                   | ✓     |
-| GET          | `/api/users/:userId/games`                    | Public collection of another user       | ✓     |
-| GET          | `/api/community/stats`                        | Global average scores per title         | ✓     |
-| GET          | `/api/community/games/:id`                    | Public game card (for discussion)       | ✓     |
-| GET / POST   | `/api/games/:gameId/comments`                 | Read / post comments                    | ✓     |
-| DELETE       | `/api/games/:gameId/comments/:commentId`      | Delete comment                          | ✓     |
-| GET / DELETE | `/api/admin/users` · `/api/admin/users/:id`   | Admin: user management                  | Admin |
-| GET / DELETE | `/api/admin/games` · `/api/admin/games/:id`   | Admin: moderate all game entries        | Admin |
+| Method       | Route                                       | Description                         | Auth  |
+| ------------ | ------------------------------------------- | ----------------------------------- | ----- |
+| GET          | `/api/test-db`                              | DB health check (dev only)          | —     |
+| POST         | `/api/auth/register`                        | Create account                      | —     |
+| POST         | `/api/auth/login`                           | Sign in, returns JWT                | —     |
+| GET          | `/api/auth/me`                              | Current user (role from DB)         | ✓     |
+| GET          | `/api/games`                                | Logged-in user's collection         | ✓     |
+| GET          | `/api/games/:id`                            | Single game detail (owner only)     | ✓     |
+| POST         | `/api/games`                                | Add game                            | ✓     |
+| PUT          | `/api/games/:id`                            | Update game                         | ✓     |
+| DELETE       | `/api/games/:id`                            | Delete own game                     | ✓     |
+| GET          | `/api/games/cover-search?q=`                | Cover art search (Steam + RAWG)     | ✓     |
+| GET          | `/api/covers/proxy?u=`                      | Image proxy (allowlisted CDN hosts) | —     |
+| GET          | `/api/users`                                | Community member list               | ✓     |
+| GET          | `/api/users/:userId/games`                  | Public collection of another user   | ✓     |
+| GET          | `/api/community/stats`                      | Global average scores per title     | ✓     |
+| GET          | `/api/community/games/:id`                  | Public game card (for discussion)   | ✓     |
+| GET / POST   | `/api/games/:gameId/comments`               | Read / post comments                | ✓     |
+| DELETE       | `/api/games/:gameId/comments/:commentId`    | Delete comment                      | ✓     |
+| GET / DELETE | `/api/admin/users` · `/api/admin/users/:id` | Admin: user management              | Admin |
+| GET / DELETE | `/api/admin/games` · `/api/admin/games/:id` | Admin: moderate all game entries    | Admin |
 
 ---
 
 ## Security overview
 
-| Control                    | Implementation                                                  |
-| -------------------------- | --------------------------------------------------------------- |
-| SQL injection              | Parameterized queries (`pg` library) throughout                 |
-| Password storage           | bcrypt (cost factor 10)                                         |
-| Authentication             | JWT — required on all private routes via `authMiddleware`       |
-| Authorization              | Role verified from DB on every admin request (not JWT-cached)   |
-| CORS                       | Restricted to `CORS_ORIGIN` env variable                        |
-| JWT secret                 | Mandatory env variable — server refuses to start without it     |
-| Request body size          | Limited to 50 kb (`express.json({ limit: "50kb" })`)            |
-| Image proxy host allowlist | Only known CDN domains accepted (`ALLOWED_COVER_HOSTS`)         |
-| Diagnostic endpoint        | `/api/test-db` returns 404 when `NODE_ENV=production`           |
+| Control                    | Implementation                                                |
+| -------------------------- | ------------------------------------------------------------- |
+| SQL injection              | Parameterized queries (`pg` library) throughout               |
+| Password storage           | bcrypt (cost factor 10)                                       |
+| Authentication             | JWT — required on all private routes via `authMiddleware`     |
+| Authorization              | Role verified from DB on every admin request (not JWT-cached) |
+| CORS                       | Restricted to `CORS_ORIGIN` env variable                      |
+| JWT secret                 | Mandatory env variable — server refuses to start without it   |
+| Request body size          | Limited to 50 kb (`express.json({ limit: "50kb" })`)          |
+| Image proxy host allowlist | Only known CDN domains accepted (`ALLOWED_COVER_HOSTS`)       |
+| Diagnostic endpoint        | `/api/test-db` returns 404 when `NODE_ENV=production`         |
 
 ---
 
 ## Status
 
-All core requirements implemented: authentication, personal collection (CRUD), catalogue-backed cover art, community profiles, aggregated statistics, discussion threads, and admin moderation panel.
+All core features implemented and tested: authentication, personal collection (CRUD), catalogue-backed cover art search (RAWG + Steam), community profiles, discussion threads, admin moderation panel, and Docker deployment. Manual test plan documented in `docs/pruebas.md`.
