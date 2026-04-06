@@ -2,6 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { API_BASE, authHeaders } from "../api";
 
+/**
+ * Lee el rol del usuario desde localStorage para personalizar
+ * el mensaje de "no hay coincidencias" en el buscador de carátulas.
+ * @returns {boolean} `true` si el usuario tiene rol 'admin'.
+ */
 function isAdminUser() {
   try {
     const raw = localStorage.getItem("user");
@@ -12,6 +17,11 @@ function isAdminUser() {
   }
 }
 
+/**
+ * Elimina espacios extra del título introducido por el usuario.
+ * @param {string} s - Cadena a normalizar.
+ * @returns {string} Cadena limpia.
+ */
 function normalizeTitleText(s) {
   return String(s ?? "")
     .trim()
@@ -29,6 +39,16 @@ const PLATFORM_OPTIONS = [
   "Otra",
 ];
 
+/**
+ * Formulario unificado de creación y edición de fichas de juego.
+ * Detecta automáticamente si está en modo edición según si existe `:id` en la URL.
+ * El campo de título lanza una búsqueda en RAWG+Steam con debounce de 550ms
+ * para mostrar una galería de carátulas entre las que el usuario puede elegir.
+ * Al seleccionar un juego del buscador, se incluye `catalogo_ref` en el payload
+ * para que el backend lo enlace con la tabla `catalogo_juegos`.
+ *
+ * @component
+ */
 export default function GameForm() {
   const [formData, setFormData] = useState({
     titulo: "",
@@ -42,18 +62,13 @@ export default function GameForm() {
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [coverLoading, setCoverLoading] = useState(false);
   const [coverHint, setCoverHint] = useState("");
-  /** Resultados de /cover-search para elegir juego / imagen */
   const [coverOptions, setCoverOptions] = useState([]);
   const [selectedCoverKey, setSelectedCoverKey] = useState(null);
-  /** Solo edición: borrar otra ficha que choca (mismo título/catálogo) y aplicar este guardado. */
   const [mergeDuplicate, setMergeDuplicate] = useState(false);
 
-  /** Solo buscar portadas tras editar el título (no sobrescribe al cargar la ficha). */
   const tituloDirty = useRef(false);
   const coverReqId = useRef(0);
-  /** Evita depender del estado async al fusionar nuevos resultados de búsqueda con la carta elegida. */
   const selectedCoverKeyRef = useRef(null);
-  /** Opción completa elegida (sirve al guardar si coverOptions ya no contiene la carta). */
   const lastCoverSelectionRef = useRef(null);
 
   const { id } = useParams();

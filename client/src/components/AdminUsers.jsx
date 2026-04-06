@@ -2,6 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { API_BASE, authHeaders } from "../api";
 import { IconShield, IconTrash, IconUsers } from "./icons";
 
+/**
+ * Panel de administración: listados de usuarios y juegos con capacidad de borrado.
+ * Solo accesible para cuentas con rol 'admin'; muestra un mensaje de acceso
+ * denegado para el resto. La búsqueda se filtra localmente con `useMemo`
+ * para no hacer peticiones al servidor en cada pulsación de tecla.
+ *
+ * @component
+ */
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [games, setGames] = useState([]);

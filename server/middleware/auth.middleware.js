@@ -1,25 +1,18 @@
 /**
- * auth.middleware.js
+ * @module auth.middleware
+ * @description Middlewares de autenticación y autorización para Express.
  *
- * Middlewares de autenticación y autorización.
- * En Express, un middleware es una función que se ejecuta entre que llega
- * la petición y que el controlador la procesa. Aquí tengo dos:
- *
- *   1. authMiddleware  → comprueba que el usuario lleva un JWT válido.
- *   2. adminMiddleware → verifica además que el usuario tiene rol "admin".
- *
- * Los encadeno así en las rutas que lo necesitan:
- *   app.get("/ruta-privada", authMiddleware, controlador)
- *   app.get("/ruta-admin",   authMiddleware, adminMiddleware, controlador)
+ * - `authMiddleware`  → verifica que la petición lleve un JWT válido.
+ * - `adminMiddleware` → verifica que el usuario autenticado tenga rol 'admin'.
+ * - `createToken`     → genera un JWT firmado con los datos del usuario.
+ * - `usuarioEsAdmin`  → consulta el rol actual en BD (fuente de verdad).
  */
 
 const jwt = require("jsonwebtoken");
 const pool = require("../config/db");
 
-// Leo el secreto desde las variables de entorno.
-// Si no está definido en producción, el servidor falla de inmediato con un
-// error claro en lugar de arrancar con un secreto conocido publicamente,
-// lo que sería un agujero de seguridad grave.
+// Si no hay secreto configurado, el servidor no puede firmar ni verificar tokens.
+// Es mejor parar en arranque que arrancar con seguridad comprometida.
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
   console.error(
@@ -30,13 +23,18 @@ if (!JWT_SECRET) {
 }
 
 /**
- * Genera un JWT firmado con los datos mínimos del usuario.
- * El token dura 7 días. Lo uso en el login y en el registro para que
- * el cliente quede autenticado directamente sin necesidad de un segundo paso.
+ * Genera un JSON Web Token firmado con los datos básicos del usuario.
  *
- * Incluyo el rol en el token para que el frontend pueda mostrar u ocultar
- * elementos del menú (ej. el panel de administración) sin consultar la BD,
- * aunque las rutas protegidas siempre re-comprueban el rol en BD por seguridad.
+ * El token contiene `id`, `email` y `rol` en el payload para que el frontend
+ * pueda mostrar menús según el rol sin necesidad de llamadas extra a la API.
+ * Sin embargo, en las rutas protegidas siempre se re-comprueba el rol en BD
+ * porque el token puede haber sido emitido antes de un cambio de permisos.
+ *
+ * @param {object} user          - Objeto usuario obtenido de la base de datos.
+ * @param {number} user.id       - ID del usuario.
+ * @param {string} user.email    - Email del usuario.
+ * @param {string} [user.rol]    - Rol ('user' | 'admin'). Por defecto 'user'.
+ * @returns {string} JWT firmado con `JWT_SECRET`, con expiración de 7 días.
  */
 const createToken = (user) =>
   jwt.sign(
@@ -46,14 +44,16 @@ const createToken = (user) =>
   );
 
 /**
- * authMiddleware
+ * Middleware Express que comprueba que la petición lleve un JWT válido.
  *
- * Verifica que la cabecera Authorization contenga un JWT válido con el formato:
- *   Authorization: Bearer <token>
+ * Espera la cabecera `Authorization: Bearer <token>`.
+ * Si el token es válido, adjunta el payload decodificado en `req.user`
+ * y llama a `next()` para continuar con la siguiente función de la cadena.
  *
- * Si la verificación tiene éxito, adjunta el payload decodificado a req.user
- * para que los controladores puedan acceder a req.user.id, req.user.rol, etc.
- * Si falla, devuelve 401 y corta la cadena de middlewares con return.
+ * @param {import("express").Request}  req  - Objeto petición de Express.
+ * @param {import("express").Response} res  - Objeto respuesta de Express.
+ * @param {import("express").NextFunction} next - Función para continuar la cadena de middlewares.
+ * @returns {void}
  */
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -64,14 +64,11 @@ const authMiddleware = (req, res, next) => {
       .json({ error: "Token no proporcionado o formato inválido." });
   }
 
-  // El token viene después del prefijo "Bearer ".
   const token = authHeader.split(" ")[1];
 
   try {
-    // jwt.verify lanza una excepción si el token es inválido o ha expirado,
-    // por eso lo envuelvo en try/catch.
     const payload = jwt.verify(token, JWT_SECRET);
-    req.user = payload; // disponible en todos los middlewares siguientes
+    req.user = payload;
     next();
   } catch {
     return res.status(401).json({ error: "Token inválido o expirado." });
@@ -79,11 +76,14 @@ const authMiddleware = (req, res, next) => {
 };
 
 /**
- * Función auxiliar: consulta el rol actual del usuario en la BD.
- * La consulto directamente en BD (y no confío solo en el rol del token)
- * porque el token puede haberse emitido antes de que un administrador
- * promoviese o degradase al usuario. Así la comprobación siempre está
- * actualizada.
+ * Consulta la base de datos para saber si un usuario tiene rol 'admin'.
+ *
+ * Se consulta la BD en lugar de confiar solo en el token porque el token
+ * puede haberse emitido antes de que se cambiara el rol del usuario.
+ * Así la comprobación siempre refleja el estado actual.
+ *
+ * @param {number} usuarioId - ID del usuario a comprobar.
+ * @returns {Promise<boolean>} `true` si el usuario tiene rol 'admin'.
  */
 async function usuarioEsAdmin(usuarioId) {
   const r = await pool.query("SELECT rol FROM usuarios WHERE id = $1", [
@@ -93,12 +93,18 @@ async function usuarioEsAdmin(usuarioId) {
 }
 
 /**
- * adminMiddleware
+ * Middleware Express que verifica que el usuario autenticado sea administrador.
  *
- * Se usa después de authMiddleware. Comprueba en la BD que el usuario
- * autenticado tiene rol "admin". Si no, devuelve 403 Forbidden.
- * El 403 (prohibido) es distinto del 401 (no autenticado): el usuario
- * está identificado pero no tiene permisos suficientes.
+ * Debe colocarse siempre DESPUÉS de `authMiddleware` en la cadena de middlewares,
+ * ya que depende de que `req.user.id` esté disponible.
+ *
+ * Devuelve 403 (Forbidden) si el usuario está logueado pero no es admin.
+ * Esto es distinto de 401 (Unauthorized), que significa que no está logueado.
+ *
+ * @param {import("express").Request}  req  - Objeto petición (requiere `req.user.id`).
+ * @param {import("express").Response} res  - Objeto respuesta de Express.
+ * @param {import("express").NextFunction} next - Función para continuar la cadena.
+ * @returns {Promise<void>}
  */
 const adminMiddleware = async (req, res, next) => {
   try {

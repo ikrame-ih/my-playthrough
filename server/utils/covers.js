@@ -1,19 +1,22 @@
 /**
- * covers.js
+ * @module covers
+ * @description Lógica para buscar carátulas de videojuegos y mantener el catálogo compartido.
  *
- * Lógica para buscar y servir carátulas de videojuegos.
- * Combina dos fuentes externas: RAWG (mejor para consolas y PC) y Steam
- * (necesario para títulos que solo aparecen en su plataforma propia).
- * También gestiona el upsert en la tabla catalogo_juegos, que actúa como
- * caché local de los metadatos de juegos ya buscados.
+ * Combina dos fuentes externas:
+ * - **RAWG** (rawg.io): base de datos de más de 500.000 juegos. Requiere API key gratuita.
+ * - **Steam** (store.steampowered.com): no necesita key, pero solo cubre títulos de PC en Steam.
+ *
+ * También gestiona el upsert en `catalogo_juegos`, que actúa como caché local de los
+ * metadatos de juegos ya buscados, evitando llamadas repetidas a las APIs externas.
  */
 
 const { fetchTimeoutMs } = require("./normalize");
 
 /**
  * Lista blanca de dominios desde los que el proxy de imágenes acepta peticiones.
- * Limitar los hosts evita que el servidor sea usado como proxy abierto
- * para cualquier URL arbitraria (SSRF - Server-Side Request Forgery).
+ * Limitar los hosts evita que el servidor sea usado como proxy abierto para cualquier
+ * URL arbitraria — un ataque conocido como SSRF (Server-Side Request Forgery).
+ * @constant {Set<string>}
  */
 const ALLOWED_COVER_HOSTS = new Set([
   "media.rawg.io",
@@ -25,17 +28,24 @@ const ALLOWED_COVER_HOSTS = new Set([
   "cdn.steamstatic.com",
 ]);
 
-// Cabeceras que enviamos al hacer fetch a APIs externas.
-// Identificarnos con un User-Agent descriptivo es una buena práctica
-// y algunos servicios lo exigen para no bloquear la petición.
+/**
+ * Cabeceras para peticiones a APIs externas (JSON).
+ * Identificarnos con un User-Agent descriptivo es buena práctica y algunos
+ * servicios lo exigen para no bloquear la petición.
+ * @constant {object}
+ */
 const COVER_FETCH_HEADERS = {
   "User-Agent":
     "Mozilla/5.0 (compatible; MyPlaythrough/1.0; +https://github.com/)",
   Accept: "application/json",
 };
 
-// Para las peticiones de imagen aceptamos formatos modernos (avif, webp)
-// además del jpeg/png clásico, para reducir el tamaño de las transferencias.
+/**
+ * Cabeceras para peticiones de descarga de imágenes.
+ * Aceptamos formatos modernos (avif, webp) además del clásico jpeg/png
+ * para reducir el tamaño de las transferencias cuando el CDN los soporta.
+ * @constant {object}
+ */
 const COVER_IMAGE_FETCH_HEADERS = {
   "User-Agent": COVER_FETCH_HEADERS["User-Agent"],
   Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
@@ -44,7 +54,11 @@ const COVER_IMAGE_FETCH_HEADERS = {
 /**
  * Busca juegos en RAWG y devuelve los resultados normalizados.
  * RAWG tiene la base de datos más completa para juegos de consola y PC.
- * Requiere una API key (gratuita) configurada en la variable RAWG_API_KEY.
+ * Filtramos los resultados sin imagen para no mostrar tarjetas vacías en la UI.
+ *
+ * @param {string} searchQuery - Término de búsqueda introducido por el usuario.
+ * @param {string} apiKey      - Clave de API de RAWG (gratuita en rawg.io/apidocs).
+ * @returns {Promise<Array<{id: number, name: string, background_image: string, source: "rawg"}>>}
  */
 async function fetchRawgCovers(searchQuery, apiKey) {
   const url = new URL("https://api.rawg.io/api/games");
@@ -64,7 +78,7 @@ async function fetchRawgCovers(searchQuery, apiKey) {
 
   const data = await rawgRes.json();
 
-  // Filtramos los juegos sin imagen para no mostrar tarjetas vacías en la UI.
+  // Filtramos los juegos sin imagen para no mostrar tarjetas vacías en la UI
   return (data.results || [])
     .filter((g) => g.background_image)
     .map((g) => ({
@@ -77,9 +91,12 @@ async function fetchRawgCovers(searchQuery, apiKey) {
 }
 
 /**
- * Busca juegos en la tienda de Steam y enriquece cada resultado
- * con la imagen de cabecera de alta calidad (header_image).
- * Steam no requiere API key, pero su buscador no es tan preciso como RAWG.
+ * Busca juegos en la API pública de Steam y enriquece cada resultado con
+ * la imagen HD de portada (`header_image`) mediante una segunda llamada a `appdetails`.
+ * No necesita API key pero cubre solo títulos disponibles en Steam.
+ *
+ * @param {string} searchQuery - Término de búsqueda.
+ * @returns {Promise<Array<{id: number, name: string, background_image: string, source: "steam"}>>}
  */
 async function fetchSteamCovers(searchQuery) {
   const searchUrl = new URL("https://store.steampowered.com/api/storesearch/");
@@ -102,13 +119,11 @@ async function fetchSteamCovers(searchQuery) {
 
   const items = (data.items || []).slice(0, 15);
 
-  // Para cada resultado hacemos una segunda llamada a la API de detalles
-  // para obtener la imagen de alta calidad. Usamos Promise.all para
-  // ejecutar todas las peticiones en paralelo y no esperar una por una.
+  // Pedimos la imagen HD de cada resultado en paralelo para acelerar la respuesta
   const enriched = await Promise.all(
     items.map(async (item) => {
       if (!item.id || !item.name) return null;
-      let background_image = item.tiny_image; // imagen de baja calidad como fallback
+      let background_image = item.tiny_image;
       try {
         const dr = await fetch(
           `https://store.steampowered.com/api/appdetails?appids=${item.id}&l=english`,
@@ -122,9 +137,7 @@ async function fetchSteamCovers(searchQuery) {
           const d = dj[String(item.id)]?.data;
           if (d?.header_image) background_image = d.header_image;
         }
-      } catch (_) {
-        // Si la petición de detalles falla, seguimos con tiny_image.
-      }
+      } catch (_) { /* si falla la llamada a appdetails, usamos tiny_image */ }
       if (!background_image) return null;
       return { id: item.id, name: item.name, background_image, source: "steam" };
     }),
@@ -135,9 +148,12 @@ async function fetchSteamCovers(searchQuery) {
 
 /**
  * Combina los resultados de RAWG y Steam eliminando duplicados por nombre.
- * RAWG va primero porque suele tener imágenes de mejor calidad.
- * Steam solo aporta los títulos que no estén ya en la lista de RAWG.
- * Limitamos el total a 30 resultados para no saturar la UI.
+ * RAWG tiene prioridad (sus imágenes son de mayor calidad).
+ * El resultado está limitado a 30 elementos para no sobrecargar la UI.
+ *
+ * @param {object[]} rawg  - Resultados de RAWG.
+ * @param {object[]} steam - Resultados de Steam.
+ * @returns {object[]} Lista combinada sin duplicados, máximo 30 elementos.
  */
 function mergeCoverResults(rawg, steam) {
   const seen = new Set(
@@ -154,11 +170,18 @@ function mergeCoverResults(rawg, steam) {
 }
 
 /**
- * Inserta o actualiza el juego en la tabla catalogo_juegos.
- * Usa ON CONFLICT para que si el juego ya existe (por rawg_id o steam_app_id)
- * simplemente actualice el título y la imagen sin crear un duplicado.
- * Devuelve el id interno de la fila en catalogo_juegos, que se guarda
- * como clave foránea en la tabla juegos del usuario.
+ * Inserta o actualiza un juego en la tabla `catalogo_juegos`.
+ * Usa ON CONFLICT para hacer un "upsert": si el juego ya existe (mismo rawg_id
+ * o steam_app_id), actualiza el título y la imagen en lugar de insertar un duplicado.
+ * Devuelve el `id` del catálogo que se usará como FK en la tabla `juegos`.
+ *
+ * @param {import("pg").PoolClient} client     - Cliente de BD dentro de una transacción abierta.
+ * @param {object}  opts            - Datos del juego a insertar/actualizar.
+ * @param {"rawg"|"steam"} opts.source - Origen de los datos.
+ * @param {number}  opts.id         - ID en RAWG o Steam App ID.
+ * @param {string}  opts.titulo     - Título del juego.
+ * @param {string|null} opts.url_imagen - URL de la portada.
+ * @returns {Promise<number|null>} ID del catálogo generado, o null si falló.
  */
 async function upsertCatalogoGame(client, { source, id, titulo, url_imagen }) {
   const { normalizeGameTitle } = require("./normalize");

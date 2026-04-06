@@ -1,3 +1,15 @@
+/**
+ * Colección de iconos SVG inline usados en toda la aplicación.
+ * Son componentes React puros: reciben solo la prop `className` para ajustar
+ * el tamaño y color desde Tailwind CSS. Todos llevan `aria-hidden` para que
+ * los lectores de pantalla los ignoren (el contexto semántico lo da el texto
+ * o el `title` del elemento padre).
+ */
+
+/**
+ * Icono de mando de videojuego usado en el logo de la app.
+ * @param {{ className?: string }} props
+ */
 export function IconController({ className = "h-6 w-6" }) {
   return (
     <svg

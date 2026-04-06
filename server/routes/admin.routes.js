@@ -1,16 +1,14 @@
 /**
- * admin.routes.js
+ * @module admin.routes
+ * @description Rutas del panel de administración. Solo accesibles con rol 'admin'.
+ * El doble middleware `authMiddleware + adminMiddleware` se aplica a nivel de router
+ * para proteger todas las rutas de este módulo de una sola vez.
  *
- * Panel de administración (RF-06). Todas las rutas de este fichero
- * requieren primero authMiddleware (usuario logueado) y después
- * adminMiddleware (que además tenga rol "admin").
- * Si alguien intenta acceder sin ser admin recibe un 403 Forbidden.
- *
- * Rutas definidas aquí:
- *   GET    /api/admin/users     → listado completo de usuarios
- *   DELETE /api/admin/users/:id → eliminar cuenta (moderación)
- *   GET    /api/admin/games     → listado global de fichas de juego
- *   DELETE /api/admin/games/:id → eliminar cualquier ficha (moderación)
+ * Rutas definidas:
+ *   GET    /api/admin/users      → listado de todas las cuentas
+ *   DELETE /api/admin/users/:id  → eliminar una cuenta (moderación)
+ *   GET    /api/admin/games      → listado de todos los juegos
+ *   DELETE /api/admin/games/:id  → eliminar cualquier ficha de juego
  */
 
 const express = require("express");
@@ -19,15 +17,15 @@ const { authMiddleware, adminMiddleware } = require("../middleware/auth.middlewa
 
 const router = express.Router();
 
-// Aplico los dos middlewares a todas las rutas de este router de una vez.
-// Es equivalente a añadirlos uno a uno en cada ruta, pero más limpio.
+// Todas las rutas de este router requieren login + rol admin
 router.use(authMiddleware, adminMiddleware);
 
 /**
- * GET /api/admin/users
- * Lista todas las cuentas con sus datos básicos y la fecha de registro.
- * La información se muestra en el panel de administración para facilitar
- * la moderación de la comunidad.
+ * Devuelve el listado completo de cuentas de usuario para el panel de administración.
+ *
+ * @route  GET /api/admin/users
+ * @access Private – Admin only
+ * @returns {object[]} 200 – Array de usuarios con `id`, `nombre_usuario`, `email`, `rol`, `fecha_registro`.
  */
 router.get("/users", async (req, res) => {
   try {
@@ -41,12 +39,14 @@ router.get("/users", async (req, res) => {
 });
 
 /**
- * DELETE /api/admin/users/:id
- * Elimina la cuenta de un usuario. Incluye una protección explícita
- * para impedir que el administrador borre su propia cuenta por accidente,
- * ya que perder la única cuenta admin bloquearía el acceso al panel.
- * Los juegos del usuario se borran automáticamente en cascada (ON DELETE CASCADE
- * definido en el esquema SQL) sin necesidad de gestionarlo aquí.
+ * Elimina la cuenta de un usuario. Operación de moderación que también borra
+ * todos sus juegos y comentarios (ON DELETE CASCADE en la BD).
+ * El admin no puede borrarse a sí mismo para evitar quedarse sin acceso al panel.
+ *
+ * @route  DELETE /api/admin/users/:id
+ * @access Private – Admin only
+ * @param  {string} req.params.id - ID del usuario a eliminar.
+ * @returns {object} 200 – `{ success, message }` | 400 – auto-borrado o ID inválido | 404 – no encontrado.
  */
 router.delete("/users/:id", async (req, res) => {
   try {
@@ -74,9 +74,12 @@ router.delete("/users/:id", async (req, res) => {
 });
 
 /**
- * GET /api/admin/games
- * Lista todas las fichas de juego de todos los usuarios con los datos
- * del propietario. Permite al admin detectar contenido inapropiado.
+ * Devuelve el listado completo de fichas de juego de todos los usuarios,
+ * incluyendo el nombre y email del propietario para facilitar la moderación.
+ *
+ * @route  GET /api/admin/games
+ * @access Private – Admin only
+ * @returns {object[]} 200 – Array de juegos con datos del propietario.
  */
 router.get("/games", async (req, res) => {
   try {
@@ -102,9 +105,14 @@ router.get("/games", async (req, res) => {
 });
 
 /**
- * DELETE /api/admin/games/:id
- * Elimina cualquier ficha de juego sin importar a quién pertenezca.
- * Solo accesible para administradores (lo garantiza el router.use anterior).
+ * Elimina cualquier ficha de juego independientemente de su propietario.
+ * Solo disponible para administradores, a diferencia del DELETE del usuario
+ * que solo puede borrar sus propios juegos.
+ *
+ * @route  DELETE /api/admin/games/:id
+ * @access Private – Admin only
+ * @param  {string} req.params.id - ID de la ficha a eliminar.
+ * @returns {object} 200 – `{ success, message }` | 400 – ID inválido | 404 – no encontrado.
  */
 router.delete("/games/:id", async (req, res) => {
   try {

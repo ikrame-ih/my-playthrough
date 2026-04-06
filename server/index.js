@@ -1,24 +1,12 @@
-/**
- * index.js — Punto de entrada del servidor
- *
- * Este fichero es el "núcleo" de la aplicación Express. Su única
- * responsabilidad es configurar los middlewares globales, montar las rutas
- * y arrancar el servidor. Toda la lógica de negocio está en sus propios módulos.
- *
- * Arquitectura de tres capas (Three-Tier Architecture):
- *   Capa de presentación  → cliente React (carpeta /client)
- *   Capa de lógica        → este servidor Express (carpeta /server)
- *   Capa de persistencia  → PostgreSQL (accedido a través de /config/db.js)
- */
+// index.js — Aquí arranca todo el backend de MyPlaythrough
 
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config(); // carga las variables de .env antes de importar nada más
+require("dotenv").config();
 
 const pool = require("./config/db");
 
-// Importamos cada router. Cada uno agrupa las rutas de un recurso concreto,
-// siguiendo el principio de responsabilidad única (SRP).
+// Cada router tiene las rutas de un recurso (auth, games, users...)
 const authRoutes      = require("./routes/auth.routes");
 const gamesRoutes     = require("./routes/games.routes");
 const usersRoutes     = require("./routes/users.routes");
@@ -29,32 +17,21 @@ const coversRoutes    = require("./routes/covers.routes");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ---------------------------------------------------------------------------
-// Middlewares globales
-// ---------------------------------------------------------------------------
+// --- Middlewares globales ---
 
-// CORS: solo aceptamos peticiones del origen de nuestro frontend.
-// Esto evita que webs de terceros puedan llamar a nuestra API directamente.
+// CORS: solo acepta peticiones de nuestro frontend
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN || "http://localhost:5173",
   }),
 );
 
-// Limitamos el tamaño del body a 50kb para dificultar ataques de payload gigante.
-// Express 5 lo acepta como opción directa de express.json().
+// Limitamos el body a 50kb por seguridad
 app.use(express.json({ limit: "50kb" }));
 
-// ---------------------------------------------------------------------------
-// Ruta de diagnóstico (protegida, solo en entornos no productivos)
-// ---------------------------------------------------------------------------
+// --- Ruta de diagnóstico (solo en desarrollo) ---
 
-/**
- * GET /api/test-db
- * Comprueba que el servidor puede conectarse a PostgreSQL.
- * Solo funciona cuando NODE_ENV no es "production" para no exponer
- * información interna del servidor en un despliegue real.
- */
+// Ruta rápida para comprobar que la conexión con PostgreSQL funciona
 app.get("/api/test-db", async (req, res) => {
   if (process.env.NODE_ENV === "production") {
     return res.status(404).json({ error: "Not found." });
@@ -67,12 +44,7 @@ app.get("/api/test-db", async (req, res) => {
   }
 });
 
-// ---------------------------------------------------------------------------
-// Montaje de routers
-// ---------------------------------------------------------------------------
-
-// El prefijo que se pone aquí se añade a todas las rutas del router.
-// Por ejemplo: authRoutes tiene POST /register → queda en POST /api/auth/register
+// --- Montaje de routers ---
 
 app.use("/api/auth",      authRoutes);
 app.use("/api/users",     usersRoutes);
@@ -80,25 +52,14 @@ app.use("/api/community", communityRoutes);
 app.use("/api/admin",     adminRoutes);
 app.use("/api/covers",    coversRoutes);
 
-// Las rutas de búsqueda de carátulas deben registrarse ANTES que /api/games/:id
-// para que Express no confunda "cover-search" con un ID numérico.
-// Montamos el router de covers también en /api/games para que la ruta
-// /api/games/cover-search funcione correctamente.
+// cover-search va ANTES que /api/games/:id para que Express
+// no confunda "cover-search" con un ID numérico
 app.use("/api/games",     coversRoutes);
 app.use("/api/games",     gamesRoutes);
 
-// ---------------------------------------------------------------------------
-// Middleware global de manejo de errores
-// ---------------------------------------------------------------------------
+// --- Manejo global de errores ---
 
-/**
- * Este middleware de 4 parámetros (err, req, res, next) intercepta cualquier
- * error que se pase con next(err) o que Express lance internamente.
- * En desarrollo devuelve el mensaje técnico para facilitar la depuración.
- * En producción solo devuelve "Error interno del servidor" para no filtrar
- * detalles de la base de datos o la estructura interna al cliente.
- * Debe ir DESPUÉS de todas las rutas para actuar como red de seguridad final.
- */
+// En desarrollo muestra el error real; en producción solo un mensaje genérico
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error(`[${req.method} ${req.path}]`, err);
@@ -109,9 +70,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Arranque del servidor
-// ---------------------------------------------------------------------------
+// --- Arranque ---
 
 app.listen(PORT, () => {
   console.log(`Servidor MyPlaythrough escuchando en el puerto ${PORT}`);

@@ -4,6 +4,14 @@ import { API_BASE, authHeaders } from "../api";
 import GameCard from "./GameCard";
 import { GameCardSkeleton, ProfileHeaderSkeleton } from "./Skeletons";
 
+/**
+ * Perfil público de otro usuario: muestra su colección en modo solo lectura.
+ * Los botones de editar y borrar están deshabilitados (`showActions={false}`)
+ * para que el visitante solo pueda ver y acceder a la discusión de cada juego.
+ * Usa el patrón `cancelled` para evitar actualizar el estado tras desmontarse.
+ *
+ * @component
+ */
 export default function UserPublicProfile() {
   const { userId } = useParams();
   const [data, setData] = useState(null);
@@ -50,10 +58,7 @@ export default function UserPublicProfile() {
   }, [userId]);
 
   if (loading) {
-    /*
-     * Mostramos el skeleton del encabezado (nombre del usuario) y 3 cards
-     * placeholder mientras la API responde, manteniendo el layout estable.
-     */
+    // Skeleton mientras carga
     return (
       <div aria-busy="true" aria-label="Cargando perfil">
         <ProfileHeaderSkeleton />

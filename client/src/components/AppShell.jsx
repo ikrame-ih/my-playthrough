@@ -10,6 +10,13 @@ import {
   IconUsers,
 } from "./icons";
 
+/**
+ * Función de clases para los enlaces de navegación del sidebar.
+ * React Router DOM llama a esta función con `{ isActive }` y aplica
+ * estilos distintos al enlace de la página activa.
+ * @param {{ isActive: boolean }} params
+ * @returns {string} Clases de Tailwind CSS para el enlace.
+ */
 const sideNav = ({ isActive }) =>
   `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
     isActive
@@ -17,6 +24,18 @@ const sideNav = ({ isActive }) =>
       : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
   }`;
 
+/**
+ * Envoltorio visual de toda la aplicación autenticada.
+ * Incluye el sidebar de navegación y la barra superior con búsqueda y avatar.
+ * Cualquier cambio de ruta limpia automáticamente el campo de búsqueda
+ * para que el filtro no persista al navegar a otra sección.
+ *
+ * @component
+ * @param {object}          props
+ * @param {object}          props.user      - Datos del usuario en sesión (`id`, `nombre_usuario`, `email`, `rol`).
+ * @param {Function}        props.onLogout  - Callback que cierra la sesión al hacer clic en "Cerrar sesión".
+ * @param {React.ReactNode} props.children  - Contenido de la página activa (renderizado en `<main>`).
+ */
 export default function AppShell({ user, onLogout, children }) {
   const initial =
     user?.nombre_usuario?.trim()?.charAt(0)?.toUpperCase() ||

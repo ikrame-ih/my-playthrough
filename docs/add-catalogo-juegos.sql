@@ -1,5 +1,5 @@
--- Catálogo global (una fila por juego oficial RAWG/Steam), estilo "categoría" Twitch.
--- Cada usuario enlaza su ficha con catalogo_id; título y carátula salen del catálogo.
+-- Catálogo global de juegos (una fila por juego de RAWG/Steam).
+-- Los usuarios enlazan su ficha con catalogo_id.
 
 CREATE TABLE IF NOT EXISTS catalogo_juegos (
   id SERIAL PRIMARY KEY,
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS catalogo_juegos (
 ALTER TABLE juegos ADD COLUMN IF NOT EXISTS catalogo_id INTEGER
   REFERENCES catalogo_juegos (id) ON DELETE SET NULL;
 
--- Un usuario no puede tener dos fichas del mismo juego del catálogo.
+-- Evitar duplicados: un usuario no puede tener dos fichas del mismo juego del catálogo
 CREATE UNIQUE INDEX IF NOT EXISTS idx_juegos_uq_usuario_catalogo
   ON juegos (usuario_id, catalogo_id)
   WHERE catalogo_id IS NOT NULL;

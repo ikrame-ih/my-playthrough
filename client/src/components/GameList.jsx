@@ -5,6 +5,14 @@ import { useSearch } from "../SearchContext";
 import GameCard from "./GameCard";
 import { GameCardSkeleton } from "./Skeletons";
 
+/**
+ * Grid de la colección personal del usuario.
+ * Obtiene los juegos de la API al montarse y filtra localmente según
+ * la búsqueda global del SearchContext (sin peticiones extra al servidor).
+ * Muestra skeletons durante la carga para evitar saltos de layout (CLS).
+ *
+ * @component
+ */
 export default function GameList() {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -73,12 +81,7 @@ export default function GameList() {
   };
 
   if (loading) {
-    /*
-     * Mostramos 6 esqueletos en el mismo grid que usarán las cards reales.
-     * Así el layout no "salta" cuando llegan los datos (evita el CLS).
-     * El atributo aria-busy le dice a los lectores de pantalla que el
-     * contenido todavía está cargando.
-     */
+    // Skeleton mientras carga
     return (
       <div
         aria-busy="true"

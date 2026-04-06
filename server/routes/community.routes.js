@@ -1,13 +1,10 @@
 /**
- * community.routes.js
+ * @module community.routes
+ * @description Rutas de estadísticas globales y detalle público de juegos.
  *
- * Rutas para las estadísticas globales de la comunidad (RF-05).
- * Agregan datos de todos los usuarios para mostrar información colectiva
- * como la nota media de cada juego.
- *
- * Rutas definidas aquí:
- *   GET /api/community/stats      → ranking de juegos por nota media
- *   GET /api/community/games/:id  → detalle público de una ficha concreta
+ * Rutas definidas:
+ *   GET /api/community/stats      → nota media por juego entre todos los usuarios
+ *   GET /api/community/games/:id  → detalle público de una ficha (para comentarios)
  */
 
 const express = require("express");
@@ -18,14 +15,16 @@ const { queryGamePublicById } = require("../utils/queries");
 const router = express.Router();
 
 /**
- * GET /api/community/stats
- * Calcula la nota media de cada juego agrupando las valoraciones de todos
- * los usuarios. Usa COALESCE para preferir el nombre del catálogo sobre el
- * título libre, y agrupa por clave de catálogo o por título normalizado
- * para que distintas fichas del mismo juego se cuenten juntas.
+ * Devuelve la nota media de cada juego calculada a partir de las puntuaciones
+ * de todos los usuarios de la comunidad.
  *
- * La función SQL REGEXP_REPLACE colapsa espacios múltiples igual que
- * nuestra función normalizeGameTitle en JavaScript, garantizando coherencia.
+ * La agrupación usa `catalogo_id` cuando está disponible (más precisa, ya que
+ * identifica el mismo juego sin depender del texto del título) y cae al título
+ * normalizado cuando el juego fue añadido manualmente sin usar el buscador.
+ *
+ * @route  GET /api/community/stats
+ * @access Private (requiere JWT válido)
+ * @returns {object[]} 200 – Array con `{ titulo, nota_media, num_votos }` ordenado por nota desc.
  */
 router.get("/stats", authMiddleware, async (req, res) => {
   try {
@@ -52,10 +51,14 @@ router.get("/stats", authMiddleware, async (req, res) => {
 });
 
 /**
- * GET /api/community/games/:id
- * Devuelve el detalle de una ficha de juego para mostrar en el hilo
- * de comentarios de la comunidad. Cualquier usuario logueado puede verla,
- * no solo el propietario.
+ * Devuelve el detalle público de una ficha de juego.
+ * Lo usa la vista de GameDiscussion para mostrar el encabezado del juego
+ * antes de cargar el hilo de comentarios.
+ *
+ * @route  GET /api/community/games/:id
+ * @access Private (requiere JWT válido)
+ * @param  {string} req.params.id - ID de la ficha de juego.
+ * @returns {object} 200 – Datos del juego con `propietario_nombre` | 404 – no encontrado.
  */
 router.get("/games/:id", authMiddleware, async (req, res) => {
   try {

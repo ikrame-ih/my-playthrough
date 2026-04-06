@@ -5,6 +5,16 @@ import { useSearch } from "../SearchContext";
 import { IconUsers } from "./icons";
 import { CommunityMemberSkeleton } from "./Skeletons";
 
+/**
+ * Página de la comunidad con dos pestañas: miembros y estadísticas globales.
+ * Carga en paralelo la lista de usuarios y las estadísticas para reducir
+ * el tiempo de espera total. La pestaña "Miembros" filtra por el SearchContext.
+ * La variable `cancelled` evita actualizar el estado si el componente se desmonta
+ * antes de que llegue la respuesta (evita un warning de React sobre actualizaciones
+ * en componentes desmontados).
+ *
+ * @component
+ */
 export default function Community() {
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState([]);
@@ -57,11 +67,7 @@ export default function Community() {
   }, [users, query]);
 
   if (loading) {
-    /*
-     * Skeleton de la vista de miembros (tab por defecto).
-     * Mostramos 8 tarjetas placeholder en el mismo grid de 4 columnas
-     * que usará la lista real, para evitar saltos de layout.
-     */
+    // Skeleton mientras carga
     return (
       <div className="space-y-8">
         <header>

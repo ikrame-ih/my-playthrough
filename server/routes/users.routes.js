@@ -1,12 +1,10 @@
 /**
- * users.routes.js
+ * @module users.routes
+ * @description Rutas para explorar los perfiles públicos de otros usuarios.
+ * Forman la base de la funcionalidad de comunidad (RF-06).
  *
- * Rutas para la funcionalidad social (RF-04): consultar otros perfiles.
- * Todas requieren autenticación: solo los usuarios registrados pueden
- * explorar la comunidad. El email nunca se expone en estas rutas.
- *
- * Rutas definidas aquí:
- *   GET /api/users              → lista de usuarios (para la página de comunidad)
+ * Rutas definidas:
+ *   GET /api/users              → lista de todos los usuarios excepto el propio
  *   GET /api/users/:userId/games → colección pública de un usuario concreto
  */
 
@@ -18,12 +16,15 @@ const { queryGamesListForUser } = require("../utils/queries");
 const router = express.Router();
 
 /**
- * GET /api/users
- * Devuelve la lista de usuarios con datos básicos para mostrar tarjetas
- * en la página de comunidad. Se excluye el propio usuario de la lista
- * (no tiene sentido verse a uno mismo en la sección de comunidad).
- * Incluye el número de juegos y la última plataforma usada como datos
- * de contexto para la tarjeta de cada miembro.
+ * Devuelve la lista de usuarios registrados para la página de comunidad.
+ * Excluye al usuario que hace la petición (`WHERE u.id <> $1`) para que
+ * no aparezca en su propio feed de comunidad.
+ * Incluye el número de juegos y la plataforma del último juego añadido
+ * como datos de contexto para la tarjeta de cada miembro.
+ *
+ * @route  GET /api/users
+ * @access Private (requiere JWT válido)
+ * @returns {object[]} 200 – Array de usuarios con `id`, `nombre_usuario`, `num_juegos`, `plataforma_ejemplo`.
  */
 router.get("/", authMiddleware, async (req, res) => {
   try {
@@ -45,10 +46,14 @@ router.get("/", authMiddleware, async (req, res) => {
 });
 
 /**
- * GET /api/users/:userId/games
- * Devuelve la colección completa de otro usuario en modo solo lectura.
- * Primero verifica que el usuario existe para devolver 404 si no,
- * en lugar de simplemente una lista vacía que podría confundir al cliente.
+ * Devuelve la colección pública de otro usuario (solo lectura).
+ * Comprueba primero que el usuario exista para devolver un 404 descriptivo
+ * en lugar del array vacío que devolvería `queryGamesListForUser` si no hay juegos.
+ *
+ * @route  GET /api/users/:userId/games
+ * @access Private (requiere JWT válido)
+ * @param  {string} req.params.userId - ID del usuario cuya colección se quiere ver.
+ * @returns {object} 200 – `{ user, games }` | 400 – ID inválido | 404 – usuario no encontrado.
  */
 router.get("/:userId/games", authMiddleware, async (req, res) => {
   try {
@@ -66,8 +71,6 @@ router.get("/:userId/games", authMiddleware, async (req, res) => {
     }
 
     const games = await queryGamesListForUser(userId);
-    // Devuelvo tanto los datos del usuario como sus juegos en un solo objeto
-    // para que el cliente no tenga que hacer dos peticiones separadas.
     res.json({ user: userExists.rows[0], games });
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -2,6 +2,16 @@ import { useEffect, useState } from "react";
 import { API_BASE } from "../api";
 import { IconController } from "./icons";
 
+/**
+ * Pantalla de autenticación que combina login y registro en un único componente.
+ * El estado `mode` controla cuál de los dos formularios se muestra.
+ * Al completar la autenticación con éxito, guarda el token en localStorage
+ * y notifica al componente padre mediante `onAuthSuccess`.
+ *
+ * @component
+ * @param {object}   props
+ * @param {Function} props.onAuthSuccess - Callback que recibe el objeto `user` tras autenticarse.
+ */
 export default function AuthPage({ onAuthSuccess }) {
   const [mode, setMode] = useState("login");
   const [formData, setFormData] = useState({

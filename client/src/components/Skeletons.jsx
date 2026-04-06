@@ -1,19 +1,15 @@
 /**
- * Componentes de skeleton loading para la aplicación MyPlaythrough.
- *
- * Un skeleton es una "silueta" inerte del componente real que se muestra
- * mientras los datos cargan desde la API. La animación `animate-pulse` de
- * Tailwind hace que los bloques grises oscilen de opacidad, dando feedback
- * visual sin necesidad de un spinner que distraiga.
- *
- * La estructura de cada skeleton imita exactamente las dimensiones y el
- * layout del componente que reemplaza (GameCard, tarjeta de miembro, etc.)
- * para evitar el salto de layout (CLS) cuando llegan los datos reales.
+ * Componentes "esqueleto" que se muestran mientras los datos están cargando.
+ * Tienen exactamente las mismas medidas que los componentes reales para evitar
+ * Cumulative Layout Shift (CLS): el layout no salta cuando los datos llegan.
+ * Todos llevan `aria-hidden="true"` para que los lectores de pantalla los ignoren;
+ * el propio contenedor padre usa `aria-busy="true"` y `aria-label` en su lugar.
+ * La animación `animate-pulse` de Tailwind crea el efecto de "respiración".
  */
 
 /**
- * Placeholder de una GameCard completa.
- * Replica: área de portada (h-44) + bloque de título/badge + fila de stats.
+ * Esqueleto de la tarjeta de juego. Replica la estructura visual de `GameCard`.
+ * @component
  */
 export function GameCardSkeleton() {
   return (
@@ -21,12 +17,9 @@ export function GameCardSkeleton() {
       className="animate-pulse overflow-hidden rounded-2xl border border-white/[0.06] bg-brand-panel shadow-figma ring-1 ring-white/[0.04]"
       aria-hidden="true"
     >
-      {/* Zona de portada */}
       <div className="h-44 bg-slate-800/80" />
 
-      {/* Zona de contenido */}
       <div className="space-y-4 p-5">
-        {/* Fila título + badge */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 space-y-2">
             <div className="h-4 w-3/4 rounded bg-slate-700/80" />
@@ -35,7 +28,6 @@ export function GameCardSkeleton() {
           <div className="h-6 w-16 shrink-0 rounded-md bg-slate-700/80" />
         </div>
 
-        {/* Fila stats (horas / puntuación) */}
         <div className="flex items-center justify-between border-t border-white/[0.06] pt-4">
           <div className="h-4 w-10 rounded bg-slate-700/60" />
           <div className="h-4 w-12 rounded bg-slate-700/60" />
@@ -46,8 +38,9 @@ export function GameCardSkeleton() {
 }
 
 /**
- * Placeholder de una tarjeta de miembro en la vista Comunidad.
- * Replica: avatar circular + dos líneas de texto (nombre / estadísticas).
+ * Esqueleto de la tarjeta de miembro de comunidad. Replica la estructura de la
+ * tarjeta de usuario con avatar circular y dos líneas de texto.
+ * @component
  */
 export function CommunityMemberSkeleton() {
   return (
@@ -55,10 +48,8 @@ export function CommunityMemberSkeleton() {
       className="figma-panel animate-pulse flex items-center gap-4 p-4"
       aria-hidden="true"
     >
-      {/* Avatar */}
       <div className="h-12 w-12 shrink-0 rounded-full bg-slate-700/80" />
 
-      {/* Texto */}
       <div className="min-w-0 flex-1 space-y-2">
         <div className="h-4 w-2/3 rounded bg-slate-700/80" />
         <div className="h-3 w-1/2 rounded bg-slate-700/50" />
@@ -68,8 +59,9 @@ export function CommunityMemberSkeleton() {
 }
 
 /**
- * Placeholder del encabezado del perfil público (nombre + subtítulo).
- * Se usa en UserPublicProfile mientras llega el nombre real del usuario.
+ * Esqueleto del encabezado del perfil público de usuario.
+ * Replica la línea decorativa, el título y el subtítulo de `UserPublicProfile`.
+ * @component
  */
 export function ProfileHeaderSkeleton() {
   return (

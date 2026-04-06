@@ -11,6 +11,12 @@ import UserPublicProfile from "./components/UserPublicProfile";
 import AdminUsers from "./components/AdminUsers";
 import GameDiscussion from "./components/GameDiscussion";
 
+/**
+ * Página principal de la colección del usuario.
+ * Muestra el encabezado con el botón "Añadir juego" y el grid de GameList.
+ * Es un componente de página sin props: obtiene sus datos a través de GameList.
+ * @component
+ */
 function HomePage() {
   return (
     <>
@@ -35,6 +41,16 @@ function HomePage() {
   );
 }
 
+/**
+ * Componente raíz de la aplicación. Gestiona el estado de autenticación global
+ * y decide qué mostrar: la pantalla de login/registro o la app completa.
+ *
+ * Al cargar, comprueba si hay un token en localStorage y lo valida con `/api/auth/me`
+ * para obtener los datos frescos del usuario (incluyendo el rol actualizado).
+ * Si el token no es válido o no existe, se muestra AuthPage.
+ *
+ * @component
+ */
 function App() {
   const [user, setUser] = useState(null);
 
@@ -42,12 +58,14 @@ function App() {
     const token = localStorage.getItem("token");
     const savedUser = localStorage.getItem("user");
 
+    // Carga inmediata desde localStorage para evitar parpadeo
     if (token && savedUser) {
       setUser(JSON.parse(savedUser));
     }
 
     if (!token) return;
 
+    // Verificación en servidor para obtener el rol actualizado
     fetch(`${API_BASE}/api/auth/me`, { headers: authHeaders() })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
@@ -59,6 +77,10 @@ function App() {
       .catch(() => {});
   }, []);
 
+  /**
+   * Cierra la sesión del usuario limpiando el token y el objeto usuario
+   * del localStorage y reseteando el estado local.
+   */
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");

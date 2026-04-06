@@ -3,6 +3,11 @@ import { Link, useParams } from "react-router-dom";
 import { API_BASE, authHeaders } from "../api";
 import { displayCoverUrl } from "../coverUrl";
 
+/**
+ * Lee y parsea el usuario actual del localStorage.
+ * Encapsula el try-catch para no repetirlo en cada componente que lo necesite.
+ * @returns {object|null} Objeto de usuario o null si no hay sesión.
+ */
 function parseUser() {
   try {
     const raw = localStorage.getItem("user");
@@ -12,6 +17,23 @@ function parseUser() {
   }
 }
 
+/**
+ * Bloque recursivo que renderiza un comentario y sus respuestas anidadas.
+ * Se llama a sí mismo (recursivamente) para los comentarios hijos,
+ * aumentando la sangría (`depth`) en cada nivel.
+ * Puede borrar: el autor del comentario, el dueño del juego o un admin.
+ *
+ * @component
+ * @param {object}   props
+ * @param {object}   props.c             - Datos del comentario actual.
+ * @param {object[]} props.childrenList  - Lista de comentarios hijos directos.
+ * @param {number}   props.depth         - Nivel de anidamiento actual (0 = raíz).
+ * @param {string}   props.gameId        - ID del juego al que pertenece el comentario.
+ * @param {number}   props.gameOwnerId   - ID del propietario de la ficha de juego.
+ * @param {Function} props.onDeleted     - Callback para recargar los comentarios tras borrar.
+ * @param {Function} props.onReply       - Callback para marcar este comentario como "respondiendo a".
+ * @param {Map}      props.allByParent   - Mapa completo de `parentId → [comentarios hijos]`.
+ */
 function CommentBlock({
   c,
   childrenList,
@@ -100,6 +122,14 @@ function CommentBlock({
   );
 }
 
+/**
+ * Página de discusión y reseñas de una ficha de juego.
+ * Carga en paralelo los datos del juego y su hilo de comentarios.
+ * Los comentarios se organizan en árbol usando un Map de `parentId → hijos`
+ * para renderizar las respuestas anidadas sin recursión extra de datos.
+ *
+ * @component
+ */
 export default function GameDiscussion() {
   const { gameId } = useParams();
   const [game, setGame] = useState(null);

@@ -1,10 +1,5 @@
-/**
- * Uso (desde la carpeta server):
- *   node scripts/reset-password.js tu@email.com nuevaContraseña
- *
- * Solo para desarrollo: actualiza el hash en PostgreSQL si olvidaste la clave
- * o la cuenta se creó con otra contraseña.
- */
+// Script para resetear contraseña (solo desarrollo):
+//   node scripts/reset-password.js tu@email.com nuevaContraseña
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const pool = require("../config/db");

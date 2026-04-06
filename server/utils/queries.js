@@ -1,26 +1,25 @@
 /**
- * queries.js
+ * @module queries
+ * @description Consultas SQL reutilizables para la tabla `juegos`.
  *
- * Consultas SQL que se reutilizan en varias rutas.
- * Las centralizo aquí para no repetir el mismo JOIN en cada controlador
- * y para que cualquier cambio en el esquema solo afecte a un único lugar.
+ * Centralizar aquí los SELECT evita repetir el mismo JOIN en cada ruta.
+ * Todas las queries usan LEFT JOIN con `catalogo_juegos` para que, cuando
+ * el usuario eligió el juego del buscador oficial (RAWG/Steam), se muestre
+ * el título e imagen del catálogo en lugar de los de la ficha manual.
  *
- * NOTA SOBRE EL ESQUEMA: estas queries asumen que la base de datos ya tiene
- * las columnas url_imagen y catalogo_id en la tabla juegos, y que existe la
- * tabla catalogo_juegos. Si tu BD aún no las tiene, ejecuta los scripts de
- * migración en la carpeta docs/ antes de arrancar el servidor.
- * Eliminé los checks dinámicos de columnas que había en la versión anterior
- * porque hacían una query extra a information_schema en cada petición,
- * lo que penaliza el rendimiento innecesariamente en producción.
+ * REQUISITO: La BD debe tener las tablas `catalogo_juegos` y las columnas
+ * `url_imagen` y `catalogo_id` en `juegos`. Si no las tienes, ejecuta
+ * primero los scripts de `docs/`.
  */
 
 const pool = require("../config/db");
 
 /**
- * Devuelve todos los juegos de un usuario concreto.
- * Usa COALESCE para mostrar el título del catálogo cuando existe,
- * y la URL de imagen del catálogo si la ficha del usuario no tiene una propia.
- * Los resultados vienen ordenados por id DESC (el más reciente primero).
+ * Devuelve todos los juegos de un usuario ordenados por fecha de inserción descendente.
+ * Usa COALESCE para priorizar el título e imagen del catálogo oficial cuando estén disponibles.
+ *
+ * @param {number} usuarioId - ID del usuario propietario de la colección.
+ * @returns {Promise<object[]>} Array de filas con los juegos del usuario.
  */
 async function queryGamesListForUser(usuarioId) {
   const result = await pool.query(
@@ -44,9 +43,13 @@ async function queryGamesListForUser(usuarioId) {
 }
 
 /**
- * Devuelve una sola ficha de juego verificando que pertenece al usuario.
- * El doble filtro (id + usuario_id) garantiza que nadie pueda leer
- * los datos de los juegos de otro usuario aunque conozca el ID.
+ * Devuelve el detalle de una sola ficha verificando que pertenezca al usuario.
+ * El doble filtro `j.id = $1 AND j.usuario_id = $2` impide que un usuario
+ * pueda leer o editar juegos ajenos aunque conozca el ID numérico.
+ *
+ * @param {number} usuarioId - ID del usuario propietario.
+ * @param {number} gameId    - ID de la ficha de juego.
+ * @returns {Promise<object|null>} Fila del juego o null si no existe o no pertenece al usuario.
  */
 async function queryOneGameForUser(usuarioId, gameId) {
   const r = await pool.query(
@@ -69,10 +72,12 @@ async function queryOneGameForUser(usuarioId, gameId) {
 }
 
 /**
- * Devuelve el detalle público de una ficha de juego (para la sección de comunidad).
- * Incluye el nombre del propietario para mostrarlo en la cabecera del hilo
- * de comentarios o en la vista de perfil ajeno.
- * Cualquier usuario logueado puede ver esta info, no solo el dueño.
+ * Devuelve el detalle público de un juego (visible para cualquier usuario autenticado).
+ * Incluye el nombre del propietario (`propietario_nombre`) para mostrarlo
+ * en la vista de comunidad y en los hilos de comentarios.
+ *
+ * @param {number|string} gameId - ID de la ficha de juego.
+ * @returns {Promise<object|null>} Fila del juego con datos de su propietario, o null.
  */
 async function queryGamePublicById(gameId) {
   const gid = parseInt(gameId, 10);
@@ -100,12 +105,12 @@ async function queryGamePublicById(gameId) {
 }
 
 /**
- * Comprueba si la tabla de comentarios ya existe en la base de datos.
- * Los comentarios son una funcionalidad opcional que requiere ejecutar
- * el script docs/add-juego-comentarios.sql. Si la tabla no existe,
- * las rutas de comentarios devuelven 503 con un mensaje claro.
- * Este check sí tiene sentido en tiempo de ejecución porque es una
- * característica que puede no estar instalada en todos los entornos.
+ * Comprueba si la tabla `juego_comentarios` existe en la BD.
+ * Esta tabla es opcional y se crea ejecutando `docs/add-juego-comentarios.sql`.
+ * Las rutas de comentarios la usan para devolver un 503 descriptivo en lugar
+ * de un error de PostgreSQL críptico si la tabla no ha sido creada todavía.
+ *
+ * @returns {Promise<boolean>} `true` si la tabla existe, `false` en caso contrario.
  */
 async function juegoComentariosTableExists() {
   try {

@@ -1,14 +1,12 @@
 /**
- * auth.routes.js
+ * @module auth.routes
+ * @description Rutas públicas de autenticación.
+ * No requieren token porque son precisamente las rutas donde el token se obtiene.
  *
- * Rutas públicas de autenticación: registro e inicio de sesión.
- * Estas rutas NO llevan el authMiddleware porque son las que permiten
- * obtener el token por primera vez. Son el punto de entrada al sistema.
- *
- * Rutas definidas aquí:
- *   POST /api/auth/register  → crea una nueva cuenta
- *   POST /api/auth/login     → verifica credenciales y devuelve JWT
- *   GET  /api/auth/me        → comprueba si el token actual sigue siendo válido
+ * Rutas definidas:
+ *   POST /api/auth/register → crear nueva cuenta
+ *   POST /api/auth/login    → iniciar sesión (devuelve JWT)
+ *   GET  /api/auth/me       → verificar que el token sigue siendo válido
  */
 
 const express = require("express");
@@ -20,10 +18,17 @@ const { normalizeEmail } = require("../utils/normalize");
 const router = express.Router();
 
 /**
- * POST /api/auth/register
- * Crea un nuevo usuario. Valida los datos, comprueba que no exista ya ese
- * email o nombre de usuario, hashea la contraseña y devuelve el token listo
- * para que el cliente quede autenticado sin necesidad de hacer login a continuación.
+ * Registra una nueva cuenta de usuario en el sistema.
+ * Valida que el email y el nombre de usuario no estén ya en uso antes de insertar.
+ * Usa bcrypt con coste 10 para hashear la contraseña (valor estándar en la industria).
+ * Devuelve un JWT directamente para que el usuario quede logueado al instante.
+ *
+ * @route  POST /api/auth/register
+ * @access Public
+ * @param  {string} req.body.nombre_usuario - Nombre visible en la comunidad.
+ * @param  {string} req.body.email          - Email único de la cuenta.
+ * @param  {string} req.body.password       - Contraseña en texto plano (mín. 6 caracteres).
+ * @returns {object} 201 – `{ success, token, user }` | 400 – `{ error }` | 500 – `{ error }`
  */
 router.post("/register", async (req, res) => {
   try {
@@ -43,8 +48,7 @@ router.post("/register", async (req, res) => {
         .json({ error: "La contraseña debe tener al menos 6 caracteres." });
     }
 
-    // Comprobamos si el email ya está en uso para dar un mensaje más claro
-    // que el error genérico de violación de unicidad que lanzaría PostgreSQL.
+    // Compruebo si ya existe antes de intentar insertar, así puedo dar un mensaje más claro
     const byEmail = await pool.query(
       "SELECT id FROM usuarios WHERE LOWER(TRIM(email)) = $1",
       [email],
@@ -65,9 +69,7 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    // bcrypt.hash aplica el algoritmo bcrypt con coste 10 (2^10 = 1024 iteraciones).
-    // Cuanto mayor es el coste, más difícil es para un atacante hacer fuerza bruta,
-    // pero también más lento para el servidor. 10 es el estándar recomendado.
+    // Coste 10 es el estándar para bcrypt (equilibrio seguridad/rendimiento)
     const password_hash = await bcrypt.hash(password, 10);
 
     const newUser = await pool.query(
@@ -77,11 +79,11 @@ router.post("/register", async (req, res) => {
       [nombre_usuario, email, password_hash, "user"],
     );
 
+    // Devuelvo el token directamente para que el usuario quede logueado sin hacer login aparte
     const token = createToken(newUser.rows[0]);
     return res.status(201).json({ success: true, token, user: newUser.rows[0] });
   } catch (error) {
     console.error("[POST /api/auth/register]", error);
-    // Código 23505: violación de restricción UNIQUE en PostgreSQL
     if (error.code === "23505") {
       return res.status(400).json({
         error: "Ese email o nombre de usuario ya existe. Prueba a iniciar sesión.",
@@ -96,10 +98,15 @@ router.post("/register", async (req, res) => {
 });
 
 /**
- * POST /api/auth/login
- * Verifica el email y la contraseña. bcrypt.compare compara la contraseña
- * en texto plano con el hash guardado sin necesidad de desencriptarlo,
- * ya que bcrypt es un hash de una sola dirección.
+ * Inicia sesión verificando las credenciales y devolviendo un JWT.
+ * La contraseña se compara con el hash almacenado usando bcrypt.compare(),
+ * que es la función inversa (verificación) del hash generado al registrarse.
+ *
+ * @route  POST /api/auth/login
+ * @access Public
+ * @param  {string} req.body.email    - Email de la cuenta.
+ * @param  {string} req.body.password - Contraseña en texto plano.
+ * @returns {object} 200 – `{ success, token, user }` | 401 – `{ error }` | 500 – `{ error }`
  */
 router.post("/login", async (req, res) => {
   try {
@@ -147,10 +154,13 @@ router.post("/login", async (req, res) => {
 });
 
 /**
- * GET /api/auth/me
- * Ruta protegida. El cliente la llama al arrancar la aplicación para verificar
- * que el token guardado en localStorage sigue siendo válido y obtener los datos
- * frescos del usuario (por si su rol cambió desde que inició sesión).
+ * Devuelve los datos frescos del usuario autenticado.
+ * El frontend la llama al cargar la app para verificar que el token almacenado
+ * en localStorage sigue siendo válido y para obtener el rol actualizado.
+ *
+ * @route  GET /api/auth/me
+ * @access Private (requiere JWT válido)
+ * @returns {object} 200 – `{ user }` | 404 – `{ error }` | 500 – `{ error }`
  */
 router.get("/me", authMiddleware, async (req, res) => {
   try {

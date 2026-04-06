@@ -1,14 +1,18 @@
 /**
- * normalize.js
+ * @module normalize
+ * @description Funciones puras de normalización para limpiar y estandarizar
+ * los datos de entrada antes de guardarlos en la BD o compararlos.
  *
- * Funciones auxiliares puras (no tocan la BD) para limpiar y estandarizar
- * los datos que llegan del cliente antes de guardarlos o compararlos.
- * Las separo aquí para poder reutilizarlas en cualquier ruta sin repetir código.
+ * Al centralizar aquí estas funciones, cada ruta no necesita repetir la misma
+ * lógica de limpieza, lo que reduce errores y mejora la consistencia.
  */
 
 /**
- * Convierte un email a minúsculas y elimina espacios.
- * Así "  Usuario@Gmail.com  " y "usuario@gmail.com" se tratan como la misma cuenta.
+ * Normaliza un email eliminando espacios y convirtiendo a minúsculas.
+ * Así "  USER@Gmail.com  " y "user@gmail.com" se tratan como el mismo email.
+ *
+ * @param {*} email - Valor recibido del cliente (puede ser null/undefined).
+ * @returns {string} Email en minúsculas y sin espacios.
  */
 const normalizeEmail = (email) =>
   String(email ?? "")
@@ -16,9 +20,11 @@ const normalizeEmail = (email) =>
     .toLowerCase();
 
 /**
- * Normaliza el título de un juego: elimina espacios sobrantes en los extremos
- * y colapsa múltiples espacios internos en uno solo.
- * Ejemplo: "  The  Witcher  3  " → "The Witcher 3"
+ * Normaliza el título de un juego colapsando espacios múltiples.
+ * Ejemplo: `"  The  Witcher  3  "` → `"The Witcher 3"`.
+ *
+ * @param {*} t - Título recibido del cliente.
+ * @returns {string} Título limpio con un solo espacio entre palabras.
  */
 function normalizeGameTitle(t) {
   return String(t ?? "")
@@ -27,16 +33,22 @@ function normalizeGameTitle(t) {
 }
 
 /**
- * Devuelve la clave de comparación para detectar duplicados por título.
- * Pasa todo a minúsculas para que "zelda" y "Zelda" cuenten como el mismo juego.
+ * Genera una clave de comparación de títulos en minúsculas.
+ * Usada para detectar duplicados sin importar mayúsculas/minúsculas.
+ *
+ * @param {string} t - Título a convertir en clave.
+ * @returns {string} Título normalizado en minúsculas.
  */
 function titleMatchKey(t) {
   return normalizeGameTitle(t).toLowerCase();
 }
 
 /**
- * Garantiza que la plataforma nunca quede vacía.
- * Si el usuario no escribe nada, asignamos "PC" como valor por defecto.
+ * Normaliza la plataforma del juego. Si el usuario no indica ninguna,
+ * se asigna "PC" como valor por defecto.
+ *
+ * @param {*} p - Plataforma recibida del cliente.
+ * @returns {string} Nombre de plataforma limpio, o "PC" si estaba vacío.
  */
 function normalizePlataforma(p) {
   const s = String(p ?? "").trim();
@@ -44,11 +56,12 @@ function normalizePlataforma(p) {
 }
 
 /**
- * Traduce el estado del juego al valor que acepta la base de datos.
- * Admite tanto los términos en español (que usa la UI) como en inglés
- * (por si algún cliente alternativo envía otro idioma).
- * Si el valor no coincide con ninguno conocido, lo devuelve tal cual
- * y PostgreSQL aplicará su propio CHECK de validación.
+ * Traduce el valor de estado del formulario al valor aceptado por la BD.
+ * Acepta tanto español ("Pendiente", "Jugando", "Completado") como inglés
+ * ("Backlog", "Playing", "Completed") para mayor flexibilidad de la API.
+ *
+ * @param {string} estado - Estado recibido del cliente.
+ * @returns {string} Valor canónico del estado para la base de datos.
  */
 function normalizeEstadoForDb(estado) {
   const s = String(estado ?? "").trim();
@@ -64,9 +77,12 @@ function normalizeEstadoForDb(estado) {
 }
 
 /**
- * Extrae y valida la referencia al catálogo externo (RAWG o Steam) del body.
- * Devuelve { source, id } si es válida, o null si no viene o está mal formada.
- * Esto nos permite vincular la ficha del usuario con el juego del catálogo global.
+ * Extrae y valida la referencia al catálogo (RAWG o Steam) del body de la petición.
+ * Esta referencia se envía cuando el usuario selecciona un juego del buscador
+ * y permite vincular la ficha personal con el catálogo compartido.
+ *
+ * @param {object} body - `req.body` de Express.
+ * @returns {{ source: "rawg"|"steam", id: number } | null} Referencia validada o null.
  */
 function parseCatalogoRef(body) {
   const ref = body?.catalogo_ref;
@@ -84,9 +100,13 @@ function parseCatalogoRef(body) {
 }
 
 /**
- * Construye el objeto de error que se devuelve al cliente.
- * En producción solo se muestra un mensaje genérico; en desarrollo
- * se añade el detalle técnico para facilitar la depuración.
+ * Construye el objeto de error para la respuesta HTTP.
+ * En desarrollo incluye el mensaje técnico para facilitar la depuración.
+ * En producción solo devuelve el mensaje genérico para no filtrar información interna.
+ *
+ * @param {Error}  err         - Objeto de error capturado en el catch.
+ * @param {string} fallbackMsg - Mensaje genérico a mostrar siempre.
+ * @returns {{ error: string, detail?: string, code?: string }} Payload de error.
  */
 function serverErrorPayload(err, fallbackMsg) {
   const out = { error: fallbackMsg };
@@ -98,10 +118,12 @@ function serverErrorPayload(err, fallbackMsg) {
 }
 
 /**
- * Crea una señal de timeout compatible con la API fetch nativa.
- * Necesaria porque fetch() no tiene timeout incorporado.
- * Si el navegador ya soporta AbortSignal.timeout() lo usa directamente;
- * si no, crea un AbortController manualmente (fallback para Node < 17.3).
+ * Crea una señal de cancelación para peticiones `fetch` con tiempo límite.
+ * Usa `AbortSignal.timeout` si está disponible (Node 17.3+), y cae al
+ * polyfill manual con `AbortController` en versiones anteriores.
+ *
+ * @param {number} ms - Tiempo máximo en milisegundos antes de cancelar el fetch.
+ * @returns {AbortSignal} Señal que se activará tras `ms` milisegundos.
  */
 function fetchTimeoutMs(ms) {
   if (

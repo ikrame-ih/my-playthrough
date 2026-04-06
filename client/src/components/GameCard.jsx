@@ -4,6 +4,20 @@ import { displayCoverUrl } from "../coverUrl";
 import { estadoBadgeClass, labelEstado } from "../gameLabels";
 import { IconImage, IconPencil, IconTrash } from "./icons";
 
+/**
+ * Tarjeta visual de un juego. Muestra la portada (vía proxy), plataforma,
+ * título, badge de estado, horas y puntuación. En modo `showActions` añade
+ * botones de editar y eliminar para la colección propia del usuario.
+ * El `imgError` permite caer a un placeholder con la inicial cuando la imagen
+ * no carga correctamente o el proxy devuelve un error.
+ *
+ * @component
+ * @param {object}   props
+ * @param {object}   props.game             - Datos del juego.
+ * @param {boolean}  [props.showActions]    - Si es `true`, muestra los botones de editar/borrar.
+ * @param {Function} [props.onDelete]       - Callback `(id, titulo) => void` para el botón borrar.
+ * @param {string}   [props.discussionTo]   - Ruta de la discusión del juego para el enlace inferior.
+ */
 export default function GameCard({
   game,
   showActions = false,

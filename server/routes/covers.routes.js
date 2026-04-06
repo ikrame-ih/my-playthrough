@@ -1,18 +1,18 @@
 /**
- * covers.routes.js
+ * @module covers.routes
+ * @description Proxy de imágenes y búsqueda de carátulas.
  *
- * Proxy de imágenes y búsqueda de carátulas.
- * El proxy existe porque los CDN de Steam bloquean las peticiones de imagen
+ * El proxy existe porque los CDN de Steam y RAWG bloquean peticiones de imagen
  * que vienen directamente desde el navegador (política CORS + hotlink protection).
  * Al hacer la petición desde el servidor, evitamos ese bloqueo.
  *
- * Rutas definidas aquí:
+ * Rutas definidas:
  *   GET /api/covers/proxy        → proxy de imagen (sin auth, la usan etiquetas <img>)
- *   GET /api/games/cover-search  → búsqueda RAWG + Steam combinada
+ *   GET /api/games/cover-search  → búsqueda RAWG + Steam combinada (requiere auth)
  *
- * NOTA: cover-search está en /api/games/ pero lo gestiono aquí porque
- * pertenece a la misma lógica de carátulas y debe registrarse ANTES
- * de la ruta /api/games/:id para que Express no lo confunda con un ID.
+ * NOTA: cover-search está montado en /api/games/ pero se gestiona aquí porque
+ * pertenece a la misma lógica de carátulas y debe registrarse ANTES de /api/games/:id
+ * para que Express no confunda "cover-search" con un ID numérico.
  */
 
 const express = require("express");
@@ -29,24 +29,13 @@ const { fetchTimeoutMs } = require("../utils/normalize");
 const router = express.Router();
 
 /**
- * GET /api/covers/proxy?u=<url>
- * Descarga una imagen de los CDN permitidos y la reenvía al cliente.
- * No requiere autenticación porque las etiquetas <img> del HTML no pueden
- * enviar cabeceras Authorization. La protección la da la lista blanca de hosts.
- * Limitamos el tamaño de la respuesta a 6 MB para evitar abusos.
- */
-/**
- * Transforma una URL de media.rawg.io a su variante recortada (600×400 px).
- * RAWG sirve las imágenes originales en resolución completa (~8 MB), pero
- * ofrece un servicio de redimensionado en la misma CDN: basta con insertar
- * /crop/<ancho>/<alto>/ después de /media/.
+ * Reescribe una URL de media.rawg.io a su variante recortada (600×400 px).
+ * Las imágenes originales de RAWG pesan ~8 MB. Insertando `/crop/600/400/`
+ * en la ruta se obtiene la misma imagen redimensionada a ~50 KB, lo que
+ * reduce drásticamente el tiempo de carga de las carátulas.
  *
- * Ejemplo:
- *   original → https://media.rawg.io/media/games/xxx.jpg  (~8 MB)
- *   recortada → https://media.rawg.io/media/crop/600/400/games/xxx.jpg  (~50 KB)
- *
- * Solo aplicamos esto cuando la URL no tiene ya un segmento de recorte,
- * para no duplicar la transformación.
+ * @param {string} url - URL original de la imagen.
+ * @returns {string} URL con el recorte aplicado, o la original si no es de RAWG.
  */
 function toRawgCropUrl(url) {
   const RAWG_HOST = "media.rawg.io";
@@ -63,6 +52,17 @@ function toRawgCropUrl(url) {
   }
 }
 
+/**
+ * Descarga una imagen de los CDN permitidos y la reenvía al cliente.
+ * No requiere autenticación porque las etiquetas `<img>` del HTML no pueden
+ * enviar cabeceras `Authorization`. La seguridad la da la lista blanca de hosts.
+ * Las carátulas se cachean 24h en el navegador (`Cache-Control: max-age=86400`).
+ *
+ * @route  GET /api/covers/proxy?u=<url>
+ * @access Public (sin auth, protegido por lista blanca de hosts)
+ * @param  {string} req.query.u - URL de la imagen a proxear.
+ * @returns {Buffer} Imagen en su formato original | 400/403/502 en caso de error.
+ */
 router.get("/proxy", async (req, res) => {
   const raw = String(req.query.u ?? "").trim();
   if (!raw) {
@@ -83,8 +83,7 @@ router.get("/proxy", async (req, res) => {
     return res.status(403).json({ error: "Host no permitido." });
   }
 
-  // Si es de RAWG, reescribimos a la variante comprimida antes de hacer fetch.
-  // Esto reduce el tamaño de ~8 MB a ~50 KB y acelera la carga de carátulas.
+  // Si es de RAWG, reescribimos a la variante comprimida antes de hacer fetch
   const fetchUrl = toRawgCropUrl(target.href);
 
   try {
@@ -97,11 +96,11 @@ router.get("/proxy", async (req, res) => {
     const ct = upstream.headers.get("content-type") || "image/jpeg";
     const buf = Buffer.from(await upstream.arrayBuffer());
 
-    // 10 MB como límite de seguridad (Steam HDR covers pueden ser grandes).
+    // 10 MB como límite de seguridad (evita abusos con imágenes gigantes)
     if (buf.length > 10 * 1024 * 1024) return res.status(502).end();
 
     res.setHeader("Content-Type", ct);
-    // Cache-Control: las carátulas no cambian, podemos cachearlas 24h en el navegador.
+    // Las carátulas no cambian, podemos cachearlas 24h en el navegador
     res.setHeader("Cache-Control", "public, max-age=86400");
     res.send(buf);
   } catch (e) {
@@ -111,10 +110,15 @@ router.get("/proxy", async (req, res) => {
 });
 
 /**
- * GET /api/games/cover-search?q=<término>
- * Busca carátulas combinando RAWG y Steam. Requiere autenticación para
- * evitar que bots externos usen la ruta como buscador gratuito.
- * La clave RAWG es opcional: si no está configurada, solo se usa Steam.
+ * Busca carátulas de juegos combinando RAWG y Steam.
+ * Requiere autenticación para evitar que bots externos usen la ruta como
+ * buscador gratuito consumiendo nuestra cuota de la API de RAWG.
+ * Si `RAWG_API_KEY` no está configurada, solo se usa Steam como fallback.
+ *
+ * @route  GET /api/games/cover-search?q=<término>
+ * @access Private (requiere JWT válido)
+ * @param  {string} req.query.q - Término de búsqueda (mínimo 2 caracteres).
+ * @returns {object} 200 – `{ results: [...] }` | 400 – parámetro inválido | 500 – error externo.
  */
 router.get("/cover-search", authMiddleware, async (req, res) => {
   const q = String(req.query.q ?? "").trim();

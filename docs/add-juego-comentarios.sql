@@ -1,4 +1,4 @@
--- Hilos de comentarios / reviews por entrada de colección (juegos.id).
+-- Tabla de comentarios (hilos de reseñas por juego)
 
 CREATE TABLE IF NOT EXISTS juego_comentarios (
   id SERIAL PRIMARY KEY,
