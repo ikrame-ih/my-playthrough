@@ -12,6 +12,7 @@ const express = require("express");
 const pool = require("../config/db");
 const { authMiddleware } = require("../middleware/auth.middleware");
 const { queryGamesListForUser } = require("../utils/queries");
+const { serverErrorPayload } = require("../utils/normalize");
 
 const router = express.Router();
 
@@ -41,7 +42,8 @@ router.get("/", authMiddleware, async (req, res) => {
     );
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("[GET /api/users]", error);
+    res.status(500).json(serverErrorPayload(error, "Error al cargar usuarios."));
   }
 });
 
@@ -73,7 +75,8 @@ router.get("/:userId/games", authMiddleware, async (req, res) => {
     const games = await queryGamesListForUser(userId);
     res.json({ user: userExists.rows[0], games });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("[GET /api/users/:userId/games]", error);
+    res.status(500).json(serverErrorPayload(error, "Error al cargar la colección pública."));
   }
 });
 

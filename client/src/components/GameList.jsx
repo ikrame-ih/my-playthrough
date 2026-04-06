@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { API_BASE, authHeaders } from "../api";
+import { API_BASE, apiFetch } from "../api";
 import { useSearch } from "../SearchContext";
 import GameCard from "./GameCard";
 import { GameCardSkeleton } from "./Skeletons";
@@ -9,7 +9,7 @@ import { GameCardSkeleton } from "./Skeletons";
  * Grid de la colección personal del usuario.
  * Obtiene los juegos de la API al montarse y filtra localmente según
  * la búsqueda global del SearchContext (sin peticiones extra al servidor).
- * Muestra skeletons durante la carga para evitar saltos de layout (CLS).
+ * Muestra skeletons durante la carga para evitar saltos de layout.
  *
  * @component
  */
@@ -30,20 +30,9 @@ export default function GameList() {
 
   const fetchGames = async () => {
     try {
-      const response = await fetch(`${API_BASE}/api/games`, {
-        headers: authHeaders(),
-      });
-
-      if (response.status === 401) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.reload();
-        return;
-      }
-
+      const response = await apiFetch(`${API_BASE}/api/games`);
       if (response.ok) {
-        const data = await response.json();
-        setGames(data);
+        setGames(await response.json());
       }
     } catch (error) {
       console.error("Error cargando juegos:", error);
@@ -59,18 +48,9 @@ export default function GameList() {
   const eliminarJuego = async (id, titulo) => {
     if (window.confirm(`¿Seguro que quieres eliminar "${titulo}"?`)) {
       try {
-        const response = await fetch(`${API_BASE}/api/games/${id}`, {
+        const response = await apiFetch(`${API_BASE}/api/games/${id}`, {
           method: "DELETE",
-          headers: authHeaders(),
         });
-
-        if (response.status === 401) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          window.location.reload();
-          return;
-        }
-
         if (response.ok) {
           fetchGames();
         }
@@ -81,7 +61,6 @@ export default function GameList() {
   };
 
   if (loading) {
-    // Skeleton mientras carga
     return (
       <div
         aria-busy="true"

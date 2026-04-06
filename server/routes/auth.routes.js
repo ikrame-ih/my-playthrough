@@ -13,7 +13,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const pool = require("../config/db");
 const { authMiddleware, createToken } = require("../middleware/auth.middleware");
-const { normalizeEmail } = require("../utils/normalize");
+const { normalizeEmail, serverErrorPayload } = require("../utils/normalize");
 
 const router = express.Router();
 
@@ -90,10 +90,9 @@ router.post("/register", async (req, res) => {
         detail: error.detail,
       });
     }
-    return res.status(500).json({
-      error: "Error al registrar usuario.",
-      detail: error.message || String(error),
-    });
+    return res.status(500).json(
+      serverErrorPayload(error, "Error al registrar usuario."),
+    );
   }
 });
 

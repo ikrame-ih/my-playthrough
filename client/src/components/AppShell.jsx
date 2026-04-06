@@ -11,6 +11,33 @@ import {
 } from "./icons";
 
 /**
+ * Paleta de colores de fondo para los avatares de iniciales.
+ * Se elige el color según el código del primer carácter del nombre de usuario,
+ * así cada persona siempre tiene el mismo color de forma consistente.
+ */
+const AVATAR_PALETTE = [
+  "from-violet-600 to-indigo-700",
+  "from-rose-500   to-pink-700",
+  "from-amber-500  to-orange-600",
+  "from-emerald-500 to-teal-700",
+  "from-sky-500    to-blue-700",
+  "from-fuchsia-500 to-purple-700",
+  "from-red-500    to-rose-700",
+  "from-cyan-500   to-sky-700",
+];
+
+/**
+ * Devuelve las clases de gradiente Tailwind asignadas al nombre de usuario.
+ * El índice se calcula a partir del primer carácter para que sea estable.
+ * @param {string} name - Nombre de usuario.
+ * @returns {string} Clases de gradiente Tailwind.
+ */
+export function avatarGradient(name) {
+  const code = (name || "?").trim().toUpperCase().charCodeAt(0) || 0;
+  return AVATAR_PALETTE[code % AVATAR_PALETTE.length];
+}
+
+/**
  * Función de clases para los enlaces de navegación del sidebar.
  * React Router DOM llama a esta función con `{ isActive }` y aplica
  * estilos distintos al enlace de la página activa.
@@ -25,22 +52,21 @@ const sideNav = ({ isActive }) =>
   }`;
 
 /**
- * Envoltorio visual de toda la aplicación autenticada.
- * Incluye el sidebar de navegación y la barra superior con búsqueda y avatar.
- * Cualquier cambio de ruta limpia automáticamente el campo de búsqueda
- * para que el filtro no persista al navegar a otra sección.
+ * Estructura visual principal de la aplicación una vez el usuario está logueado.
+ * Contiene el menú lateral y la barra de búsqueda superior.
+ * Cada vez que el usuario navega a otra página se limpia la búsqueda
+ * para que el filtro anterior no interfiera con la nueva vista.
  *
  * @component
  * @param {object}          props
- * @param {object}          props.user      - Datos del usuario en sesión (`id`, `nombre_usuario`, `email`, `rol`).
- * @param {Function}        props.onLogout  - Callback que cierra la sesión al hacer clic en "Cerrar sesión".
- * @param {React.ReactNode} props.children  - Contenido de la página activa (renderizado en `<main>`).
+ * @param {object}          props.user      - Datos del usuario logueado (`id`, `nombre_usuario`, `email`, `rol`).
+ * @param {Function}        props.onLogout  - Función que se llama al pulsar "Cerrar sesión".
+ * @param {React.ReactNode} props.children  - Contenido de la página activa, que se renderiza en el centro.
  */
 export default function AppShell({ user, onLogout, children }) {
-  const initial =
-    user?.nombre_usuario?.trim()?.charAt(0)?.toUpperCase() ||
-    user?.email?.charAt(0)?.toUpperCase() ||
-    "?";
+  const name    = user?.nombre_usuario?.trim() || user?.email || "?";
+  const initial = name.charAt(0).toUpperCase();
+  const gradient = avatarGradient(name);
 
   const { query, setQuery } = useSearch();
   const location = useLocation();
@@ -56,12 +82,18 @@ export default function AppShell({ user, onLogout, children }) {
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 text-brand-accent ring-1 ring-white/[0.08]">
             <IconController className="h-5 w-5" />
           </span>
-          <Link to="/" className="text-[1.05rem] font-bold tracking-tight text-white">
+          <Link
+            to="/"
+            className="text-[1.05rem] font-bold tracking-tight text-white"
+          >
             My<span className="text-brand-accent">Play</span>through
           </Link>
         </div>
 
-        <nav className="mt-8 flex flex-1 flex-col gap-1 px-3" aria-label="Principal">
+        <nav
+          className="mt-8 flex flex-1 flex-col gap-1 px-3"
+          aria-label="Principal"
+        >
           <NavLink to="/" end className={sideNav}>
             <IconCollection className="h-5 w-5 shrink-0 opacity-90" />
             Mi colección
@@ -104,7 +136,7 @@ export default function AppShell({ user, onLogout, children }) {
             />
           </div>
           <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-brand-accent/50 bg-gradient-to-br from-slate-800 to-slate-900 text-sm font-bold text-white shadow-inner"
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${gradient} text-sm font-bold text-white shadow-md`}
             title={user?.nombre_usuario || user?.email}
           >
             {initial}

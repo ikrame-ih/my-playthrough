@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { API_BASE, authHeaders } from "../api";
+import { API_BASE, apiFetch } from "../api";
 import { IconShield, IconTrash, IconUsers } from "./icons";
 
 /**
@@ -20,16 +20,7 @@ export default function AdminUsers() {
 
   const loadUsers = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/admin/users`, {
-        headers: authHeaders(),
-      });
-
-      if (res.status === 401) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.reload();
-        return;
-      }
+      const res = await apiFetch(`${API_BASE}/api/admin/users`);
 
       if (res.status === 403) {
         setForbidden(true);
@@ -47,10 +38,8 @@ export default function AdminUsers() {
 
   const loadGames = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/admin/games`, {
-        headers: authHeaders(),
-      });
-      if (res.status === 403 || res.status === 401) return;
+      const res = await apiFetch(`${API_BASE}/api/admin/games`);
+      if (res.status === 403) return;
       if (res.ok) {
         setGames(await res.json());
       }
@@ -104,9 +93,8 @@ export default function AdminUsers() {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/api/admin/users/${id}`, {
+      const res = await apiFetch(`${API_BASE}/api/admin/users/${id}`, {
         method: "DELETE",
-        headers: authHeaders(),
       });
 
       const data = await res.json().catch(() => ({}));
@@ -132,9 +120,8 @@ export default function AdminUsers() {
       return;
     }
     try {
-      const res = await fetch(`${API_BASE}/api/admin/games/${id}`, {
+      const res = await apiFetch(`${API_BASE}/api/admin/games/${id}`, {
         method: "DELETE",
-        headers: authHeaders(),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {

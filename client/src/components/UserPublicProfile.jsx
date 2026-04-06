@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { API_BASE, authHeaders } from "../api";
+import { API_BASE, apiFetch } from "../api";
 import GameCard from "./GameCard";
 import { GameCardSkeleton, ProfileHeaderSkeleton } from "./Skeletons";
 
@@ -8,7 +8,8 @@ import { GameCardSkeleton, ProfileHeaderSkeleton } from "./Skeletons";
  * Perfil público de otro usuario: muestra su colección en modo solo lectura.
  * Los botones de editar y borrar están deshabilitados (`showActions={false}`)
  * para que el visitante solo pueda ver y acceder a la discusión de cada juego.
- * Usa el patrón `cancelled` para evitar actualizar el estado tras desmontarse.
+ * También usa la variable `cancelled` para no actualizar el estado si el usuario
+ * navega a otra página mientras la petición sigue en curso.
  *
  * @component
  */
@@ -22,16 +23,7 @@ export default function UserPublicProfile() {
 
     async function load() {
       try {
-        const res = await fetch(`${API_BASE}/api/users/${userId}/games`, {
-          headers: authHeaders(),
-        });
-
-        if (res.status === 401) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          window.location.reload();
-          return;
-        }
+        const res = await apiFetch(`${API_BASE}/api/users/${userId}/games`);
 
         if (res.status === 404) {
           if (!cancelled) setData({ notFound: true });

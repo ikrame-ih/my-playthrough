@@ -11,6 +11,7 @@ const express = require("express");
 const pool = require("../config/db");
 const { authMiddleware } = require("../middleware/auth.middleware");
 const { queryGamePublicById } = require("../utils/queries");
+const { serverErrorPayload } = require("../utils/normalize");
 
 const router = express.Router();
 
@@ -46,7 +47,8 @@ router.get("/stats", authMiddleware, async (req, res) => {
     `);
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("[GET /api/community/stats]", error);
+    res.status(500).json(serverErrorPayload(error, "Error al cargar estadísticas."));
   }
 });
 
@@ -68,7 +70,8 @@ router.get("/games/:id", authMiddleware, async (req, res) => {
     }
     res.json(row);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("[GET /api/community/games/:id]", error);
+    res.status(500).json(serverErrorPayload(error, "Error al cargar el juego."));
   }
 });
 

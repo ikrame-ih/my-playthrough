@@ -1,10 +1,10 @@
 /**
- * Componentes "esqueleto" que se muestran mientras los datos están cargando.
- * Tienen exactamente las mismas medidas que los componentes reales para evitar
- * Cumulative Layout Shift (CLS): el layout no salta cuando los datos llegan.
- * Todos llevan `aria-hidden="true"` para que los lectores de pantalla los ignoren;
- * el propio contenedor padre usa `aria-busy="true"` y `aria-label` en su lugar.
- * La animación `animate-pulse` de Tailwind crea el efecto de "respiración".
+ * Componentes "esqueleto" (placeholders animados) que se muestran mientras
+ * los datos están cargando. Tienen exactamente las mismas medidas que los
+ * componentes reales para que el layout no cambie de golpe cuando llegan los datos.
+ * Todos llevan `aria-hidden="true"` para que los lectores de pantalla los ignoren
+ * y lean solo el `aria-label` descriptivo del contenedor padre.
+ * La clase `animate-pulse` de Tailwind crea el efecto de "respiración" gris.
  */
 
 /**

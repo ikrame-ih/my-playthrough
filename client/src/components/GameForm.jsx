@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { API_BASE, authHeaders } from "../api";
+import { API_BASE, apiFetch } from "../api";
 
 /**
  * Lee el rol del usuario desde localStorage para personalizar
@@ -42,9 +42,9 @@ const PLATFORM_OPTIONS = [
 /**
  * Formulario unificado de creación y edición de fichas de juego.
  * Detecta automáticamente si está en modo edición según si existe `:id` en la URL.
- * El campo de título lanza una búsqueda en RAWG+Steam con debounce de 550ms
- * para mostrar una galería de carátulas entre las que el usuario puede elegir.
- * Al seleccionar un juego del buscador, se incluye `catalogo_ref` en el payload
+ * Al escribir en el campo de título, espera 550ms antes de buscar en RAWG y Steam
+ * para no lanzar una petición por cada letra (se llama "debounce").
+ * Si el usuario elige un juego del buscador, se envía su referencia de catálogo
  * para que el backend lo enlace con la tabla `catalogo_juegos`.
  *
  * @component
@@ -64,7 +64,6 @@ export default function GameForm() {
   const [coverHint, setCoverHint] = useState("");
   const [coverOptions, setCoverOptions] = useState([]);
   const [selectedCoverKey, setSelectedCoverKey] = useState(null);
-  const [mergeDuplicate, setMergeDuplicate] = useState(false);
 
   const tituloDirty = useRef(false);
   const coverReqId = useRef(0);
@@ -77,17 +76,8 @@ export default function GameForm() {
 
   useEffect(() => {
     if (isEditing) {
-      fetch(`${API_BASE}/api/games/${id}`, {
-        headers: authHeaders(),
-      })
-        .then((res) => {
-          if (res.status === 401) {
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-            window.location.reload();
-          }
-          return res.json();
-        })
+      apiFetch(`${API_BASE}/api/games/${id}`)
+        .then((res) => res.json())
         .then((data) => {
           tituloDirty.current = false;
           setFormData({
@@ -127,9 +117,8 @@ export default function GameForm() {
     const timer = setTimeout(async () => {
       setCoverLoading(true);
       try {
-        const res = await fetch(
+        const res = await apiFetch(
           `${API_BASE}/api/games/cover-search?q=${encodeURIComponent(t)}`,
-          { headers: authHeaders() },
         );
 
         if (reqId !== coverReqId.current) return;
@@ -277,7 +266,7 @@ export default function GameForm() {
       puntuacion,
       horas_jugadas,
       url_imagen: urlFinal,
-      ...(isEditing && mergeDuplicate ? { merge_duplicate: true } : {}),
+      ...(isEditing ? { merge_duplicate: true } : {}),
       ...(selected && selected.source && selected.id != null
         ? {
             catalogo_ref: {
@@ -290,18 +279,10 @@ export default function GameForm() {
 
     setFormSubmitting(true);
     try {
-      const response = await fetch(url, {
+      const response = await apiFetch(url, {
         method: method,
-        headers: authHeaders(),
         body: JSON.stringify(payload),
       });
-
-      if (response.status === 401) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.reload();
-        return;
-      }
 
       const text = await response.text();
       let data = {};
@@ -530,30 +511,6 @@ export default function GameForm() {
               />
             </div>
           </div>
-
-          {isEditing && (
-            <div className="rounded-xl border border-amber-500/20 bg-amber-950/20 px-4 py-3">
-              <label className="flex cursor-pointer items-start gap-3 text-sm text-slate-300">
-                <input
-                  type="checkbox"
-                  checked={mergeDuplicate}
-                  onChange={(e) => setMergeDuplicate(e.target.checked)}
-                  className="mt-1 h-4 w-4 rounded border-white/20 bg-brand-input text-brand-accent focus:ring-brand-accent/40"
-                />
-                <span>
-                  <span className="font-medium text-amber-100/95">
-                    Eliminar la otra ficha duplicada
-                  </span>
-                  <span className="mt-1 block text-xs leading-relaxed text-slate-500">
-                    Actívalo si al guardar el juego correcto el sistema dice que ya tienes
-                    otra entrada con el mismo título o catálogo (por ejemplo tenías el DLC
-                    y ya habías añadido el juego base). Se borrará la otra ficha y se
-                    conservará esta.
-                  </span>
-                </span>
-              </label>
-            </div>
-          )}
 
           <div className="mt-2 flex flex-wrap items-center justify-end gap-3 border-t border-white/[0.06] pt-8">
             <button

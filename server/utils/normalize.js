@@ -56,12 +56,12 @@ function normalizePlataforma(p) {
 }
 
 /**
- * Traduce el valor de estado del formulario al valor aceptado por la BD.
+ * Traduce el valor de estado del formulario al valor que espera la base de datos.
  * Acepta tanto español ("Pendiente", "Jugando", "Completado") como inglés
- * ("Backlog", "Playing", "Completed") para mayor flexibilidad de la API.
+ * ("Backlog", "Playing", "Completed") para que la API sea flexible.
  *
  * @param {string} estado - Estado recibido del cliente.
- * @returns {string} Valor canónico del estado para la base de datos.
+ * @returns {string} El valor de estado correcto para guardar en la base de datos.
  */
 function normalizeEstadoForDb(estado) {
   const s = String(estado ?? "").trim();
@@ -69,7 +69,7 @@ function normalizeEstadoForDb(estado) {
     Pendiente: "Pendiente",
     Jugando: "Jugando",
     Completado: "Completado",
-    Backlog: "Pendiente",   // alias en inglés
+    Backlog: "Pendiente", // alias en inglés
     Playing: "Jugando",
     Completed: "Completado",
   };
@@ -100,13 +100,13 @@ function parseCatalogoRef(body) {
 }
 
 /**
- * Construye el objeto de error para la respuesta HTTP.
- * En desarrollo incluye el mensaje técnico para facilitar la depuración.
- * En producción solo devuelve el mensaje genérico para no filtrar información interna.
+ * Prepara el objeto de error que se devuelve en la respuesta HTTP.
+ * En modo desarrollo incluye el mensaje técnico del error para poder depurar.
+ * En producción solo devuelve un mensaje genérico para no exponer detalles internos.
  *
- * @param {Error}  err         - Objeto de error capturado en el catch.
- * @param {string} fallbackMsg - Mensaje genérico a mostrar siempre.
- * @returns {{ error: string, detail?: string, code?: string }} Payload de error.
+ * @param {Error}  err         - El error capturado en el bloque catch.
+ * @param {string} fallbackMsg - Mensaje genérico que siempre se muestra.
+ * @returns {{ error: string, detail?: string, code?: string }} Objeto de error listo para enviar.
  */
 function serverErrorPayload(err, fallbackMsg) {
   const out = { error: fallbackMsg };
@@ -118,12 +118,12 @@ function serverErrorPayload(err, fallbackMsg) {
 }
 
 /**
- * Crea una señal de cancelación para peticiones `fetch` con tiempo límite.
- * Usa `AbortSignal.timeout` si está disponible (Node 17.3+), y cae al
- * polyfill manual con `AbortController` en versiones anteriores.
+ * Crea un temporizador para cancelar peticiones `fetch` que tarden demasiado.
+ * Si el entorno lo soporta usa la forma nativa (`AbortSignal.timeout`);
+ * si no, hace lo mismo de forma manual con `AbortController` y `setTimeout`.
  *
- * @param {number} ms - Tiempo máximo en milisegundos antes de cancelar el fetch.
- * @returns {AbortSignal} Señal que se activará tras `ms` milisegundos.
+ * @param {number} ms - Tiempo máximo de espera en milisegundos.
+ * @returns {AbortSignal} Señal que cancela el fetch cuando se agota el tiempo.
  */
 function fetchTimeoutMs(ms) {
   if (

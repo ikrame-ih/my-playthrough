@@ -6,16 +6,17 @@
  * - **RAWG** (rawg.io): base de datos de más de 500.000 juegos. Requiere API key gratuita.
  * - **Steam** (store.steampowered.com): no necesita key, pero solo cubre títulos de PC en Steam.
  *
- * También gestiona el upsert en `catalogo_juegos`, que actúa como caché local de los
- * metadatos de juegos ya buscados, evitando llamadas repetidas a las APIs externas.
+ * También guarda los resultados en la tabla `catalogo_juegos` para no repetir la
+ * misma búsqueda externa cada vez que alguien añade el mismo juego.
  */
 
 const { fetchTimeoutMs } = require("./normalize");
 
 /**
- * Lista blanca de dominios desde los que el proxy de imágenes acepta peticiones.
- * Limitar los hosts evita que el servidor sea usado como proxy abierto para cualquier
- * URL arbitraria — un ataque conocido como SSRF (Server-Side Request Forgery).
+ * Lista de dominios permitidos para el proxy de imágenes.
+ * Solo aceptamos URLs de estos servidores para evitar que alguien use
+ * nuestro backend para descargar contenido de cualquier sitio web externo,
+ * lo que podría comprometer la seguridad del servidor.
  * @constant {Set<string>}
  */
 const ALLOWED_COVER_HOSTS = new Set([
@@ -41,9 +42,9 @@ const COVER_FETCH_HEADERS = {
 };
 
 /**
- * Cabeceras para peticiones de descarga de imágenes.
- * Aceptamos formatos modernos (avif, webp) además del clásico jpeg/png
- * para reducir el tamaño de las transferencias cuando el CDN los soporta.
+ * Cabeceras para descargar imágenes de los CDN externos.
+ * Indicamos que aceptamos formatos modernos como avif y webp, que pesan menos
+ * que jpeg/png y se cargan más rápido cuando el servidor los soporta.
  * @constant {object}
  */
 const COVER_IMAGE_FETCH_HEADERS = {
@@ -137,9 +138,16 @@ async function fetchSteamCovers(searchQuery) {
           const d = dj[String(item.id)]?.data;
           if (d?.header_image) background_image = d.header_image;
         }
-      } catch (_) { /* si falla la llamada a appdetails, usamos tiny_image */ }
+      } catch (_) {
+        /* si falla la llamada a appdetails, usamos tiny_image */
+      }
       if (!background_image) return null;
-      return { id: item.id, name: item.name, background_image, source: "steam" };
+      return {
+        id: item.id,
+        name: item.name,
+        background_image,
+        source: "steam",
+      };
     }),
   );
 
@@ -170,18 +178,20 @@ function mergeCoverResults(rawg, steam) {
 }
 
 /**
- * Inserta o actualiza un juego en la tabla `catalogo_juegos`.
- * Usa ON CONFLICT para hacer un "upsert": si el juego ya existe (mismo rawg_id
- * o steam_app_id), actualiza el título y la imagen en lugar de insertar un duplicado.
- * Devuelve el `id` del catálogo que se usará como FK en la tabla `juegos`.
+ * Guarda un juego en la tabla compartida `catalogo_juegos`.
+ * Si el juego ya existía (mismo ID de RAWG o de Steam), actualiza sus datos
+ * en lugar de crear un duplicado. Este comportamiento se llama "upsert" en bases de datos:
+ * insertar si no existe, actualizar si ya existe.
+ * Devuelve el ID del catálogo, que la tabla `juegos` usa para enlazar la ficha personal
+ * con el juego del catálogo.
  *
- * @param {import("pg").PoolClient} client     - Cliente de BD dentro de una transacción abierta.
- * @param {object}  opts            - Datos del juego a insertar/actualizar.
- * @param {"rawg"|"steam"} opts.source - Origen de los datos.
- * @param {number}  opts.id         - ID en RAWG o Steam App ID.
+ * @param {import("pg").PoolClient} client     - Conexión de base de datos dentro de una transacción.
+ * @param {object}  opts            - Datos del juego a guardar.
+ * @param {"rawg"|"steam"} opts.source - De dónde viene el juego (RAWG o Steam).
+ * @param {number}  opts.id         - ID del juego en RAWG o Steam.
  * @param {string}  opts.titulo     - Título del juego.
  * @param {string|null} opts.url_imagen - URL de la portada.
- * @returns {Promise<number|null>} ID del catálogo generado, o null si falló.
+ * @returns {Promise<number|null>} ID del registro en el catálogo, o null si algo falló.
  */
 async function upsertCatalogoGame(client, { source, id, titulo, url_imagen }) {
   const { normalizeGameTitle } = require("./normalize");

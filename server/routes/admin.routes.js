@@ -14,6 +14,7 @@
 const express = require("express");
 const pool = require("../config/db");
 const { authMiddleware, adminMiddleware } = require("../middleware/auth.middleware");
+const { serverErrorPayload } = require("../utils/normalize");
 
 const router = express.Router();
 
@@ -34,7 +35,8 @@ router.get("/users", async (req, res) => {
     );
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("[GET /api/admin/users]", error);
+    res.status(500).json(serverErrorPayload(error, "Error al cargar usuarios."));
   }
 });
 
@@ -69,7 +71,8 @@ router.delete("/users/:id", async (req, res) => {
     }
     res.json({ success: true, message: "Usuario eliminado." });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("[DELETE /api/admin/users/:id]", error);
+    res.status(500).json(serverErrorPayload(error, "Error al eliminar usuario."));
   }
 });
 
@@ -100,7 +103,8 @@ router.get("/games", async (req, res) => {
     );
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("[GET /api/admin/games]", error);
+    res.status(500).json(serverErrorPayload(error, "Error al cargar juegos."));
   }
 });
 
@@ -130,7 +134,8 @@ router.delete("/games/:id", async (req, res) => {
     }
     res.json({ success: true, message: "Juego eliminado." });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("[DELETE /api/admin/games/:id]", error);
+    res.status(500).json(serverErrorPayload(error, "Error al eliminar juego."));
   }
 });
 

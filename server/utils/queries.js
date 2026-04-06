@@ -104,29 +104,8 @@ async function queryGamePublicById(gameId) {
   return r.rows[0] ?? null;
 }
 
-/**
- * Comprueba si la tabla `juego_comentarios` existe en la BD.
- * Esta tabla es opcional y se crea ejecutando `docs/add-juego-comentarios.sql`.
- * Las rutas de comentarios la usan para devolver un 503 descriptivo en lugar
- * de un error de PostgreSQL críptico si la tabla no ha sido creada todavía.
- *
- * @returns {Promise<boolean>} `true` si la tabla existe, `false` en caso contrario.
- */
-async function juegoComentariosTableExists() {
-  try {
-    const r = await pool.query(
-      `SELECT 1 FROM information_schema.tables
-       WHERE table_schema = 'public' AND table_name = 'juego_comentarios'`,
-    );
-    return r.rows.length > 0;
-  } catch {
-    return false;
-  }
-}
-
 module.exports = {
   queryGamesListForUser,
   queryOneGameForUser,
   queryGamePublicById,
-  juegoComentariosTableExists,
 };

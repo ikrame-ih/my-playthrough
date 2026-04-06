@@ -2,9 +2,9 @@
  * @module covers.routes
  * @description Proxy de imágenes y búsqueda de carátulas.
  *
- * El proxy existe porque los CDN de Steam y RAWG bloquean peticiones de imagen
- * que vienen directamente desde el navegador (política CORS + hotlink protection).
- * Al hacer la petición desde el servidor, evitamos ese bloqueo.
+ * El proxy existe porque Steam y RAWG bloquean las peticiones de imagen
+ * que llegan directamente desde el navegador. Al pedirlas desde el servidor
+ * en su lugar, se evita ese bloqueo y el navegador recibe la imagen sin problemas.
  *
  * Rutas definidas:
  *   GET /api/covers/proxy        → proxy de imagen (sin auth, la usan etiquetas <img>)
@@ -54,9 +54,9 @@ function toRawgCropUrl(url) {
 
 /**
  * Descarga una imagen de los CDN permitidos y la reenvía al cliente.
- * No requiere autenticación porque las etiquetas `<img>` del HTML no pueden
- * enviar cabeceras `Authorization`. La seguridad la da la lista blanca de hosts.
- * Las carátulas se cachean 24h en el navegador (`Cache-Control: max-age=86400`).
+ * No requiere autenticación porque las etiquetas `<img>` del HTML no tienen forma
+ * de enviar un token. La seguridad la da la lista de dominios permitidos.
+ * Las carátulas se guardan en caché 24h en el navegador para no descargarlas cada vez.
  *
  * @route  GET /api/covers/proxy?u=<url>
  * @access Public (sin auth, protegido por lista blanca de hosts)
@@ -111,8 +111,8 @@ router.get("/proxy", async (req, res) => {
 
 /**
  * Busca carátulas de juegos combinando RAWG y Steam.
- * Requiere autenticación para evitar que bots externos usen la ruta como
- * buscador gratuito consumiendo nuestra cuota de la API de RAWG.
+ * Requiere autenticación para que solo los usuarios registrados puedan buscar
+ * y no se consuma la cuota de la API de RAWG con peticiones anónimas.
  * Si `RAWG_API_KEY` no está configurada, solo se usa Steam como fallback.
  *
  * @route  GET /api/games/cover-search?q=<término>

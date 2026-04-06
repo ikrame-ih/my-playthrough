@@ -24,7 +24,6 @@ const { authMiddleware, usuarioEsAdmin } = require("../middleware/auth.middlewar
 const {
   queryGamesListForUser,
   queryOneGameForUser,
-  juegoComentariosTableExists,
 } = require("../utils/queries");
 const {
   normalizeGameTitle,
@@ -56,7 +55,8 @@ router.get("/", authMiddleware, async (req, res) => {
     const rows = await queryGamesListForUser(req.user.id);
     res.json(rows);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("[GET /api/games]", error);
+    res.status(500).json(serverErrorPayload(error, "Error al cargar la colección."));
   }
 });
 
@@ -194,7 +194,8 @@ router.get("/:id", authMiddleware, async (req, res) => {
     }
     res.json(row);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("[GET /api/games/:id]", error);
+    res.status(500).json(serverErrorPayload(error, "Error al cargar el juego."));
   }
 });
 
@@ -387,13 +388,10 @@ router.delete("/:id", authMiddleware, async (req, res) => {
 
 /**
  * Devuelve todos los comentarios de una ficha ordenados cronológicamente.
- * Si la tabla `juego_comentarios` no existe, devuelve 503 con instrucciones
- * en lugar de un error de PostgreSQL críptico.
- *
  * @route  GET /api/games/:gameId/comments
  * @access Private (requiere JWT válido)
  * @param  {string} req.params.gameId - ID de la ficha.
- * @returns {object} 200 – `{ comments: [...] }` | 503 – tabla no creada.
+ * @returns {object} 200 – `{ comments: [...] }` | 404 – juego no encontrado.
  */
 router.get("/:gameId/comments", authMiddleware, async (req, res) => {
   try {
@@ -407,12 +405,6 @@ router.get("/:gameId/comments", authMiddleware, async (req, res) => {
       return res.status(404).json({ error: "Juego no encontrado." });
     }
 
-    if (!(await juegoComentariosTableExists())) {
-      return res.status(503).json({
-        error: "Los comentarios no están activos. Ejecuta docs/add-juego-comentarios.sql.",
-      });
-    }
-
     const result = await pool.query(
       `SELECT c.id, c.juego_id, c.usuario_id, c.parent_id, c.cuerpo, c.fecha_creacion,
               u.nombre_usuario AS autor_nombre
@@ -424,7 +416,8 @@ router.get("/:gameId/comments", authMiddleware, async (req, res) => {
     );
     res.json({ comments: result.rows });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("[GET comments]", error);
+    res.status(500).json(serverErrorPayload(error, "Error al cargar los comentarios."));
   }
 });
 
@@ -444,12 +437,6 @@ router.post("/:gameId/comments", authMiddleware, async (req, res) => {
     const gameId = parseInt(req.params.gameId, 10);
     if (Number.isNaN(gameId)) {
       return res.status(400).json({ error: "ID inválido." });
-    }
-
-    if (!(await juegoComentariosTableExists())) {
-      return res.status(503).json({
-        error: "Los comentarios no están activos. Ejecuta docs/add-juego-comentarios.sql.",
-      });
     }
 
     const cuerpo = String(req.body?.cuerpo ?? "").trim();
@@ -500,7 +487,8 @@ router.post("/:gameId/comments", authMiddleware, async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("[POST comment]", error);
+    res.status(500).json(serverErrorPayload(error, "Error al publicar el comentario."));
   }
 });
 
@@ -518,10 +506,6 @@ router.delete("/:gameId/comments/:commentId", authMiddleware, async (req, res) =
     const commentId = parseInt(req.params.commentId, 10);
     if (Number.isNaN(gameId) || Number.isNaN(commentId)) {
       return res.status(400).json({ error: "ID inválido." });
-    }
-
-    if (!(await juegoComentariosTableExists())) {
-      return res.status(503).json({ error: "Comentarios no disponibles." });
     }
 
     const row = await pool.query(
@@ -547,7 +531,8 @@ router.delete("/:gameId/comments/:commentId", authMiddleware, async (req, res) =
     await pool.query("DELETE FROM juego_comentarios WHERE id = $1", [commentId]);
     res.json({ success: true, message: "Comentario eliminado." });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("[DELETE comment]", error);
+    res.status(500).json(serverErrorPayload(error, "Error al eliminar el comentario."));
   }
 });
 

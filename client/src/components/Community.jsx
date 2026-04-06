@@ -1,17 +1,27 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { API_BASE, authHeaders } from "../api";
+import { API_BASE, apiFetch } from "../api";
 import { useSearch } from "../SearchContext";
 import { IconUsers } from "./icons";
 import { CommunityMemberSkeleton } from "./Skeletons";
+import { avatarGradient } from "./AppShell";
+
+/** Lee el rol del usuario desde localStorage. */
+function getCurrentUserRole() {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "{}")?.rol ?? "user";
+  } catch {
+    return "user";
+  }
+}
 
 /**
  * Página de la comunidad con dos pestañas: miembros y estadísticas globales.
  * Carga en paralelo la lista de usuarios y las estadísticas para reducir
  * el tiempo de espera total. La pestaña "Miembros" filtra por el SearchContext.
- * La variable `cancelled` evita actualizar el estado si el componente se desmonta
- * antes de que llegue la respuesta (evita un warning de React sobre actualizaciones
- * en componentes desmontados).
+ * La variable `cancelled` sirve para no actualizar el estado si el usuario
+ * navega a otra página antes de que llegue la respuesta del servidor,
+ * lo que evitaría un error de React al intentar actualizar un componente que ya no existe.
  *
  * @component
  */
@@ -22,22 +32,17 @@ export default function Community() {
   const [tab, setTab] = useState("members");
   const { query } = useSearch();
 
+  const isAdmin = getCurrentUserRole() === "admin";
+
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
       try {
         const [uRes, sRes] = await Promise.all([
-          fetch(`${API_BASE}/api/users`, { headers: authHeaders() }),
-          fetch(`${API_BASE}/api/community/stats`, { headers: authHeaders() }),
+          apiFetch(`${API_BASE}/api/users`),
+          apiFetch(`${API_BASE}/api/community/stats`),
         ]);
-
-        if (uRes.status === 401 || sRes.status === 401) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          window.location.reload();
-          return;
-        }
 
         if (uRes.ok && !cancelled) {
           setUsers(await uRes.json());
@@ -140,20 +145,18 @@ export default function Community() {
           ) : (
             <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredUsers.map((u) => {
-                const letter = (u.nombre_usuario || "?")
-                  .trim()
-                  .charAt(0)
-                  .toUpperCase();
-                const num = u.num_juegos ?? 0;
-                const plat =
-                  u.plataforma_ejemplo?.trim() || "—";
+                const name   = (u.nombre_usuario || "?").trim();
+                const letter = name.charAt(0).toUpperCase();
+                const grad   = avatarGradient(name);
+                const num    = u.num_juegos ?? 0;
+                const plat   = u.plataforma_ejemplo?.trim() || "—";
                 return (
                   <li key={u.id}>
                     <Link
                       to={`/user/${u.id}`}
                       className="figma-panel flex items-center gap-4 p-4 transition hover:border-brand-accent/35 hover:shadow-figma-lg"
                     >
-                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-brand-accent/50 bg-slate-900 text-lg font-bold text-white">
+                      <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${grad} text-lg font-bold text-white shadow-md`}>
                         {letter}
                       </span>
                       <div className="min-w-0">
@@ -175,10 +178,13 @@ export default function Community() {
 
       {tab === "stats" && (
         <section>
-          <p className="mb-5 max-w-2xl text-sm leading-relaxed text-slate-400">
-            Nota media por título según las puntuaciones que la comunidad va
-            guardando (mismo título = misma fila).
-          </p>
+          {/* Solo el admin ve la nota técnica; el resto solo ve la tabla */}
+          {isAdmin && (
+            <p className="mb-5 max-w-2xl text-sm leading-relaxed text-slate-400">
+              Puntuación media de cada juego calculada a partir de todas las
+              valoraciones guardadas en la comunidad.
+            </p>
+          )}
           {stats.length === 0 ? (
             <p className="figma-panel px-5 py-8 text-sm text-slate-500">
               Aún no hay datos suficientes para calcular medias.

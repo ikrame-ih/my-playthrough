@@ -19,12 +19,17 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Enunciados / PDFs de la tarea (solo en local; no subir a GitHub)
-docs/**/*.pdf
+# Documentos locales (PDFs y Word; no subir a GitHub)
+*.pdf
+*.docx
+*.doc
 
 # Cursor (reglas y ajustes locales; no subir)
 .cursor/
 ESTUDIO_EXPOSICION.md
+GUIA_CUARTA_ENTREGA.md
+diagrama_bd.html
+arquitectura_pern.html
 
 # Cursor internal files
 .agents/

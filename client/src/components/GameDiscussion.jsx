@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { API_BASE, authHeaders } from "../api";
+import { API_BASE, apiFetch } from "../api";
 import { displayCoverUrl } from "../coverUrl";
 
 /**
@@ -89,9 +89,9 @@ function CommentBlock({
               onClick={async () => {
                 if (!window.confirm("¿Eliminar este comentario?")) return;
                 try {
-                  const res = await fetch(
+                  const res = await apiFetch(
                     `${API_BASE}/api/games/${gameId}/comments/${c.id}`,
-                    { method: "DELETE", headers: authHeaders() },
+                    { method: "DELETE" },
                   );
                   if (res.ok) onDeleted();
                 } catch {
@@ -144,20 +144,9 @@ export default function GameDiscussion() {
     setErr("");
     try {
       const [gRes, cRes] = await Promise.all([
-        fetch(`${API_BASE}/api/community/games/${gameId}`, {
-          headers: authHeaders(),
-        }),
-        fetch(`${API_BASE}/api/games/${gameId}/comments`, {
-          headers: authHeaders(),
-        }),
+        apiFetch(`${API_BASE}/api/community/games/${gameId}`),
+        apiFetch(`${API_BASE}/api/games/${gameId}/comments`),
       ]);
-
-      if (gRes.status === 401) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.reload();
-        return;
-      }
 
       if (!gRes.ok) {
         setErr("No se encontró el juego.");
@@ -197,9 +186,8 @@ export default function GameDiscussion() {
     if (!body || posting) return;
     setPosting(true);
     try {
-      const res = await fetch(`${API_BASE}/api/games/${gameId}/comments`, {
+      const res = await apiFetch(`${API_BASE}/api/games/${gameId}/comments`, {
         method: "POST",
-        headers: authHeaders(),
         body: JSON.stringify({
           cuerpo: body,
           parent_id: replyTo ?? undefined,

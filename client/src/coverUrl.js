@@ -1,19 +1,19 @@
 import { API_BASE } from "./api";
 
 /**
- * Transforma una URL de carátula para que se sirva a través del proxy del backend.
+ * Convierte la URL de una carátula para que el navegador la pida a través de nuestro servidor.
  *
- * Los CDN de Steam y RAWG bloquean peticiones directas desde el navegador
- * (política CORS + hotlink protection). Esta función redirige la carga de
- * imágenes a `/api/covers/proxy?u=<url>`, donde el servidor actúa de intermediario.
+ * Steam y RAWG bloquean las peticiones de imagen que vienen directamente del navegador,
+ * así que en lugar de pedir la imagen al CDN directamente, el navegador se la pide
+ * a nuestro backend (`/api/covers/proxy`), que la descarga y la reenvía.
  *
- * Casos especiales manejados:
- * - URLs `data:` (base64): se devuelven tal cual, no necesitan proxy.
- * - URLs que ya pasan por el proxy: no se duplica el envoltorio.
- * - URLs con protocolo no http(s): se devuelven sin modificar.
+ * Casos en los que no se aplica el proxy:
+ * - Imágenes en base64 (`data:`): ya están en el navegador, no necesitan descargarse.
+ * - URLs que ya pasan por el proxy: para no anidar dos llamadas.
+ * - URLs que no son http/https: no se procesan.
  *
  * @param {string} url - URL original de la carátula.
- * @returns {string} URL que apunta al proxy, o la original si no necesita proxy.
+ * @returns {string} URL que apunta al proxy, o la original si no necesita cambios.
  */
 export function displayCoverUrl(url) {
   const u = (url || "").trim();
