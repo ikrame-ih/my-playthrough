@@ -10,6 +10,7 @@ import Community from "./components/Community";
 import UserPublicProfile from "./components/UserPublicProfile";
 import AdminUsers from "./components/AdminUsers";
 import GameDiscussion from "./components/GameDiscussion";
+import ProfileSettings from "./components/ProfileSettings";
 
 /**
  * Página principal de la colección del usuario.
@@ -101,6 +102,12 @@ function App() {
             <Route path="/edit/:id" element={<GameForm />} />
             <Route path="/community" element={<Community />} />
             <Route path="/user/:userId" element={<UserPublicProfile />} />
+            <Route
+              path="/settings"
+              element={
+                <ProfileSettings user={user} onUserUpdate={setUser} />
+              }
+            />
             <Route path="/admin" element={<AdminUsers />} />
             <Route
               path="/juego/:gameId/discussion"

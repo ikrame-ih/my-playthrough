@@ -107,7 +107,7 @@ export default function AuthPage({ onAuthSuccess }) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-brand-bg bg-app-radial px-4 py-12">
       <div className="mb-8 flex flex-col items-center text-center">
-        <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-900 text-brand-accent ring-1 ring-white/[0.08]">
+        <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-900/90 text-brand-accent shadow-[0_0_28px_-8px_rgba(45,212,191,0.55)] ring-1 ring-brand-accent/30">
           <IconController className="h-7 w-7" />
         </span>
         <h1 className="mt-5 max-w-sm text-2xl font-bold leading-tight text-white sm:text-[1.65rem]">
@@ -117,7 +117,7 @@ export default function AuthPage({ onAuthSuccess }) {
         </h1>
       </div>
 
-      <div className="figma-panel w-full max-w-md p-8 sm:p-10">
+      <div className="figma-panel w-full max-w-md p-8 shadow-[0_0_48px_-16px_rgba(45,212,191,0.12)] ring-1 ring-brand-accent/10 sm:p-10">
         {formError && (
           <div
             className="mb-5 rounded-lg border border-red-500/35 bg-red-950/35 px-4 py-3 text-sm text-red-100"
@@ -203,6 +203,29 @@ export default function AuthPage({ onAuthSuccess }) {
               />
               Recordarme
             </label>
+          )}
+
+          {mode === "login" && (
+            <p className="text-center text-xs text-slate-500">
+              <button
+                type="button"
+                className="font-medium text-brand-accent underline decoration-brand-accent/40 underline-offset-2 transition hover:text-teal-300"
+                onClick={() =>
+                  setFormData((f) => ({
+                    ...f,
+                    email: "demo@myplaythrough.local",
+                    password: "demo123456",
+                  }))
+                }
+              >
+                Rellenar cuenta demo
+              </button>
+              <span className="block mt-1 text-[0.65rem] text-slate-600">
+                Requiere haber ejecutado{" "}
+                <code className="text-slate-500">npm run seed:demo</code> en{" "}
+                <code className="text-slate-500">server/</code>
+              </span>
+            </p>
           )}
 
           <button

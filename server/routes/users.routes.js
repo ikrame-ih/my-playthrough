@@ -13,6 +13,7 @@ const pool = require("../config/db");
 const { authMiddleware } = require("../middleware/auth.middleware");
 const { queryGamesListForUser } = require("../utils/queries");
 const { serverErrorPayload } = require("../utils/normalize");
+const { coerceAvatarId } = require("../constants/avatars");
 
 const router = express.Router();
 
@@ -33,6 +34,7 @@ router.get("/", authMiddleware, async (req, res) => {
       `SELECT
          u.id,
          u.nombre_usuario,
+         u.avatar_id,
          (SELECT COUNT(*)::int FROM juegos j WHERE j.usuario_id = u.id) AS num_juegos,
          (SELECT j.plataforma FROM juegos j WHERE j.usuario_id = u.id ORDER BY j.id DESC LIMIT 1) AS plataforma_ejemplo
        FROM usuarios u
@@ -40,7 +42,12 @@ router.get("/", authMiddleware, async (req, res) => {
        ORDER BY u.nombre_usuario ASC`,
       [req.user.id],
     );
-    res.json(result.rows);
+    res.json(
+      result.rows.map((r) => ({
+        ...r,
+        avatar_id: coerceAvatarId(r.avatar_id),
+      })),
+    );
   } catch (error) {
     console.error("[GET /api/users]", error);
     res.status(500).json(serverErrorPayload(error, "Error al cargar usuarios."));
@@ -65,15 +72,18 @@ router.get("/:userId/games", authMiddleware, async (req, res) => {
     }
 
     const userExists = await pool.query(
-      "SELECT id, nombre_usuario FROM usuarios WHERE id = $1",
+      "SELECT id, nombre_usuario, avatar_id FROM usuarios WHERE id = $1",
       [userId],
     );
     if (userExists.rows.length === 0) {
       return res.status(404).json({ error: "Usuario no encontrado." });
     }
 
+    const u = userExists.rows[0];
+    u.avatar_id = coerceAvatarId(u.avatar_id);
+
     const games = await queryGamesListForUser(userId);
-    res.json({ user: userExists.rows[0], games });
+    res.json({ user: u, games });
   } catch (error) {
     console.error("[GET /api/users/:userId/games]", error);
     res.status(500).json(serverErrorPayload(error, "Error al cargar la colección pública."));

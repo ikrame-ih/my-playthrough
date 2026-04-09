@@ -11,14 +11,17 @@
 @layer components {
   /* Paneles / inputs alineados con capturas Figma */
   .figma-panel {
-    @apply rounded-2xl border border-white/[0.08] bg-brand-panel shadow-figma ring-1 ring-white/[0.04];
+    @apply rounded-2xl border border-white/[0.08] bg-brand-panel bg-card-shine shadow-figma ring-1 ring-white/[0.04] transition-shadow duration-300 ease-out;
+  }
+  .figma-panel-interactive {
+    @apply figma-panel hover:border-brand-accent/20 hover:shadow-[0_12px_40px_-10px_rgba(45,212,191,0.12)];
   }
   .figma-input {
     @apply w-full rounded-lg border border-white/10 bg-brand-input px-4 py-3 text-white placeholder:text-slate-500 transition focus:border-brand-accent focus:outline-none focus:ring-2 focus:ring-brand-accent/25;
   }
   /* Botón principal: teal sólido + texto negro (login / CTAs) */
   .figma-btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand-tealBtn px-5 py-2.5 text-sm font-bold text-black shadow-lg shadow-teal-900/25 transition hover:brightness-95 active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand-tealBtn px-5 py-2.5 text-sm font-bold text-black shadow-lg shadow-teal-900/30 transition-all duration-200 ease-out hover:brightness-105 hover:shadow-[0_8px_28px_-6px_rgba(45,212,191,0.45)] active:scale-[0.98];
   }
   .figma-btn-outline {
     @apply inline-flex w-full items-center justify-center rounded-lg border border-white/10 bg-brand-input py-3 text-sm font-semibold text-white transition hover:bg-white/[0.04];

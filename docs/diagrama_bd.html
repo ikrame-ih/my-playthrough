@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MyPlaythrough — Diagrama lógico de base de datos</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --panel: #161d2f;
+      --accent: #2dd4bf;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 2rem 1.5rem 3rem;
+    }
+    h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+    }
+    p.sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin: 0 0 2rem;
+      max-width: 42rem;
+    }
+    .grid {
+      display: grid;
+      gap: 1.25rem;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      max-width: 1200px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      background: var(--panel);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 0 1px var(--border);
+    }
+    caption {
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.75rem 1rem;
+      background: rgba(45, 212, 191, 0.08);
+      border-bottom: 1px solid var(--border);
+      color: var(--accent);
+    }
+    th, td {
+      padding: 0.45rem 0.75rem;
+      text-align: left;
+      border-top: 1px solid var(--border);
+    }
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      width: 38%;
+    }
+    .pk { color: var(--accent); }
+    .fk { color: #a5b4fc; }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0 0 1.25rem;
+    }
+    .toolbar button {
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: rgba(45, 212, 191, 0.12);
+      color: var(--accent);
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .toolbar button:hover {
+      background: rgba(45, 212, 191, 0.2);
+      border-color: rgba(45, 212, 191, 0.35);
+    }
+    .toolbar .hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      max-width: 28rem;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button type="button" id="btn-download-html" aria-label="Descargar este diagrama como archivo HTML">
+      Descargar HTML
+    </button>
+    <span class="hint">
+      Genera <code>diagrama_bd.html</code> en tu carpeta de descargas. En GitHub: abre el archivo → <strong>Raw</strong> → <kbd>Ctrl+S</kbd> (Guardar página como).
+    </span>
+  </div>
+  <h1>Modelo lógico — tablas principales</h1>
+  <p class="sub">
+    Vista HTML del esquema alineada con <code>docs/schema.sql</code>. La tabla
+    <strong>usuarios</strong> incluye <code>avatar_id</code> (robots predefinidos
+    <code>robot-0</code> … <code>robot-9</code>).
+  </p>
+
+  <div class="grid">
+    <table>
+      <caption>usuarios</caption>
+      <tbody>
+        <tr><th class="pk">id</th><td>SERIAL PK</td></tr>
+        <tr><th>nombre_usuario</th><td>VARCHAR(255) NOT NULL</td></tr>
+        <tr><th>email</th><td>VARCHAR(255) UNIQUE NOT NULL</td></tr>
+        <tr><th>password_hash</th><td>VARCHAR(255) NOT NULL</td></tr>
+        <tr><th>rol</th><td>VARCHAR(50) DEFAULT 'user'</td></tr>
+        <tr><th>avatar_id</th><td>VARCHAR(32) NOT NULL DEFAULT 'robot-0'</td></tr>
+        <tr><th>fecha_registro</th><td>TIMESTAMP DEFAULT NOW()</td></tr>
+      </tbody>
+    </table>
+
+    <table>
+      <caption>catalogo_juegos</caption>
+      <tbody>
+        <tr><th class="pk">id</th><td>SERIAL PK</td></tr>
+        <tr><th>titulo</th><td>VARCHAR(512) NOT NULL</td></tr>
+        <tr><th>url_imagen</th><td>TEXT</td></tr>
+        <tr><th>rawg_id</th><td>INTEGER UNIQUE</td></tr>
+        <tr><th>steam_app_id</th><td>BIGINT UNIQUE</td></tr>
+        <tr><th>created_at</th><td>TIMESTAMPTZ</td></tr>
+      </tbody>
+    </table>
+
+    <table>
+      <caption>juegos</caption>
+      <tbody>
+        <tr><th class="pk">id</th><td>SERIAL PK</td></tr>
+        <tr><th class="fk">usuario_id</th><td>FK → usuarios(id) CASCADE</td></tr>
+        <tr><th>titulo</th><td>VARCHAR(255) NOT NULL</td></tr>
+        <tr><th>estado</th><td>VARCHAR(50) NOT NULL</td></tr>
+        <tr><th>plataforma</th><td>VARCHAR(100)</td></tr>
+        <tr><th>puntuacion</th><td>INTEGER</td></tr>
+        <tr><th>horas_jugadas</th><td>INTEGER DEFAULT 0</td></tr>
+        <tr><th>comentario</th><td>VARCHAR(1000)</td></tr>
+        <tr><th>url_imagen</th><td>TEXT</td></tr>
+        <tr><th class="fk">catalogo_id</th><td>FK → catalogo_juegos(id) SET NULL</td></tr>
+      </tbody>
+    </table>
+
+    <table>
+      <caption>juego_comentarios</caption>
+      <tbody>
+        <tr><th class="pk">id</th><td>SERIAL PK</td></tr>
+        <tr><th class="fk">juego_id</th><td>FK → juegos(id) CASCADE</td></tr>
+        <tr><th class="fk">usuario_id</th><td>FK → usuarios(id) CASCADE</td></tr>
+        <tr><th class="fk">parent_id</th><td>FK → juego_comentarios(id) CASCADE</td></tr>
+        <tr><th>cuerpo</th><td>TEXT NOT NULL</td></tr>
+        <tr><th>fecha_creacion</th><td>TIMESTAMPTZ DEFAULT NOW()</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <script>
+    (function () {
+      var btn = document.getElementById("btn-download-html");
+      if (!btn) return;
+      btn.addEventListener("click", function () {
+        try {
+          var doctype = "<!DOCTYPE html>\n";
+          var html = doctype + document.documentElement.outerHTML;
+          var blob = new Blob([html], { type: "text/html;charset=utf-8" });
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = url;
+          a.download = "diagrama_bd.html";
+          a.rel = "noopener";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(function () {
+            URL.revokeObjectURL(url);
+          }, 1500);
+        } catch (e) {
+          alert(
+            "No se pudo descargar desde este entorno. Usa clic derecho → Guardar como… o en GitHub: vista Raw y Ctrl+S.",
+          );
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

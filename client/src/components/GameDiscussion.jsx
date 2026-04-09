@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { API_BASE, apiFetch } from "../api";
 import { displayCoverUrl } from "../coverUrl";
+import UserAvatar from "./UserAvatar";
 
 /**
  * Lee y parsea el usuario actual del localStorage.
@@ -56,9 +57,16 @@ function CommentBlock({
       className={`${depth > 0 ? "ml-6 border-l border-white/[0.08] pl-4" : ""}`}
     >
       <div className="rounded-xl border border-white/[0.06] bg-slate-900/40 px-4 py-3">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <span className="font-semibold text-brand-accent">
-            {c.autor_nombre || "Usuario"}
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="flex min-w-0 items-center gap-2">
+            <UserAvatar
+              avatarId={c.autor_avatar_id}
+              size="sm"
+              title={`Avatar de ${c.autor_nombre || "Usuario"}`}
+            />
+            <span className="truncate font-semibold text-brand-accent">
+              {c.autor_nombre || "Usuario"}
+            </span>
           </span>
           <time
             className="text-xs text-slate-500"

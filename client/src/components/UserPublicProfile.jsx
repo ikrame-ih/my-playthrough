@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { API_BASE, apiFetch } from "../api";
 import GameCard from "./GameCard";
 import { GameCardSkeleton, ProfileHeaderSkeleton } from "./Skeletons";
+import UserAvatar from "./UserAvatar";
 
 /**
  * Perfil público de otro usuario: muestra su colección en modo solo lectura.
@@ -90,14 +91,22 @@ export default function UserPublicProfile() {
   return (
     <div>
       <div className="mb-10 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="mb-2 h-1 w-14 rounded-full bg-gradient-to-r from-brand-accent to-brand-accent/40" />
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-[2.25rem]">
-            Colección de {user.nombre_usuario}
-          </h1>
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-400">
-            Vista solo lectura (no puedes editar ni borrar juegos ajenos).
-          </p>
+        <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-start">
+          <UserAvatar
+            avatarId={user.avatar_id}
+            size="xl"
+            title={`Avatar de ${user.nombre_usuario}`}
+            className="sm:mt-1"
+          />
+          <div className="min-w-0">
+            <div className="mb-2 h-1 w-14 rounded-full bg-gradient-to-r from-brand-accent to-brand-accent/40" />
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-[2.25rem]">
+              Colección de {user.nombre_usuario}
+            </h1>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-400">
+              Vista solo lectura (no puedes editar ni borrar juegos ajenos).
+            </p>
+          </div>
         </div>
         <Link
           to="/community"

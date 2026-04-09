@@ -26,9 +26,9 @@ export default {
       },
       backgroundImage: {
         "app-radial":
-          "radial-gradient(ellipse 90% 60% at 50% -15%, rgba(45, 212, 191, 0.09), transparent 55%)",
+          "radial-gradient(ellipse 100% 72% at 50% -18%, rgba(45, 212, 191, 0.13), transparent 52%), radial-gradient(ellipse 65% 48% at 100% 0%, rgba(34, 211, 238, 0.08), transparent 45%), radial-gradient(ellipse 50% 42% at 0% 92%, rgba(45, 212, 191, 0.06), transparent 48%), linear-gradient(180deg, rgba(45, 212, 191, 0.035) 0%, transparent 26%, transparent 74%, rgba(34, 211, 238, 0.028) 100%)",
         "card-shine":
-          "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 50%)",
+          "linear-gradient(135deg, rgba(255,255,255,0.07) 0%, transparent 52%)",
       },
     },
   },

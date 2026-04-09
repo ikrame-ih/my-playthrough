@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { API_BASE, apiFetch } from "../api";
 import { IconShield, IconTrash, IconUsers } from "./icons";
+import UserAvatar from "./UserAvatar";
 
 /**
  * Panel de administración: listados de usuarios y juegos con capacidad de borrado.
@@ -214,17 +215,16 @@ export default function AdminUsers() {
                 >
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <span
-                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs ${
-                          u.rol === "admin"
-                            ? "bg-red-500/15 text-red-400"
-                            : "bg-brand-accent/15 text-brand-accent"
-                        }`}
-                      >
-                        {u.rol === "admin" ? (
-                          <IconShield className="h-4 w-4" />
-                        ) : (
-                          <IconUsers className="h-4 w-4" />
+                      <span className="relative shrink-0">
+                        <UserAvatar
+                          avatarId={u.avatar_id}
+                          size="sm"
+                          title={`Avatar de ${u.nombre_usuario}`}
+                        />
+                        {u.rol === "admin" && (
+                          <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500/90 text-white ring-2 ring-[#161D2F]">
+                            <IconShield className="h-2.5 w-2.5" />
+                          </span>
                         )}
                       </span>
                       <div>

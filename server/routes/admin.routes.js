@@ -15,6 +15,7 @@ const express = require("express");
 const pool = require("../config/db");
 const { authMiddleware, adminMiddleware } = require("../middleware/auth.middleware");
 const { serverErrorPayload } = require("../utils/normalize");
+const { coerceAvatarId } = require("../constants/avatars");
 
 const router = express.Router();
 
@@ -31,9 +32,14 @@ router.use(authMiddleware, adminMiddleware);
 router.get("/users", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, nombre_usuario, email, rol, fecha_registro FROM usuarios ORDER BY id ASC",
+      "SELECT id, nombre_usuario, email, rol, fecha_registro, avatar_id FROM usuarios ORDER BY id ASC",
     );
-    res.json(result.rows);
+    res.json(
+      result.rows.map((u) => ({
+        ...u,
+        avatar_id: coerceAvatarId(u.avatar_id),
+      })),
+    );
   } catch (error) {
     console.error("[GET /api/admin/users]", error);
     res.status(500).json(serverErrorPayload(error, "Error al cargar usuarios."));

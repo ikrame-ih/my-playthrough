@@ -14,6 +14,10 @@ const bcrypt = require("bcryptjs");
 const pool = require("../config/db");
 const { authMiddleware, createToken } = require("../middleware/auth.middleware");
 const { normalizeEmail, serverErrorPayload } = require("../utils/normalize");
+const {
+  isValidRobotAvatarId,
+  coerceAvatarId,
+} = require("../constants/avatars");
 
 const router = express.Router();
 
@@ -75,13 +79,15 @@ router.post("/register", async (req, res) => {
     const newUser = await pool.query(
       `INSERT INTO usuarios (nombre_usuario, email, password_hash, rol)
        VALUES ($1, $2, $3, $4)
-       RETURNING id, nombre_usuario, email, rol`,
+       RETURNING id, nombre_usuario, email, rol, avatar_id`,
       [nombre_usuario, email, password_hash, "user"],
     );
 
     // Devuelvo el token directamente para que el usuario quede logueado sin hacer login aparte
-    const token = createToken(newUser.rows[0]);
-    return res.status(201).json({ success: true, token, user: newUser.rows[0] });
+    const row = newUser.rows[0];
+    row.avatar_id = coerceAvatarId(row.avatar_id);
+    const token = createToken(row);
+    return res.status(201).json({ success: true, token, user: row });
   } catch (error) {
     console.error("[POST /api/auth/register]", error);
     if (error.code === "23505") {
@@ -119,7 +125,7 @@ router.post("/login", async (req, res) => {
     }
 
     const result = await pool.query(
-      "SELECT id, nombre_usuario, email, password_hash, rol FROM usuarios WHERE LOWER(TRIM(email)) = $1",
+      "SELECT id, nombre_usuario, email, password_hash, rol, avatar_id FROM usuarios WHERE LOWER(TRIM(email)) = $1",
       [email],
     );
 
@@ -145,6 +151,7 @@ router.post("/login", async (req, res) => {
         nombre_usuario: user.nombre_usuario,
         email: user.email,
         rol: user.rol,
+        avatar_id: coerceAvatarId(user.avatar_id),
       },
     });
   } catch {
@@ -164,7 +171,7 @@ router.post("/login", async (req, res) => {
 router.get("/me", authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, nombre_usuario, email, rol FROM usuarios WHERE id = $1",
+      "SELECT id, nombre_usuario, email, rol, avatar_id FROM usuarios WHERE id = $1",
       [req.user.id],
     );
 
@@ -172,9 +179,54 @@ router.get("/me", authMiddleware, async (req, res) => {
       return res.status(404).json({ error: "Usuario no encontrado." });
     }
 
-    return res.json({ user: result.rows[0] });
+    const u = result.rows[0];
+    u.avatar_id = coerceAvatarId(u.avatar_id);
+    return res.json({ user: u });
   } catch {
     return res.status(500).json({ error: "Error al validar sesión." });
+  }
+});
+
+/**
+ * Actualiza el avatar de perfil (solo entre los identificadores permitidos).
+ *
+ * @route  PATCH /api/auth/me
+ * @access Private
+ */
+router.patch("/me", authMiddleware, async (req, res) => {
+  try {
+    const avatar_id = req.body?.avatar_id;
+    if (avatar_id === undefined || avatar_id === null) {
+      return res.status(400).json({ error: "Falta el campo avatar_id." });
+    }
+    if (!isValidRobotAvatarId(String(avatar_id).trim())) {
+      return res.status(400).json({ error: "Avatar no válido." });
+    }
+    const id = String(avatar_id).trim();
+    const result = await pool.query(
+      `UPDATE usuarios SET avatar_id = $1 WHERE id = $2
+       RETURNING id, nombre_usuario, email, rol, avatar_id`,
+      [id, req.user.id],
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado." });
+    }
+    const u = result.rows[0];
+    u.avatar_id = coerceAvatarId(u.avatar_id);
+    return res.json({ user: u });
+  } catch (error) {
+    console.error("[PATCH /api/auth/me]", error);
+    // Columna avatar_id ausente en BD antigua (PostgreSQL: 42703 = undefined_column)
+    if (error?.code === "42703" && String(error?.message || "").includes("avatar_id")) {
+      return res.status(500).json({
+        error:
+          "La base de datos no tiene la columna avatar_id. Ejecuta una vez el script docs/add-avatar-id-usuarios.sql (o vuelve a crear la BD desde docs/schema.sql) y reinicia el servidor.",
+        code: error.code,
+      });
+    }
+    return res.status(500).json(
+      serverErrorPayload(error, "Error al actualizar el perfil."),
+    );
   }
 });
 

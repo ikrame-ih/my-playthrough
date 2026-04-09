@@ -1,7 +1,7 @@
 -- MyPlaythrough — Esquema completo de la BD
 -- Docker lo ejecuta la primera vez que levanta el contenedor de PostgreSQL.
 
--- 1. Usuarios
+-- Usuarios
 CREATE TABLE IF NOT EXISTS usuarios (
   id             SERIAL PRIMARY KEY,
   nombre_usuario VARCHAR(255) NOT NULL,
@@ -9,10 +9,11 @@ CREATE TABLE IF NOT EXISTS usuarios (
   password_hash  VARCHAR(255) NOT NULL,
   rol            VARCHAR(50)  NOT NULL DEFAULT 'user'
                    CHECK (rol IN ('user', 'admin')),
+  avatar_id      VARCHAR(32)  NOT NULL DEFAULT 'robot-0',
   fecha_registro TIMESTAMP DEFAULT NOW()
 );
 
--- 2. Catálogo global (datos compartidos de RAWG/Steam para que todos usen el mismo título/imagen)
+-- Catálogo global (datos compartidos de RAWG/Steam para que todos usen el mismo título/imagen)
 CREATE TABLE IF NOT EXISTS catalogo_juegos (
   id           SERIAL PRIMARY KEY,
   titulo       VARCHAR(512) NOT NULL,
@@ -22,7 +23,7 @@ CREATE TABLE IF NOT EXISTS catalogo_juegos (
   created_at   TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. Colección personal de juegos (una ficha por juego por usuario)
+-- Colección personal de juegos (una ficha por juego por usuario)
 -- CASCADE: si se borra el usuario, se borran sus fichas
 CREATE TABLE IF NOT EXISTS juegos (
   id            SERIAL PRIMARY KEY,
@@ -42,7 +43,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_juegos_uq_usuario_catalogo
   ON juegos (usuario_id, catalogo_id)
   WHERE catalogo_id IS NOT NULL;
 
--- 4. Comentarios (hilos de reseñas, con respuestas encadenadas vía parent_id)
+-- Comentarios (hilos de reseñas, con respuestas encadenadas vía parent_id)
 CREATE TABLE IF NOT EXISTS juego_comentarios (
   id             SERIAL PRIMARY KEY,
   juego_id       INTEGER NOT NULL REFERENCES juegos(id)           ON DELETE CASCADE,

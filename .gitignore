@@ -1,36 +1,26 @@
-# Dependencias 
+# Dependencias y build
 node_modules/
 package-lock.json
-
-# Archivos de compilación
 dist/
 build/
 
-# Variables de entorno (Claves secretas)
+# Entorno
 .env
 .env.local
 
-# Logs y archivos del sistema
+# Sistema y logs
 *.log
 .DS_Store
 Thumbs.db
 
-# Configuración de editores
+# IDE
 .vscode/
 .idea/
 
-# Documentos locales (PDFs y Word; no subir a GitHub)
-*.pdf
-*.docx
-*.doc
-
-# Cursor (reglas y ajustes locales; no subir)
+# Herramientas locales (Cursor)
 .cursor/
-ESTUDIO_EXPOSICION.md
-GUIA_CUARTA_ENTREGA.md
-diagrama_bd.html
-arquitectura_pern.html
-
-# Cursor internal files
 .agents/
 skills-lock.json
+
+# Carpeta local de entrega (memorias PDF, anexos); el código vive en client/, server/, docs/
+material_entrega/

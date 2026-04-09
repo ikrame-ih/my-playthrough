@@ -1,0 +1,65 @@
+/**
+ * Micro-movimiento inspirado en easing de motion libraries (p. ej. squash/fade),
+ * para efectos y micro-interacciones. Prioritiza soluciones CSS-only para HTML.
+ */
+:root {
+  --mp-ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --mp-ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes mp-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Entrada escalonada en rejillas (p. ej. avatares en perfil) */
+.motion-stagger > * {
+  animation: mp-fade-up 0.48s var(--mp-ease-out-expo) both;
+}
+.motion-stagger > *:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.motion-stagger > *:nth-child(2) {
+  animation-delay: 0.06s;
+}
+.motion-stagger > *:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.motion-stagger > *:nth-child(4) {
+  animation-delay: 0.14s;
+}
+.motion-stagger > *:nth-child(5) {
+  animation-delay: 0.18s;
+}
+.motion-stagger > *:nth-child(6) {
+  animation-delay: 0.22s;
+}
+.motion-stagger > *:nth-child(7) {
+  animation-delay: 0.26s;
+}
+.motion-stagger > *:nth-child(8) {
+  animation-delay: 0.3s;
+}
+.motion-stagger > *:nth-child(9) {
+  animation-delay: 0.34s;
+}
+.motion-stagger > *:nth-child(10) {
+  animation-delay: 0.38s;
+}
+
+/* Hover suave en tarjetas de avatar (sin saltar layout) */
+.motion-avatar-tile {
+  transition:
+    transform 0.22s var(--mp-ease-out-expo),
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+.motion-avatar-tile:hover:not(:disabled) {
+  transform: translateY(-2px);
+}

@@ -34,6 +34,7 @@ const {
   serverErrorPayload,
 } = require("../utils/normalize");
 const { upsertCatalogoGame } = require("../utils/covers");
+const { coerceAvatarId } = require("../constants/avatars");
 
 const router = express.Router();
 
@@ -407,14 +408,20 @@ router.get("/:gameId/comments", authMiddleware, async (req, res) => {
 
     const result = await pool.query(
       `SELECT c.id, c.juego_id, c.usuario_id, c.parent_id, c.cuerpo, c.fecha_creacion,
-              u.nombre_usuario AS autor_nombre
+              u.nombre_usuario AS autor_nombre,
+              u.avatar_id AS autor_avatar_id
        FROM juego_comentarios c
        JOIN usuarios u ON u.id = c.usuario_id
        WHERE c.juego_id = $1
        ORDER BY c.fecha_creacion ASC`,
       [gameId],
     );
-    res.json({ comments: result.rows });
+    res.json({
+      comments: result.rows.map((row) => ({
+        ...row,
+        autor_avatar_id: coerceAvatarId(row.autor_avatar_id),
+      })),
+    });
   } catch (error) {
     console.error("[GET comments]", error);
     res.status(500).json(serverErrorPayload(error, "Error al cargar los comentarios."));
@@ -474,9 +481,8 @@ router.post("/:gameId/comments", authMiddleware, async (req, res) => {
       [gameId, req.user.id, parentId, cuerpo],
     );
 
-    // Devuelvo el nombre del autor para que el frontend no tenga que pedirlo aparte
     const nombre = await pool.query(
-      "SELECT nombre_usuario FROM usuarios WHERE id = $1",
+      "SELECT nombre_usuario, avatar_id FROM usuarios WHERE id = $1",
       [req.user.id],
     );
 
@@ -484,6 +490,7 @@ router.post("/:gameId/comments", authMiddleware, async (req, res) => {
       comment: {
         ...ins.rows[0],
         autor_nombre: nombre.rows[0]?.nombre_usuario ?? "",
+        autor_avatar_id: coerceAvatarId(nombre.rows[0]?.avatar_id),
       },
     });
   } catch (error) {

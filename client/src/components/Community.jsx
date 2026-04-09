@@ -4,7 +4,7 @@ import { API_BASE, apiFetch } from "../api";
 import { useSearch } from "../SearchContext";
 import { IconUsers } from "./icons";
 import { CommunityMemberSkeleton } from "./Skeletons";
-import { avatarGradient } from "./AppShell";
+import UserAvatar from "./UserAvatar";
 
 /** Lee el rol del usuario desde localStorage. */
 function getCurrentUserRole() {
@@ -106,13 +106,13 @@ export default function Community() {
         </p>
       </header>
 
-      <div className="inline-flex rounded-full bg-slate-900/90 p-1 ring-1 ring-white/10">
+      <div className="inline-flex rounded-full bg-slate-900/90 p-1 ring-1 ring-brand-accent/15 shadow-[0_0_24px_-8px_rgba(45,212,191,0.25)]">
         <button
           type="button"
           onClick={() => setTab("members")}
-          className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
+          className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${
             tab === "members"
-              ? "bg-white/[0.12] text-white shadow-inner"
+              ? "bg-brand-accent/18 text-brand-accent shadow-[inset_0_0_16px_-6px_rgba(45,212,191,0.35)] ring-1 ring-brand-accent/30"
               : "text-slate-500 hover:text-slate-300"
           }`}
         >
@@ -122,9 +122,9 @@ export default function Community() {
         <button
           type="button"
           onClick={() => setTab("stats")}
-          className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+          className={`rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${
             tab === "stats"
-              ? "bg-white/[0.12] text-white shadow-inner"
+              ? "bg-brand-accent/18 text-brand-accent shadow-[inset_0_0_16px_-6px_rgba(45,212,191,0.35)] ring-1 ring-brand-accent/30"
               : "text-slate-500 hover:text-slate-300"
           }`}
         >
@@ -143,22 +143,22 @@ export default function Community() {
               Ningún miembro coincide con la búsqueda.
             </p>
           ) : (
-            <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <ul className="motion-stagger grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredUsers.map((u) => {
-                const name   = (u.nombre_usuario || "?").trim();
-                const letter = name.charAt(0).toUpperCase();
-                const grad   = avatarGradient(name);
-                const num    = u.num_juegos ?? 0;
-                const plat   = u.plataforma_ejemplo?.trim() || "—";
+                const name = (u.nombre_usuario || "?").trim();
+                const num = u.num_juegos ?? 0;
+                const plat = u.plataforma_ejemplo?.trim() || "—";
                 return (
                   <li key={u.id}>
                     <Link
                       to={`/user/${u.id}`}
-                      className="figma-panel flex items-center gap-4 p-4 transition hover:border-brand-accent/35 hover:shadow-figma-lg"
+                      className="figma-panel-interactive flex items-center gap-4 p-4"
                     >
-                      <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${grad} text-lg font-bold text-white shadow-md`}>
-                        {letter}
-                      </span>
+                      <UserAvatar
+                        avatarId={u.avatar_id}
+                        size="lg"
+                        title={`Avatar de ${name}`}
+                      />
                       <div className="min-w-0">
                         <p className="truncate font-semibold text-white">
                           {u.nombre_usuario}

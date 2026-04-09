@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Plan de pruebas — MyPlaythrough</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --panel: #161d2f;
+      --accent: #2dd4bf;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0 auto;
+      max-width: 1100px;
+      padding: 2rem 1.25rem 3rem;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      font-size: 0.95rem;
+    }
+    h1 { font-size: 1.5rem; margin: 0 0 0.5rem; color: var(--accent); }
+    .meta { color: var(--muted); font-size: 0.88rem; margin-bottom: 1.5rem; }
+    .meta p { margin: 0.2rem 0; }
+    h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35rem; }
+    h3 { font-size: 1rem; margin: 1.25rem 0 0.5rem; color: #cbd5e1; }
+    p { margin: 0.65rem 0; }
+    a { color: var(--accent); }
+    .note {
+      background: var(--panel);
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      margin: 1rem 0;
+      border: 1px solid var(--border);
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      margin: 0.75rem 0 1.25rem;
+      background: var(--panel);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 0 1px var(--border);
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.45rem 0.55rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: rgba(45, 212, 191, 0.08); color: var(--accent); font-weight: 600; }
+    tbody tr:nth-child(even) { background: rgba(0, 0, 0, 0.15); }
+    ul, ol { margin: 0.5rem 0; padding-left: 1.35rem; }
+    li { margin: 0.25rem 0; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    code { background: rgba(255, 255, 255, 0.06); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+
+  <h1>Plan de pruebas — MyPlaythrough</h1>
+  <div class="meta">
+    <p><strong>Proyecto:</strong> MyPlaythrough</p>
+    <p><strong>Alumna:</strong> Ikrame Ibn Hayoun</p>
+    <p><strong>Ciclo:</strong> Desarrollo de Aplicaciones Web — CESUR Málaga Este</p>
+    <p><strong>Curso:</strong> 2025/2026 · Entrega final (cuarta entrega)</p>
+  </div>
+
+  <div class="note">
+    <strong>Fuente:</strong> mismo contenido que <code>docs/pruebas.md</code> en el repositorio.
+    Abre este HTML en el navegador para imprimir o exportar a PDF. Para entregar en Aula Virtual puedes copiarlo a tu carpeta <code>material_entrega</code> (esa carpeta no se sube a GitHub).
+  </div>
+
+  <h2>1. Finalidad y alcance</h2>
+  <p>Este documento describe <strong>qué se ha probado</strong>, <strong>cómo</strong> y <strong>con qué resultado</strong> en la aplicación MyPlaythrough. Incluye pruebas <strong>manuales</strong> (interfaz y API con Thunder Client) y <strong>unitarias automáticas</strong> (Vitest), sin sustituir la revisión funcional completa del código en el repositorio.</p>
+
+  <h2>2. Tipos de prueba realizadas</h2>
+  <table>
+    <thead><tr><th>Tipo</th><th>Descripción breve</th></tr></thead>
+    <tbody>
+      <tr><td>Manuales funcionales</td><td>Comprobación de flujos de usuario (registro, colección, comunidad, admin, comentarios).</td></tr>
+      <tr><td>Seguridad básica</td><td>Acceso a rutas protegidas sin token, permisos, límites de cuerpo, endpoint de diagnóstico en producción.</td></tr>
+      <tr><td>Validación de datos</td><td>Normalización de entradas (email, título, estado, plataforma) coherente con el backend.</td></tr>
+      <tr><td>Unitarias automáticas</td><td>Tests repetibles sobre lógica pura (sin navegador ni base de datos), ejecutados con Vitest 3.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3. Entorno de prueba</h2>
+  <table>
+    <thead><tr><th>Parámetro</th><th>Valor</th></tr></thead>
+    <tbody>
+      <tr><td>Sistema operativo</td><td>Windows 11</td></tr>
+      <tr><td>Navegador</td><td>Google Chrome 124</td></tr>
+      <tr><td>Backend</td><td>Node.js 20, Express 5, puerto 3000</td></tr>
+      <tr><td>Frontend</td><td>Vite, React 18, puerto 5173</td></tr>
+      <tr><td>Base de datos</td><td>PostgreSQL 16 (local o contenedor Docker)</td></tr>
+      <tr><td>Cliente API</td><td>Thunder Client (extensión de VS Code)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>4. Pruebas automáticas unitarias (Vitest)</h2>
+  <p>Se ejecutan en terminal, desde la carpeta de cada paquete, <strong>sin</strong> levantar obligatoriamente Docker ni PostgreSQL para los tests del <code>normalize</code> y utilidades del cliente.</p>
+  <table>
+    <thead><tr><th>Ubicación</th><th>Comando</th><th>Ficheros / ámbito</th></tr></thead>
+    <tbody>
+      <tr><td>Backend (<code>server/</code>)</td><td><code>npm test</code></td><td><code>server/utils/normalize.js</code> (email, título, plataforma, estado, referencia catálogo, payload de error según <code>NODE_ENV</code>).</td></tr>
+      <tr><td>Frontend (<code>client/</code>)</td><td><code>npm test</code></td><td><code>gameLabels.js</code>, <code>coverUrl.js</code>.</td></tr>
+    </tbody>
+  </table>
+  <p>Modo vigilancia (opcional): <code>npm run test:watch</code> en <code>server</code> o <code>client</code>. <strong>Herramienta:</strong> Vitest 3.</p>
+  <p><strong>Relación con validación manual:</strong> los casos V-01 a V-04 del apartado 8 están alineados con la lógica probada en <code>normalize.js</code>.</p>
+
+  <h2>5. Pruebas manuales funcionales</h2>
+
+  <h3>5.1. RF-01 — Gestión de usuarios (autenticación)</h3>
+  <table>
+    <thead><tr><th>ID</th><th>Caso</th><th>Pasos (resumen)</th><th>Esperado</th><th>Obtenido</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>P-01</td><td>Registro válido</td><td>Login → Crear cuenta → datos válidos → Registrarse</td><td>Redirección al dashboard; JWT en <code>localStorage</code></td><td>Colección vacía visible; sesión iniciada</td><td>OK</td></tr>
+      <tr><td>P-02</td><td>Email duplicado</td><td>Registrar de nuevo el mismo email</td><td>Error claro; no duplicado</td><td>Mensaje de error mostrado</td><td>OK</td></tr>
+      <tr><td>P-03</td><td>Contraseña corta</td><td>Contraseña de menos de 6 caracteres</td><td>Validación; no se envía</td><td>Mensaje en formulario</td><td>OK</td></tr>
+      <tr><td>P-04</td><td>Login correcto</td><td>Email y contraseña válidos</td><td>JWT y acceso al dashboard</td><td>Dashboard accesible</td><td>OK</td></tr>
+      <tr><td>P-05</td><td>Contraseña incorrecta</td><td>Email válido, contraseña errónea</td><td>401; sin acceso</td><td>Error mostrado</td><td>OK</td></tr>
+      <tr><td>P-06</td><td>Email inexistente</td><td>Email no registrado</td><td>401; mensaje coherente</td><td>Error mostrado</td><td>OK</td></tr>
+      <tr><td>P-07</td><td>Cerrar sesión</td><td>Botón en sidebar</td><td>Token eliminado; pantalla de login</td><td>Logout correcto</td><td>OK</td></tr>
+      <tr><td>P-08</td><td>Sesión tras F5</td><td>Recargar estando logueada</td><td>Sesión mantenida</td><td>Mantiene autenticación</td><td>OK</td></tr>
+      <tr><td>P-08b</td><td>Avatar de perfil</td><td>Ajustes → Perfil → elegir otro robot</td><td><code>PATCH /api/auth/me</code> correcto; avatar en barra, comunidad y comentarios</td><td>Cambio visible tras guardar</td><td>OK</td></tr>
+      <tr><td>P-08c</td><td>Avatar inválido (API)</td><td>Thunder Client: <code>PATCH /api/auth/me</code> con <code>avatar_id</code> no listado</td><td>400</td><td>Rechazado</td><td>OK</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.2. RF-02 — Biblioteca (CRUD)</h3>
+  <table>
+    <thead><tr><th>ID</th><th>Caso</th><th>Pasos (resumen)</th><th>Esperado</th><th>Obtenido</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>P-09</td><td>Añadir manual</td><td>Añadir juego con título, estado, plataforma</td><td>Aparece en la colección</td><td>Visible en dashboard</td><td>OK</td></tr>
+      <tr><td>P-10</td><td>Añadir con buscador</td><td>Búsqueda → elegir resultado → guardar</td><td>Carátula desde CDN</td><td>Imagen y ficha correctas</td><td>OK</td></tr>
+      <tr><td>P-11</td><td>Duplicado</td><td>Mismo título que uno existente</td><td>Error; no duplicar</td><td>Mensaje; una sola ficha</td><td>OK</td></tr>
+      <tr><td>P-12</td><td>Sin título</td><td>Guardar con título vacío</td><td>Validación</td><td>Error en formulario</td><td>OK</td></tr>
+      <tr><td>P-13</td><td>Editar estado</td><td>Detalle → cambiar estado → guardar</td><td>Estado actualizado</td><td>Correcto</td><td>OK</td></tr>
+      <tr><td>P-14</td><td>Editar nota y horas</td><td>Cambiar puntuación y horas</td><td>Valores persistidos</td><td>Correcto</td><td>OK</td></tr>
+      <tr><td>P-15</td><td>Eliminar</td><td>Eliminar y confirmar</td><td>Desaparece de la colección</td><td>Eliminado</td><td>OK</td></tr>
+      <tr><td>P-16</td><td>Filtro por estado</td><td>Filtro "Completados" en sidebar</td><td>Solo completados</td><td>Filtro correcto</td><td>OK</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.3. RF-03 — Edición de detalles</h3>
+  <table>
+    <thead><tr><th>ID</th><th>Caso</th><th>Pasos</th><th>Esperado</th><th>Obtenido</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>P-17</td><td>Nota fuera de rango</td><td>Valor &gt; 10</td><td>Bloqueo o aviso en UI</td><td><code>max=10</code> en formulario</td><td>OK</td></tr>
+      <tr><td>P-18</td><td>Horas negativas</td><td>Introducir horas negativas</td><td>Normalización a 0 en servidor</td><td>Guardado 0 en BD</td><td>OK</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.4. RF-04 — Comunidad</h3>
+  <table>
+    <thead><tr><th>ID</th><th>Caso</th><th>Pasos</th><th>Esperado</th><th>Obtenido</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>P-19</td><td>Lista de miembros</td><td>Entrar en Comunidad</td><td>Lista con número de juegos</td><td>Correcta</td><td>OK</td></tr>
+      <tr><td>P-20</td><td>Perfil ajeno</td><td>Clic en miembro</td><td>Colección ajena solo lectura</td><td>Sin edición</td><td>OK</td></tr>
+      <tr><td>P-21</td><td>Sin token</td><td>Acceder a <code>/community</code> sin sesión</td><td>401; redirección a login</td><td>Bloqueado</td><td>OK</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.5. RF-05 — Estadísticas</h3>
+  <table>
+    <thead><tr><th>ID</th><th>Caso</th><th>Pasos</th><th>Esperado</th><th>Obtenido</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>P-22</td><td>Ranking global</td><td>Comunidad → estadísticas</td><td>Media y número de votos</td><td>Cálculo SQL correcto</td><td>OK</td></tr>
+      <tr><td>P-23</td><td>Media con dos votos</td><td>Mismo juego puntuado por dos usuarios</td><td>Media aritmética correcta</td><td>Ej.: 8 y 6 → 7,00</td><td>OK</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.6. RF-06 — Administración</h3>
+  <table>
+    <thead><tr><th>ID</th><th>Caso</th><th>Pasos</th><th>Esperado</th><th>Obtenido</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>P-24</td><td>Usuario normal en <code>/admin</code></td><td>Acceso sin rol admin</td><td>403; sin enlace en UI</td><td>Bloqueado</td><td>OK</td></tr>
+      <tr><td>P-25</td><td>Listado admin</td><td>Admin → panel</td><td>Tabla de usuarios</td><td>Datos visibles</td><td>OK</td></tr>
+      <tr><td>P-26</td><td>Borrar otro usuario</td><td>Eliminar fila de otro usuario</td><td>Usuario y juegos en cascada</td><td>Correcto</td><td>OK</td></tr>
+      <tr><td>P-27</td><td>No auto-borrado</td><td>Admin intenta borrarse a sí misma</td><td>Error controlado</td><td>Operación bloqueada</td><td>OK</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.7. Comentarios en ficha de juego</h3>
+  <table>
+    <thead><tr><th>ID</th><th>Caso</th><th>Pasos</th><th>Esperado</th><th>Obtenido</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>P-28</td><td>Publicar comentario</td><td>Abrir hilo → enviar texto</td><td>Comentario con autor y fecha</td><td>Publicado</td><td>OK</td></tr>
+      <tr><td>P-29</td><td>Borrar propio</td><td>Eliminar comentario propio</td><td>Desaparece del hilo</td><td>Eliminado correctamente</td><td>OK</td></tr>
+      <tr><td>P-30</td><td>Borrar ajeno (API)</td><td>Thunder Client: borrar comentario de otra persona</td><td>403</td><td>Bloqueado</td><td>OK</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6. Pruebas de seguridad (API / configuración)</h2>
+  <table>
+    <thead><tr><th>ID</th><th>Caso</th><th>Herramienta / condición</th><th>Esperado</th><th>Obtenido</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>S-01</td><td>Sin token</td><td><code>GET /api/games</code> sin <code>Authorization</code></td><td>401</td><td>JSON de error coherente</td><td>OK</td></tr>
+      <tr><td>S-02</td><td>JWT alterado</td><td>Token modificado a mano</td><td>401</td><td>Rechazado</td><td>OK</td></tr>
+      <tr><td>S-03</td><td>Juego de otro usuario</td><td><code>GET /api/games/:id</code> con juego de otro <code>usuario_id</code></td><td>404</td><td>Sin datos ajenos</td><td>OK</td></tr>
+      <tr><td>S-04</td><td>Admin sin rol</td><td><code>GET /api/admin/users</code> con JWT de usuario</td><td>403</td><td>Mensaje de permisos</td><td>OK</td></tr>
+      <tr><td>S-05</td><td>test-db en producción</td><td><code>NODE_ENV=production</code> y <code>GET /api/test-db</code></td><td>404</td><td>Endpoint oculto</td><td>OK</td></tr>
+      <tr><td>S-06</td><td>Body &gt; 50 KB</td><td>Registro con payload grande</td><td>413</td><td>Rechazado</td><td>OK</td></tr>
+    </tbody>
+  </table>
+
+  <h2>7. Validación de datos (coherencia con backend)</h2>
+  <table>
+    <thead><tr><th>ID</th><th>Caso</th><th>Entrada / acción</th><th>Esperado</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>V-01</td><td>Email</td><td><code>"  Usuario@GMAIL.com  "</code></td><td>Normalizado a <code>usuario@gmail.com</code></td><td>OK</td></tr>
+      <tr><td>V-02</td><td>Título</td><td><code>"The  Witcher   3"</code></td><td><code>"The Witcher 3"</code> (<code>normalizeGameTitle</code>)</td><td>OK</td></tr>
+      <tr><td>V-03</td><td>Estado en inglés</td><td><code>estado: "Completed"</code></td><td>Guardado como <code>Completado</code></td><td>OK</td></tr>
+      <tr><td>V-04</td><td>Plataforma vacía</td><td>Sin campo <code>plataforma</code></td><td>Por defecto <code>PC</code></td><td>OK</td></tr>
+    </tbody>
+  </table>
+
+  <h2>8. Resumen numérico</h2>
+  <p><strong>Comprobación del recuento (por ID):</strong></p>
+  <ul>
+    <li><strong>P-01 … P-30</strong> → <strong>30</strong> casos (autenticación, biblioteca, comunidad, estadísticas, administración y comentarios en ficha). <em>Incluye P-08b y P-08c dentro del bloque de autenticación / perfil.</em></li>
+    <li><strong>S-01 … S-06</strong> → <strong>6</strong> casos (seguridad API / configuración).</li>
+    <li><strong>V-01 … V-04</strong> → <strong>4</strong> casos (validación de datos coherente con el backend).</li>
+  </ul>
+  <p><strong>Suma manual: 30 + 6 + 4 = 40.</strong></p>
+  <p><em>(En borradores anteriores a veces se citaba <strong>37</strong> al sumar solo los casos agrupados en RF-01…RF-06 <strong>sin</strong> los tres casos de comentarios <strong>P-28…P-30</strong>, más seguridad y validación: 27 + 6 + 4 = 37. Este documento usa el inventario completo por identificador P/S/V.)</em></p>
+  <table>
+    <thead><tr><th>Categoría</th><th>Total</th><th>Pasadas</th><th>Fallidas</th></tr></thead>
+    <tbody>
+      <tr><td>Flujo de aplicación (P-01 … P-30)</td><td>30</td><td>30</td><td>0</td></tr>
+      <tr><td>Seguridad API / configuración (S-01 … S-06)</td><td>6</td><td>6</td><td>0</td></tr>
+      <tr><td>Validación de datos (V-01 … V-04)</td><td>4</td><td>4</td><td>0</td></tr>
+      <tr><td><strong>Total pruebas manuales</strong></td><td><strong>40</strong></td><td><strong>40</strong></td><td><strong>0</strong></td></tr>
+      <tr><td>Unitarias automáticas (Vitest)</td><td>22</td><td>22</td><td>0</td></tr>
+    </tbody>
+  </table>
+  <p><em>Las 22 pruebas unitarias corresponden a 14 tests en <code>server</code> (<code>npm test</code> en <code>server/</code>) y 8 en <code>client</code> (<code>npm test</code> en <code>client/</code>).</em></p>
+
+  <h2>9. Mejoras detectadas durante las pruebas (líneas futuras)</h2>
+  <ol>
+    <li><strong>Intentos de login:</strong> no hay límite de reintentos; en producción convendría <em>rate limiting</em> (p. ej. <code>express-rate-limit</code>).</li>
+    <li><strong>Errores en producción:</strong> unificar el envío de errores hacia <code>next(error)</code> para que todo pase por el manejador central y no se filtre <code>error.message</code> en rutas sueltas.</li>
+    <li><strong>Duplicados de ficha:</strong> el flujo de fusión de duplicados en edición puede simplificarse cuando ambas fichas comparten el mismo <code>catalogo_id</code>.</li>
+  </ol>
+
+</body>
+</html>

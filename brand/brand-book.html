@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MyPlaythrough — Brand guidelines</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 2rem 1rem 3rem;
+        background: #1e293b;
+        font-family: Inter, system-ui, sans-serif;
+        color: #e2e8f0;
+      }
+      h1 {
+        text-align: center;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0 0 2rem;
+        letter-spacing: -0.02em;
+      }
+      section {
+        max-width: 36rem;
+        margin: 0 auto 2.5rem;
+        padding: 1.5rem;
+        background: #0f172a;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      section h2 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0 0 1rem;
+        color: #2dd4bf;
+      }
+      .preview-panel {
+        display: flex;
+        justify-content: center;
+        padding: 1.5rem;
+        background: #0b1120;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+      }
+      button {
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        background: #2dd4bf;
+        color: #0f172a;
+      }
+      button:hover {
+        filter: brightness(0.95);
+      }
+      button.primary {
+        background: #38bdf8;
+        color: #0f172a;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand .icon-box {
+        display: flex;
+        height: 36px;
+        width: 36px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: #0f172a;
+        color: #2dd4bf;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+      }
+      .brand .icon-box svg {
+        width: 20px;
+        height: 20px;
+      }
+      .brand .word {
+        font-size: 1.05rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        color: #fff;
+      }
+      .brand .word .accent {
+        color: #2dd4bf;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>MyPlaythrough</h1>
+    <section aria-labelledby="sec-combo">
+      <h2 id="sec-combo">Marca combinada</h2>
+      <div class="preview-panel" id="combo-preview-wrap"></div>
+      <div class="actions">
+        <button type="button" class="primary" id="btn-combo">
+          Descargar PNG
+        </button>
+      </div>
+    </section>
+
+    <section aria-labelledby="sec-iso">
+      <h2 id="sec-iso">Isotipo</h2>
+      <div class="preview-panel">
+        <div id="preview-iso"></div>
+      </div>
+      <div class="actions">
+        <button type="button" data-iso="512">PNG 512×512</button>
+        <button type="button" data-iso="1024">PNG 1024×1024</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="sec-logo">
+      <h2 id="sec-logo">Logotipo</h2>
+      <div class="preview-panel">
+        <div class="brand">
+          <span class="icon-box" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path
+                d="M6 11h2M7 10v2M16 11h.01M18 11h.01"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <rect x="2" y="7" width="20" height="10" rx="3" />
+            </svg>
+          </span>
+          <span class="word">My<span class="accent">Play</span>through</span>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" data-logo="2">PNG — escala 2×</button>
+        <button type="button" data-logo="4">PNG — escala 4×</button>
+      </div>
+    </section>
+
+    <script>
+      (function () {
+        var BG = "#0f172a";
+        var ACCENT = "#2dd4bf";
+        var WHITE = "#ffffff";
+        var PAGE_BG = "#0b1120";
+        var RING = "rgba(255,255,255,0.08)";
+        var BOX = 36;
+        var RADIUS = 8;
+        var ICON = 20;
+        var PAD = (BOX - ICON) / 2;
+        var GAP = 10;
+        var FS = 16.8;
+        var LW = 200;
+        var LH = 40;
+
+        function buildSvg(size) {
+          var s = size / BOX;
+          var r = RADIUS * s;
+          var pad = PAD * s;
+          var icon = ICON * s;
+          var ringW = 1 * s;
+          var ns = "http://www.w3.org/2000/svg";
+          var svg = document.createElementNS(ns, "svg");
+          svg.setAttribute("xmlns", ns);
+          svg.setAttribute("width", String(size));
+          svg.setAttribute("height", String(size));
+          svg.setAttribute("viewBox", "0 0 " + size + " " + size);
+          var rect = document.createElementNS(ns, "rect");
+          rect.setAttribute("width", size);
+          rect.setAttribute("height", size);
+          rect.setAttribute("rx", r);
+          rect.setAttribute("ry", r);
+          rect.setAttribute("fill", BG);
+          rect.setAttribute("stroke", RING);
+          rect.setAttribute("stroke-width", ringW);
+          svg.appendChild(rect);
+          var g = document.createElementNS(ns, "g");
+          g.setAttribute(
+            "transform",
+            "translate(" + pad + "," + pad + ") scale(" + icon / 24 + ")",
+          );
+          var path1 = document.createElementNS(ns, "path");
+          path1.setAttribute("d", "M6 11h2M7 10v2M16 11h.01M18 11h.01");
+          path1.setAttribute("fill", "none");
+          path1.setAttribute("stroke", ACCENT);
+          path1.setAttribute("stroke-width", "1.5");
+          path1.setAttribute("stroke-linecap", "round");
+          path1.setAttribute("stroke-linejoin", "round");
+          var rect2 = document.createElementNS(ns, "rect");
+          rect2.setAttribute("x", "2");
+          rect2.setAttribute("y", "7");
+          rect2.setAttribute("width", "20");
+          rect2.setAttribute("height", "10");
+          rect2.setAttribute("rx", "3");
+          rect2.setAttribute("fill", "none");
+          rect2.setAttribute("stroke", ACCENT);
+          rect2.setAttribute("stroke-width", "1.5");
+          g.appendChild(path1);
+          g.appendChild(rect2);
+          svg.appendChild(g);
+          return svg;
+        }
+
+        function svgToCanvas(svg, w, h, callback) {
+          var xml = new XMLSerializer().serializeToString(svg);
+          var blob = new Blob([xml], { type: "image/svg+xml;charset=utf-8" });
+          var url = URL.createObjectURL(blob);
+          var img = new Image();
+          img.crossOrigin = "anonymous";
+          img.onload = function () {
+            var c = document.createElement("canvas");
+            c.width = w;
+            c.height = h;
+            var x = c.getContext("2d");
+            x.fillStyle = BG;
+            x.fillRect(0, 0, w, h);
+            x.drawImage(img, 0, 0);
+            URL.revokeObjectURL(url);
+            callback(c);
+          };
+          img.onerror = function () {
+            URL.revokeObjectURL(url);
+            callback(null);
+          };
+          img.src = url;
+        }
+
+        function downloadCanvas(canvas, filename) {
+          canvas.toBlob(function (png) {
+            if (!png) return;
+            var a = document.createElement("a");
+            a.href = URL.createObjectURL(png);
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(a.href);
+          }, "image/png");
+        }
+
+        function downloadIso(size) {
+          svgToCanvas(buildSvg(size), size, size, function (c) {
+            if (c) downloadCanvas(c, "myplaythrough-isotipo-" + size + ".png");
+            else alert("No se pudo generar la imagen.");
+          });
+        }
+
+        function pathRoundedRect(ctx, x, y, w, h, r) {
+          ctx.beginPath();
+          ctx.moveTo(x + r, y);
+          ctx.lineTo(x + w - r, y);
+          ctx.arcTo(x + w, y, x + w, y + r, r);
+          ctx.lineTo(x + w, y + h - r);
+          ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+          ctx.lineTo(x + r, y + h);
+          ctx.arcTo(x, y + h, x, y + h - r, r);
+          ctx.lineTo(x, y + r);
+          ctx.arcTo(x, y, x + r, y, r);
+          ctx.closePath();
+        }
+
+        function drawController(ctx, ox, oy, scale) {
+          ctx.save();
+          ctx.translate(ox + PAD * scale, oy + PAD * scale);
+          ctx.scale(scale, scale);
+          ctx.strokeStyle = ACCENT;
+          ctx.lineWidth = 1.5;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          ctx.beginPath();
+          ctx.moveTo(6, 11);
+          ctx.lineTo(8, 11);
+          ctx.moveTo(7, 10);
+          ctx.lineTo(7, 12);
+          ctx.moveTo(16, 11);
+          ctx.lineTo(16.01, 11);
+          ctx.moveTo(18, 11);
+          ctx.lineTo(18.01, 11);
+          ctx.stroke();
+          pathRoundedRect(ctx, 2, 7, 20, 10, 3);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        function drawLogo(ctx, scale) {
+          var top = 2 * scale;
+          ctx.fillStyle = PAGE_BG;
+          ctx.fillRect(0, 0, LW * scale, LH * scale);
+          ctx.fillStyle = BG;
+          pathRoundedRect(ctx, 0, top, BOX * scale, BOX * scale, RADIUS * scale);
+          ctx.fill();
+          ctx.strokeStyle = RING;
+          ctx.lineWidth = 1 * scale;
+          pathRoundedRect(ctx, 0, top, BOX * scale, BOX * scale, RADIUS * scale);
+          ctx.stroke();
+          drawController(ctx, 0, top, scale);
+          ctx.font =
+            "700 " + FS * scale + "px Inter, system-ui, sans-serif";
+          ctx.textBaseline = "middle";
+          var textY = top + (BOX * scale) / 2;
+          var tx = BOX * scale + GAP * scale;
+          ctx.fillStyle = WHITE;
+          ctx.fillText("My", tx, textY);
+          tx += ctx.measureText("My").width;
+          ctx.fillStyle = ACCENT;
+          ctx.fillText("Play", tx, textY);
+          tx += ctx.measureText("Play").width;
+          ctx.fillStyle = WHITE;
+          ctx.fillText("through", tx, textY);
+        }
+
+        async function downloadLogo(scale) {
+          await document.fonts.load("700 " + FS * scale + "px Inter");
+          var cw = LW * scale;
+          var ch = LH * scale;
+          var canvas = document.createElement("canvas");
+          canvas.width = cw;
+          canvas.height = ch;
+          drawLogo(canvas.getContext("2d"), scale);
+          downloadCanvas(canvas, "myplaythrough-logotipo-" + cw + "x" + ch + ".png");
+        }
+
+        async function downloadCombo() {
+          var logoScale = 2;
+          await document.fonts.load("700 " + FS * logoScale + "px Inter");
+          var isoSize = 220;
+          var gap = 28;
+          var pad = 36;
+          var lw = LW * logoScale;
+          var lh = LH * logoScale;
+          var cw = Math.max(isoSize, lw) + pad * 2;
+          var ch = pad + isoSize + gap + lh + pad;
+          var out = document.createElement("canvas");
+          out.width = cw;
+          out.height = ch;
+          var octx = out.getContext("2d");
+          octx.fillStyle = PAGE_BG;
+          octx.fillRect(0, 0, cw, ch);
+          svgToCanvas(buildSvg(isoSize), isoSize, isoSize, function (isoC) {
+            if (!isoC) {
+              alert("No se pudo generar la imagen.");
+              return;
+            }
+            var ix = (cw - isoSize) / 2;
+            var iy = pad;
+            octx.drawImage(isoC, ix, iy);
+            var logoCanvas = document.createElement("canvas");
+            logoCanvas.width = lw;
+            logoCanvas.height = lh;
+            drawLogo(logoCanvas.getContext("2d"), logoScale);
+            octx.drawImage(logoCanvas, (cw - lw) / 2, iy + isoSize + gap);
+            downloadCanvas(out, "myplaythrough-marca.png");
+          });
+        }
+
+        var pIso = document.getElementById("preview-iso");
+        var isoPrev = buildSvg(220);
+        isoPrev.setAttribute("width", "160");
+        isoPrev.setAttribute("height", "160");
+        pIso.appendChild(isoPrev);
+
+        document.querySelectorAll("[data-iso]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            downloadIso(Number(b.getAttribute("data-iso")));
+          });
+        });
+        document.querySelectorAll("[data-logo]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            downloadLogo(Number(b.getAttribute("data-logo")));
+          });
+        });
+        document.getElementById("btn-combo").addEventListener("click", function () {
+          downloadCombo();
+        });
+
+        (function buildComboPreview() {
+          var wrap = document.getElementById("combo-preview-wrap");
+          var isoSize = 120;
+          var svg = buildSvg(isoSize);
+          svg.setAttribute("width", String(isoSize));
+          svg.setAttribute("height", String(isoSize));
+          var box = document.createElement("div");
+          box.style.textAlign = "center";
+          box.appendChild(svg);
+          var br = document.createElement("div");
+          br.style.height = "16px";
+          var inner = document.createElement("div");
+          inner.className = "brand";
+          inner.style.justifyContent = "center";
+          inner.innerHTML =
+            '<span class="icon-box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 11h2M7 10v2M16 11h.01M18 11h.01" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="7" width="20" height="10" rx="3"/></svg></span><span class="word">My<span class="accent">Play</span>through</span>';
+          box.appendChild(br);
+          box.appendChild(inner);
+          wrap.appendChild(box);
+        })();
+      })();
+    </script>
+  </body>
+</html>
