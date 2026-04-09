@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -132,7 +132,12 @@
       <div class="preview-panel">
         <div class="brand">
           <span class="icon-box" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
               <path
                 d="M6 11h2M7 10v2M16 11h.01M18 11h.01"
                 stroke-linecap="round"
@@ -298,15 +303,28 @@
           ctx.fillStyle = PAGE_BG;
           ctx.fillRect(0, 0, LW * scale, LH * scale);
           ctx.fillStyle = BG;
-          pathRoundedRect(ctx, 0, top, BOX * scale, BOX * scale, RADIUS * scale);
+          pathRoundedRect(
+            ctx,
+            0,
+            top,
+            BOX * scale,
+            BOX * scale,
+            RADIUS * scale,
+          );
           ctx.fill();
           ctx.strokeStyle = RING;
           ctx.lineWidth = 1 * scale;
-          pathRoundedRect(ctx, 0, top, BOX * scale, BOX * scale, RADIUS * scale);
+          pathRoundedRect(
+            ctx,
+            0,
+            top,
+            BOX * scale,
+            BOX * scale,
+            RADIUS * scale,
+          );
           ctx.stroke();
           drawController(ctx, 0, top, scale);
-          ctx.font =
-            "700 " + FS * scale + "px Inter, system-ui, sans-serif";
+          ctx.font = "700 " + FS * scale + "px Inter, system-ui, sans-serif";
           ctx.textBaseline = "middle";
           var textY = top + (BOX * scale) / 2;
           var tx = BOX * scale + GAP * scale;
@@ -328,7 +346,10 @@
           canvas.width = cw;
           canvas.height = ch;
           drawLogo(canvas.getContext("2d"), scale);
-          downloadCanvas(canvas, "myplaythrough-logotipo-" + cw + "x" + ch + ".png");
+          downloadCanvas(
+            canvas,
+            "myplaythrough-logotipo-" + cw + "x" + ch + ".png",
+          );
         }
 
         async function downloadCombo() {
@@ -380,9 +401,11 @@
             downloadLogo(Number(b.getAttribute("data-logo")));
           });
         });
-        document.getElementById("btn-combo").addEventListener("click", function () {
-          downloadCombo();
-        });
+        document
+          .getElementById("btn-combo")
+          .addEventListener("click", function () {
+            downloadCombo();
+          });
 
         (function buildComboPreview() {
           var wrap = document.getElementById("combo-preview-wrap");
