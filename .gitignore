@@ -21,6 +21,3 @@ Thumbs.db
 .cursor/
 .agents/
 skills-lock.json
-
-# Carpeta local de entrega (memorias PDF, anexos); el código vive en client/, server/, docs/
-material_entrega/
