@@ -108,7 +108,7 @@ Base de datos manual: ejecuta `docs/schema.sql` una vez. Si ya tenías una BD an
 
 - Que **quien evalúe el proyecto** (profesor, tribunal) pueda entrar **sin registrarse** y ver la app **con datos** (colección con varios juegos, estadísticas, vista lista/cuadrícula).
 - Ahorrar tiempo en **defensa oral** o revisión: no hace falta crear usuario y añadir juegos a mano.
-- **No sustituye** las pruebas con tu usuario real; es solo un atajo para demostración.
+- **No sustituye** las pruebas con usuario real; es solo un atajo para demostración.
 
 Tras `npm run seed:demo`: usuario `demo@myplaythrough.local` / contraseña `demo123456`. En la pantalla de login: **«Rellenar cuenta demo»**.
 

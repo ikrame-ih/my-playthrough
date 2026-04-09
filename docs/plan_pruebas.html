@@ -62,9 +62,92 @@
     li { margin: 0.25rem 0; }
     hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
     code { background: rgba(255, 255, 255, 0.06); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.88em; }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0 0 1.5rem;
+      padding: 1rem 1.1rem;
+      background: var(--panel);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .toolbar button {
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: rgba(45, 212, 191, 0.12);
+      color: var(--accent);
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.5rem 0.95rem;
+      border-radius: 8px;
+    }
+    .toolbar button:hover {
+      background: rgba(45, 212, 191, 0.2);
+      border-color: rgba(45, 212, 191, 0.35);
+    }
+    .toolbar .hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      max-width: 36rem;
+      line-height: 1.45;
+      margin: 0;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      body {
+        max-width: none;
+        padding: 0.75rem;
+        background: #fff !important;
+        color: #111 !important;
+        font-size: 9pt;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      h1 { color: #0f766e !important; }
+      h2 { color: #111 !important; border-bottom-color: #ccc !important; }
+      h3 { color: #222 !important; }
+      .meta { color: #444 !important; }
+      .note {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #334155 !important;
+      }
+      table {
+        background: #fff !important;
+        box-shadow: none !important;
+        break-inside: auto;
+        page-break-inside: auto;
+      }
+      thead { display: table-header-group; }
+      tr { break-inside: avoid; page-break-inside: avoid; }
+      th, td {
+        border-color: #94a3b8 !important;
+        color: #111 !important;
+      }
+      th { background: #e2e8f0 !important; color: #0f172a !important; }
+      tbody tr:nth-child(even) { background: #f8fafc !important; }
+      a { color: #0f766e !important; text-decoration: none; }
+      code { background: #e2e8f0 !important; color: #0f172a !important; }
+      hr { border-top-color: #ccc !important; }
+    }
   </style>
 </head>
 <body>
+
+  <div class="toolbar no-print">
+    <button type="button" id="btn-print-pdf" aria-label="Abrir diálogo de impresión para guardar como PDF">
+      Imprimir / guardar PDF
+    </button>
+    <button type="button" id="btn-download-html" aria-label="Descargar este plan como archivo HTML">
+      Descargar HTML
+    </button>
+    <p class="hint">
+      <strong>PDF:</strong> al imprimir, elige destino <strong>Guardar como PDF</strong> / <strong>Microsoft Print to PDF</strong>. Si abres el archivo desde GitHub, usa <strong>Raw</strong> y luego <kbd>Ctrl+S</kbd>, o descarga el HTML con el botón y ábrelo en local.
+    </p>
+  </div>
 
   <h1>Plan de pruebas — MyPlaythrough</h1>
   <div class="meta">
@@ -76,7 +159,7 @@
 
   <div class="note">
     <strong>Fuente:</strong> mismo contenido que <code>docs/pruebas.md</code> en el repositorio.
-    Abre este HTML en el navegador para imprimir o exportar a PDF. Para entregar en Aula Virtual puedes copiarlo a tu carpeta <code>material_entrega</code> (esa carpeta no se sube a GitHub).
+    <span class="no-print"> Usa los botones de arriba para PDF o descarga HTML.</span> Para entregar en Aula Virtual puedes copiar el HTML o el PDF a tu carpeta <code>material_entrega</code> (esa carpeta no se sube a GitHub).
   </div>
 
   <h2>1. Finalidad y alcance</h2>
@@ -253,5 +336,39 @@
     <li><strong>Duplicados de ficha:</strong> el flujo de fusión de duplicados en edición puede simplificarse cuando ambas fichas comparten el mismo <code>catalogo_id</code>.</li>
   </ol>
 
+  <script>
+    (function () {
+      var printBtn = document.getElementById("btn-print-pdf");
+      if (printBtn) {
+        printBtn.addEventListener("click", function () {
+          window.print();
+        });
+      }
+      var btn = document.getElementById("btn-download-html");
+      if (!btn) return;
+      btn.addEventListener("click", function () {
+        try {
+          var doctype = "<!DOCTYPE html>\n";
+          var html = doctype + document.documentElement.outerHTML;
+          var blob = new Blob([html], { type: "text/html;charset=utf-8" });
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = url;
+          a.download = "plan_pruebas.html";
+          a.rel = "noopener";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(function () {
+            URL.revokeObjectURL(url);
+          }, 1500);
+        } catch (e) {
+          alert(
+            "No se pudo descargar desde este entorno. Usa clic derecho → Guardar como… o en GitHub: vista Raw y Ctrl+S.",
+          );
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
