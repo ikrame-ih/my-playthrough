@@ -10,7 +10,16 @@ import Community from "./components/Community";
 import UserPublicProfile from "./components/UserPublicProfile";
 import AdminUsers from "./components/AdminUsers";
 import GameDiscussion from "./components/GameDiscussion";
+import SearchResultsPage from "./components/SearchResultsPage";
 import ProfileSettings from "./components/ProfileSettings";
+import RecommendationsPage from "./components/RecommendationsPage";
+
+/**
+ * @file Raíz de la SPA: autenticación, enrutado y envoltorio de layout.
+ * - Sin token válido → `AuthPage`.
+ * - Con sesión → `SearchProvider` + `BrowserRouter` + `AppShell` y rutas hijas
+ *   (colección, comunidad, discusión, admin, recomendaciones, etc.).
+ */
 
 /**
  * Página principal de la colección del usuario.
@@ -101,6 +110,11 @@ function App() {
             <Route path="/game/new" element={<GameForm />} />
             <Route path="/edit/:id" element={<GameForm />} />
             <Route path="/community" element={<Community />} />
+            <Route path="/search" element={<SearchResultsPage />} />
+            <Route
+              path="/recommendations"
+              element={<RecommendationsPage />}
+            />
             <Route path="/user/:userId" element={<UserPublicProfile />} />
             <Route
               path="/settings"

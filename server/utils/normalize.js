@@ -20,6 +20,31 @@ const normalizeEmail = (email) =>
     .toLowerCase();
 
 /**
+ * Valida contraseña para registro: longitud mínima y mezcla de tipos de carácter.
+ * @param {string} password - Contraseña en texto plano.
+ * @returns {string|null} Mensaje de error en español, o `null` si es válida.
+ */
+function passwordPolicyMessage(password) {
+  const p = String(password ?? "");
+  if (p.length < 8) {
+    return "La contraseña debe tener al menos 8 caracteres.";
+  }
+  if (!/[a-zñáéíóúü]/.test(p)) {
+    return "Incluye al menos una letra minúscula.";
+  }
+  if (!/[A-ZÑÁÉÍÓÚÜ]/.test(p)) {
+    return "Incluye al menos una letra mayúscula.";
+  }
+  if (!/[0-9]/.test(p)) {
+    return "Incluye al menos un número.";
+  }
+  if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]/.test(p)) {
+    return "Incluye al menos un símbolo especial (por ejemplo ! ? #).";
+  }
+  return null;
+}
+
+/**
  * Normaliza el título de un juego colapsando espacios múltiples.
  * Ejemplo: `"  The  Witcher  3  "` → `"The Witcher 3"`.
  *
@@ -139,6 +164,7 @@ function fetchTimeoutMs(ms) {
 
 module.exports = {
   normalizeEmail,
+  passwordPolicyMessage,
   normalizeGameTitle,
   titleMatchKey,
   normalizePlataforma,

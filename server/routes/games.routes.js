@@ -1,11 +1,12 @@
 /**
  * @module games.routes
- * @description CRUD completo de la colección personal de juegos (RF-02, RF-03)
- * y sistema de comentarios por hilo (RF-05).
+ * @description CRUD de la colección personal y comentarios/reseñas por ficha.
  *
- * Todas las rutas están protegidas con `authMiddleware`. El filtro
- * `usuario_id = req.user.id` garantiza que cada usuario solo puede leer
- * y modificar sus propios juegos, nunca los de otros.
+ * Regla de aislamiento: casi todas las consultas filtran por `usuario_id = req.user.id`
+ * salvo las lecturas de comentarios, que son sobre una ficha concreta (visible en comunidad)
+ * y los votos de “útil / no útil” en reseñas raíz.
+ *
+ * Todas las rutas llevan `authMiddleware` (JWT en `Authorization: Bearer`).
  *
  * Rutas definidas:
  *   GET    /api/games                              → lista mis juegos
@@ -16,6 +17,7 @@
  *   GET    /api/games/:gameId/comments             → comentarios de una ficha
  *   POST   /api/games/:gameId/comments             → añadir comentario
  *   DELETE /api/games/:gameId/comments/:commentId  → borrar comentario
+ *   PUT    /api/games/:gameId/comments/:commentId/vote → pulgar en reseña raíz
  */
 
 const express = require("express");
@@ -409,21 +411,34 @@ router.get("/:gameId/comments", authMiddleware, async (req, res) => {
     const result = await pool.query(
       `SELECT c.id, c.juego_id, c.usuario_id, c.parent_id, c.cuerpo, c.fecha_creacion,
               u.nombre_usuario AS autor_nombre,
-              u.avatar_id AS autor_avatar_id
+              u.avatar_id AS autor_avatar_id,
+              COALESCE(SUM(CASE WHEN v.valor = 1 THEN 1 ELSE 0 END), 0)::int AS votos_arriba,
+              COALESCE(SUM(CASE WHEN v.valor = -1 THEN 1 ELSE 0 END), 0)::int AS votos_abajo,
+              MAX(CASE WHEN v.usuario_id = $2 THEN v.valor END)::int AS mi_voto
        FROM juego_comentarios c
        JOIN usuarios u ON u.id = c.usuario_id
+       LEFT JOIN juego_comentario_votos v ON v.comentario_id = c.id
        WHERE c.juego_id = $1
+       GROUP BY c.id, c.juego_id, c.usuario_id, c.parent_id, c.cuerpo, c.fecha_creacion,
+                u.nombre_usuario, u.avatar_id
        ORDER BY c.fecha_creacion ASC`,
-      [gameId],
+      [gameId, req.user.id],
     );
     res.json({
       comments: result.rows.map((row) => ({
         ...row,
         autor_avatar_id: coerceAvatarId(row.autor_avatar_id),
+        mi_voto: row.mi_voto == null ? null : Number(row.mi_voto),
       })),
     });
   } catch (error) {
     console.error("[GET comments]", error);
+    if (error.code === "42P01") {
+      return res.status(503).json({
+        error:
+          "Falta la tabla de votos en reseñas. Ejecuta en el servidor: npm run migrate:votes",
+      });
+    }
     res.status(500).json(serverErrorPayload(error, "Error al cargar los comentarios."));
   }
 });
@@ -540,6 +555,83 @@ router.delete("/:gameId/comments/:commentId", authMiddleware, async (req, res) =
   } catch (error) {
     console.error("[DELETE comment]", error);
     res.status(500).json(serverErrorPayload(error, "Error al eliminar el comentario."));
+  }
+});
+
+/**
+ * Pulgar arriba / abajo en una reseña de primer nivel (solo `parent_id` nulo).
+ * `val`: 1, -1 o 0 (quita el voto).
+ *
+ * @route  PUT /api/games/:gameId/comments/:commentId/vote
+ * @access Private
+ */
+router.put("/:gameId/comments/:commentId/vote", authMiddleware, async (req, res) => {
+  try {
+    const gameId = parseInt(req.params.gameId, 10);
+    const commentId = parseInt(req.params.commentId, 10);
+    if (Number.isNaN(gameId) || Number.isNaN(commentId)) {
+      return res.status(400).json({ error: "ID inválido." });
+    }
+
+    const raw = req.body?.val;
+    const val = raw === 0 || raw === "0" ? 0 : Number(raw);
+    if (val !== 0 && val !== 1 && val !== -1) {
+      return res.status(400).json({ error: "Usa val: 1, -1 o 0 (quitar voto)." });
+    }
+
+    const row = await pool.query(
+      `SELECT c.id, c.parent_id FROM juego_comentarios c WHERE c.id = $1 AND c.juego_id = $2`,
+      [commentId, gameId],
+    );
+    if (row.rows.length === 0) {
+      return res.status(404).json({ error: "Comentario no encontrado." });
+    }
+    if (row.rows[0].parent_id != null) {
+      return res
+        .status(400)
+        .json({ error: "Solo se pueden valorar reseñas de primer nivel." });
+    }
+
+    if (val === 0) {
+      await pool.query(
+        `DELETE FROM juego_comentario_votos WHERE comentario_id = $1 AND usuario_id = $2`,
+        [commentId, req.user.id],
+      );
+    } else {
+      await pool.query(
+        `INSERT INTO juego_comentario_votos (comentario_id, usuario_id, valor)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (comentario_id, usuario_id) DO UPDATE SET valor = EXCLUDED.valor`,
+        [commentId, req.user.id, val],
+      );
+    }
+
+    const agg = await pool.query(
+      `SELECT
+         COALESCE(SUM(CASE WHEN valor = 1 THEN 1 ELSE 0 END), 0)::int AS votos_arriba,
+         COALESCE(SUM(CASE WHEN valor = -1 THEN 1 ELSE 0 END), 0)::int AS votos_abajo
+       FROM juego_comentario_votos WHERE comentario_id = $1`,
+      [commentId],
+    );
+    const mine = await pool.query(
+      `SELECT valor FROM juego_comentario_votos WHERE comentario_id = $1 AND usuario_id = $2`,
+      [commentId, req.user.id],
+    );
+
+    res.json({
+      votos_arriba: agg.rows[0]?.votos_arriba ?? 0,
+      votos_abajo: agg.rows[0]?.votos_abajo ?? 0,
+      mi_voto: mine.rows[0]?.valor != null ? Number(mine.rows[0].valor) : null,
+    });
+  } catch (error) {
+    console.error("[PUT vote]", error);
+    if (error.code === "42P01") {
+      return res.status(503).json({
+        error:
+          "Falta la tabla de votos. Ejecuta npm run migrate:votes en la carpeta server.",
+      });
+    }
+    res.status(500).json(serverErrorPayload(error, "Error al registrar el voto."));
   }
 });
 

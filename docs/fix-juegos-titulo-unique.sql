@@ -3,6 +3,7 @@
 
 ALTER TABLE juegos DROP CONSTRAINT IF EXISTS juegos_titulo_key;
 ALTER TABLE juegos DROP CONSTRAINT IF EXISTS juegos_titulo_unique;
+ALTER TABLE juegos DROP CONSTRAINT IF EXISTS titulo_unico;
 
 -- También por si tenías UNIQUE(usuario_id, titulo):
 

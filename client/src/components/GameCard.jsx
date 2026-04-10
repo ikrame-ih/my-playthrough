@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { displayCoverUrl } from "../coverUrl";
 import { estadoBadgeClass, labelEstado } from "../gameLabels";
-import { IconImage, IconPencil, IconTrash } from "./icons";
+import { IconGift, IconImage, IconPencil, IconTrash } from "./icons";
 
 /**
  * Tarjeta visual de un juego. Muestra la portada (vía proxy), plataforma,
@@ -16,12 +16,14 @@ import { IconImage, IconPencil, IconTrash } from "./icons";
  * @param {object}   props.game             - Datos del juego.
  * @param {boolean}  [props.showActions]    - Si es `true`, muestra los botones de editar/borrar.
  * @param {Function} [props.onDelete]       - Callback `(id, titulo) => void` para el botón borrar.
+ * @param {Function} [props.onRecommend]     - Si existe, muestra botón para abrir el modal de recomendar.
  * @param {string}   [props.discussionTo]   - Ruta de la discusión del juego para el enlace inferior.
  */
 export default function GameCard({
   game,
   showActions = false,
   onDelete,
+  onRecommend,
   discussionTo,
 }) {
   const initial = (game.titulo || "?").trim().charAt(0).toUpperCase();
@@ -103,6 +105,17 @@ export default function GameCard({
           </span>
           {showActions && (
             <div className="flex shrink-0 items-center gap-1">
+              {onRecommend && (
+                <button
+                  type="button"
+                  onClick={() => onRecommend(game)}
+                  className="rounded-lg p-2 text-slate-500 transition hover:bg-white/[0.06] hover:text-brand-accent"
+                  title="Recomendar a alguien"
+                  aria-label={`Recomendar ${game.titulo}`}
+                >
+                  <IconGift />
+                </button>
+              )}
               <Link
                 to={`/edit/${game.id}`}
                 className="rounded-lg p-2 text-slate-500 transition hover:bg-white/[0.06] hover:text-brand-accent"

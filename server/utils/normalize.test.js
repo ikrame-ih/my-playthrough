@@ -5,6 +5,7 @@
  */
 const {
   normalizeEmail,
+  passwordPolicyMessage,
   normalizeGameTitle,
   titleMatchKey,
   normalizePlataforma,
@@ -115,5 +116,19 @@ describe("serverErrorPayload", () => {
     process.env.NODE_ENV = "production";
     const err = new Error("secreto");
     expect(serverErrorPayload(err, "Error genérico")).toEqual({ error: "Error genérico" });
+  });
+});
+
+describe("passwordPolicyMessage", () => {
+  it("acepta una contraseña fuerte típica", () => {
+    expect(passwordPolicyMessage("Presentacion2026!")).toBeNull();
+  });
+
+  it("rechaza si falta mayúscula", () => {
+    expect(passwordPolicyMessage("presentacion2026!")).toMatch(/mayúscula/i);
+  });
+
+  it("rechaza si es demasiado corta", () => {
+    expect(passwordPolicyMessage("Aa1!")).toMatch(/8 caracteres/i);
   });
 });

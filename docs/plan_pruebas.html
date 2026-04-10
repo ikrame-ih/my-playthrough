@@ -209,7 +209,7 @@
     <tbody>
       <tr><td>P-01</td><td>Registro válido</td><td>Login → Crear cuenta → datos válidos → Registrarse</td><td>Redirección al dashboard; JWT en <code>localStorage</code></td><td>Colección vacía visible; sesión iniciada</td><td>OK</td></tr>
       <tr><td>P-02</td><td>Email duplicado</td><td>Registrar de nuevo el mismo email</td><td>Error claro; no duplicado</td><td>Mensaje de error mostrado</td><td>OK</td></tr>
-      <tr><td>P-03</td><td>Contraseña corta</td><td>Contraseña de menos de 6 caracteres</td><td>Validación; no se envía</td><td>Mensaje en formulario</td><td>OK</td></tr>
+      <tr><td>P-03</td><td>Contraseña corta</td><td>Contraseña de menos de 8 caracteres</td><td>Validación; no se envía</td><td>Mensaje en formulario (política fuerte en servidor)</td><td>OK</td></tr>
       <tr><td>P-04</td><td>Login correcto</td><td>Email y contraseña válidos</td><td>JWT y acceso al dashboard</td><td>Dashboard accesible</td><td>OK</td></tr>
       <tr><td>P-05</td><td>Contraseña incorrecta</td><td>Email válido, contraseña errónea</td><td>401; sin acceso</td><td>Error mostrado</td><td>OK</td></tr>
       <tr><td>P-06</td><td>Email inexistente</td><td>Email no registrado</td><td>401; mensaje coherente</td><td>Error mostrado</td><td>OK</td></tr>
@@ -248,7 +248,7 @@
   <table>
     <thead><tr><th>ID</th><th>Caso</th><th>Pasos</th><th>Esperado</th><th>Obtenido</th><th>Estado</th></tr></thead>
     <tbody>
-      <tr><td>P-19</td><td>Lista de miembros</td><td>Entrar en Comunidad</td><td>Lista con número de juegos</td><td>Correcta</td><td>OK</td></tr>
+      <tr><td>P-19</td><td>Lista de miembros</td><td>Entrar en Comunidad</td><td>Lista con juegos, seguidores y plataforma de ejemplo</td><td>Correcta</td><td>OK</td></tr>
       <tr><td>P-20</td><td>Perfil ajeno</td><td>Clic en miembro</td><td>Colección ajena solo lectura</td><td>Sin edición</td><td>OK</td></tr>
       <tr><td>P-21</td><td>Sin token</td><td>Acceder a <code>/community</code> sin sesión</td><td>401; redirección a login</td><td>Bloqueado</td><td>OK</td></tr>
     </tbody>
@@ -284,6 +284,33 @@
     </tbody>
   </table>
 
+  <h3>5.8. RF-07 — Social ampliado (seguimientos, recomendaciones, LFG, actividad)</h3>
+  <table>
+    <thead><tr><th>ID</th><th>Caso</th><th>Pasos</th><th>Esperado</th><th>Obtenido</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>P-31</td><td>Seguir desde perfil</td><td>Comunidad → perfil ajeno → Seguir</td><td><code>POST /api/social/follow/:id</code>; estado «Siguiendo»</td><td>Correcto</td><td>OK</td></tr>
+      <tr><td>P-32</td><td>Dejar de seguir</td><td>Perfil → Dejar de seguir</td><td><code>DELETE</code>; puede volver a seguir</td><td>Correcto</td><td>OK</td></tr>
+      <tr><td>P-33</td><td>Seguir desde tarjeta</td><td>Comunidad → Miembros → botón Seguir sin entrar al perfil</td><td>Pasa a «Siguiendo»</td><td>Correcto</td><td>OK</td></tr>
+      <tr><td>P-34</td><td>Recomendar sin seguir (API)</td><td>Thunder: <code>POST /api/social/recommendations</code> sin relación de seguimiento</td><td>403</td><td>Rechazado</td><td>OK</td></tr>
+      <tr><td>P-35</td><td>Recomendar desde colección</td><td>Icono regalo en ficha propia → elegir seguido → enviar</td><td>Aparece en bandeja del destinatario</td><td>Correcto</td><td>OK</td></tr>
+      <tr><td>P-36</td><td>Bandeja y leídas</td><td>Campana → Recomendaciones → marcar leída / enlace a discusión</td><td>Contador y estado coherentes</td><td>Correcto</td><td>OK</td></tr>
+      <tr><td>P-37</td><td>Publicar LFG</td><td>Comunidad → Buscar grupo → formulario válido</td><td>Aparece en listado</td><td>Correcto</td><td>OK</td></tr>
+      <tr><td>P-38</td><td>Listado LFG</td><td>Varios usuarios publican</td><td>Orden reciente; datos de juego y autor</td><td>Correcto</td><td>OK</td></tr>
+      <tr><td>P-39</td><td>Borrar LFG propia</td><td>Eliminar en tarjeta (solo autor o admin)</td><td>Desaparece del listado</td><td>Correcto</td><td>OK</td></tr>
+      <tr><td>P-40</td><td>Actividad de seguidos</td><td>Tras seguir a alguien que comenta o publica LFG → pestaña Actividad</td><td>Entradas recientes enlazadas a la ficha</td><td>Correcto</td><td>OK</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.9. RF-08 — Preferencias y presentación (tour, notificaciones, métricas sociales)</h3>
+  <table>
+    <thead><tr><th>ID</th><th>Caso</th><th>Pasos</th><th>Esperado</th><th>Obtenido</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>P-41</td><td>Tour guiado repetible</td><td>Perfil → Iniciar tour guiado</td><td>Recorrido por la interfaz; se puede cerrar</td><td>Correcto</td><td>OK</td></tr>
+      <tr><td>P-42</td><td>Tono de recomendaciones</td><td>Probar según README («Cómo probar el sonido…»)</td><td>Contador de la campana y tono opcional coherentes con Perfil</td><td>Correcto</td><td>OK</td></tr>
+      <tr><td>P-43</td><td>Contador de seguidores</td><td>Comunidad → Miembros y perfil público</td><td>Número de seguidores visible y coherente con la API</td><td>Correcto</td><td>OK</td></tr>
+    </tbody>
+  </table>
+
   <h2>6. Pruebas de seguridad (API / configuración)</h2>
   <table>
     <thead><tr><th>ID</th><th>Caso</th><th>Herramienta / condición</th><th>Esperado</th><th>Obtenido</th><th>Estado</th></tr></thead>
@@ -294,6 +321,7 @@
       <tr><td>S-04</td><td>Admin sin rol</td><td><code>GET /api/admin/users</code> con JWT de usuario</td><td>403</td><td>Mensaje de permisos</td><td>OK</td></tr>
       <tr><td>S-05</td><td>test-db en producción</td><td><code>NODE_ENV=production</code> y <code>GET /api/test-db</code></td><td>404</td><td>Endpoint oculto</td><td>OK</td></tr>
       <tr><td>S-06</td><td>Body &gt; 50 KB</td><td>Registro con payload grande</td><td>413</td><td>Rechazado</td><td>OK</td></tr>
+      <tr><td>S-07</td><td>Social sin token</td><td><code>GET /api/social/lfg</code> sin <code>Authorization</code></td><td>401</td><td>Rechazado</td><td>OK</td></tr>
     </tbody>
   </table>
 
@@ -311,29 +339,29 @@
   <h2>8. Resumen numérico</h2>
   <p><strong>Comprobación del recuento (por ID):</strong></p>
   <ul>
-    <li><strong>P-01 … P-30</strong> → <strong>30</strong> casos (autenticación, biblioteca, comunidad, estadísticas, administración y comentarios en ficha). <em>Incluye P-08b y P-08c dentro del bloque de autenticación / perfil.</em></li>
-    <li><strong>S-01 … S-06</strong> → <strong>6</strong> casos (seguridad API / configuración).</li>
+    <li><strong>P-01 … P-43</strong> → <strong>43</strong> casos (incluye RF-07 social ampliado y RF-08: tour, sonido de recomendaciones y contador de seguidores). <em>P-08b y P-08c siguen en autenticación / perfil.</em></li>
+    <li><strong>S-01 … S-07</strong> → <strong>7</strong> casos (seguridad API / configuración).</li>
     <li><strong>V-01 … V-04</strong> → <strong>4</strong> casos (validación de datos coherente con el backend).</li>
   </ul>
-  <p><strong>Suma manual: 30 + 6 + 4 = 40.</strong></p>
-  <p><em>(En borradores anteriores a veces se citaba <strong>37</strong> al sumar solo los casos agrupados en RF-01…RF-06 <strong>sin</strong> los tres casos de comentarios <strong>P-28…P-30</strong>, más seguridad y validación: 27 + 6 + 4 = 37. Este documento usa el inventario completo por identificador P/S/V.)</em></p>
+  <p><strong>Suma manual: 43 + 7 + 4 = 54.</strong></p>
+  <p><em>Nota rápida: antes a veces salía <strong>37</strong> «de cabeza» si alguien sumaba solo los bloques RF viejos y se dejaba fuera los tres casos de comentarios (P-28…P-30); aquí el total sale de contar <strong>todos</strong> los IDs P, S y V sin saltos.</em></p>
   <table>
     <thead><tr><th>Categoría</th><th>Total</th><th>Pasadas</th><th>Fallidas</th></tr></thead>
     <tbody>
-      <tr><td>Flujo de aplicación (P-01 … P-30)</td><td>30</td><td>30</td><td>0</td></tr>
-      <tr><td>Seguridad API / configuración (S-01 … S-06)</td><td>6</td><td>6</td><td>0</td></tr>
+      <tr><td>Flujo de aplicación (P-01 … P-43)</td><td>43</td><td>43</td><td>0</td></tr>
+      <tr><td>Seguridad API / configuración (S-01 … S-07)</td><td>7</td><td>7</td><td>0</td></tr>
       <tr><td>Validación de datos (V-01 … V-04)</td><td>4</td><td>4</td><td>0</td></tr>
-      <tr><td><strong>Total pruebas manuales</strong></td><td><strong>40</strong></td><td><strong>40</strong></td><td><strong>0</strong></td></tr>
-      <tr><td>Unitarias automáticas (Vitest)</td><td>22</td><td>22</td><td>0</td></tr>
+      <tr><td><strong>Total pruebas manuales</strong></td><td><strong>54</strong></td><td><strong>54</strong></td><td><strong>0</strong></td></tr>
+      <tr><td>Unitarias automáticas (Vitest)</td><td>27</td><td>27</td><td>0</td></tr>
     </tbody>
   </table>
-  <p><em>Las 22 pruebas unitarias corresponden a 14 tests en <code>server</code> (<code>npm test</code> en <code>server/</code>) y 8 en <code>client</code> (<code>npm test</code> en <code>client/</code>).</em></p>
+  <p><em>Las 27 pruebas unitarias corresponden a 17 tests en <code>server</code> y 10 en <code>client</code> (<code>npm test</code> en cada carpeta).</em></p>
 
   <h2>9. Mejoras detectadas durante las pruebas (líneas futuras)</h2>
   <ol>
-    <li><strong>Intentos de login:</strong> no hay límite de reintentos; en producción convendría <em>rate limiting</em> (p. ej. <code>express-rate-limit</code>).</li>
-    <li><strong>Errores en producción:</strong> unificar el envío de errores hacia <code>next(error)</code> para que todo pase por el manejador central y no se filtre <code>error.message</code> en rutas sueltas.</li>
-    <li><strong>Duplicados de ficha:</strong> el flujo de fusión de duplicados en edición puede simplificarse cuando ambas fichas comparten el mismo <code>catalogo_id</code>.</li>
+    <li><strong>Intentos de login:</strong> ahora mismo puedes probar contraseñas una y otra vez sin límites; en un despliegue real convendría <strong>frenar</strong> eso (por ejemplo con <code>express-rate-limit</code>), para que no sea tan fácil ir a lo bruto.</li>
+    <li><strong>Errores en producción:</strong> en algunas rutas el error se «escupe» al cliente de forma distinta; lo ideal sería que <strong>todo</strong> pasara por el mismo sitio central y en producción no se enseñaran detalles internos técnicos.</li>
+    <li><strong>Duplicados de ficha:</strong> si en el futuro hubiera que <strong>juntar</strong> dos fichas del mismo juego, sería más sencillo cuando ambas ya comparten el mismo <code>catalogo_id</code>.</li>
   </ol>
 
   <script>

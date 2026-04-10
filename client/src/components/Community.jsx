@@ -6,7 +6,6 @@ import { IconUsers } from "./icons";
 import { CommunityMemberSkeleton } from "./Skeletons";
 import UserAvatar from "./UserAvatar";
 
-/** Lee el rol del usuario desde localStorage. */
 function getCurrentUserRole() {
   try {
     return JSON.parse(localStorage.getItem("user") || "{}")?.rol ?? "user";
@@ -15,15 +14,22 @@ function getCurrentUserRole() {
   }
 }
 
+function getCurrentUserId() {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "{}")?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function labelLfgModo(m) {
+  if (m === "online") return "Online / multijugador";
+  if (m === "coop_local") return "Co-op local o pantalla compartida";
+  return "Otro";
+}
+
 /**
- * Página de la comunidad con dos pestañas: miembros y estadísticas globales.
- * Carga en paralelo la lista de usuarios y las estadísticas para reducir
- * el tiempo de espera total. La pestaña "Miembros" filtra por el SearchContext.
- * La variable `cancelled` sirve para no actualizar el estado si el usuario
- * navega a otra página antes de que llegue la respuesta del servidor,
- * lo que evitaría un error de React al intentar actualizar un componente que ya no existe.
- *
- * @component
+ * Comunidad: miembros, estadísticas, actividad de seguidos y buscar grupo (LFG).
  */
 export default function Community() {
   const [users, setUsers] = useState([]);
@@ -32,7 +38,20 @@ export default function Community() {
   const [tab, setTab] = useState("members");
   const { query } = useSearch();
 
+  const [activity, setActivity] = useState([]);
+  const [activityLoading, setActivityLoading] = useState(false);
+
+  const [lfgList, setLfgList] = useState([]);
+  const [lfgLoading, setLfgLoading] = useState(false);
+  const [myGames, setMyGames] = useState([]);
+  const [lfgGameId, setLfgGameId] = useState("");
+  const [lfgModo, setLfgModo] = useState("online");
+  const [lfgMsg, setLfgMsg] = useState("");
+  const [lfgErr, setLfgErr] = useState("");
+  const [lfgSubmitting, setLfgSubmitting] = useState(false);
+
   const isAdmin = getCurrentUserRole() === "admin";
+  const myId = getCurrentUserId();
 
   useEffect(() => {
     let cancelled = false;
@@ -63,6 +82,151 @@ export default function Community() {
     };
   }, []);
 
+  useEffect(() => {
+    if (tab !== "activity") return;
+    let cancelled = false;
+    async function load() {
+      setActivityLoading(true);
+      try {
+        const res = await apiFetch(`${API_BASE}/api/social/activity`);
+        if (res.ok && !cancelled) setActivity(await res.json());
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (!cancelled) setActivityLoading(false);
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [tab]);
+
+  useEffect(() => {
+    if (tab !== "lfg") return;
+    let cancelled = false;
+    async function load() {
+      setLfgLoading(true);
+      try {
+        const [lr, gr] = await Promise.all([
+          apiFetch(`${API_BASE}/api/social/lfg`),
+          apiFetch(`${API_BASE}/api/games`),
+        ]);
+        if (lr.ok && !cancelled) setLfgList(await lr.json());
+        if (gr.ok && !cancelled) setMyGames(await gr.json());
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (!cancelled) setLfgLoading(false);
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [tab]);
+
+  const refreshLfg = async () => {
+    const lr = await apiFetch(`${API_BASE}/api/social/lfg`);
+    if (lr.ok) setLfgList(await lr.json());
+  };
+
+  const toggleFollowMember = async (u, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      if (u.siguiendo) {
+        const res = await apiFetch(`${API_BASE}/api/social/follow/${u.id}`, {
+          method: "DELETE",
+        });
+        if (res.ok) {
+          setUsers((prev) =>
+            prev.map((x) =>
+              x.id === u.id
+                ? {
+                    ...x,
+                    siguiendo: false,
+                    num_seguidores: Math.max(
+                      0,
+                      (x.num_seguidores ?? 0) - 1,
+                    ),
+                  }
+                : x,
+            ),
+          );
+        }
+      } else {
+        const res = await apiFetch(`${API_BASE}/api/social/follow/${u.id}`, {
+          method: "POST",
+        });
+        if (res.ok || res.status === 201) {
+          setUsers((prev) =>
+            prev.map((x) =>
+              x.id === u.id
+                ? {
+                    ...x,
+                    siguiendo: true,
+                    num_seguidores: (x.num_seguidores ?? 0) + 1,
+                  }
+                : x,
+            ),
+          );
+        }
+      }
+    } catch {
+      /* ignorar */
+    }
+  };
+
+  const submitLfg = async (ev) => {
+    ev.preventDefault();
+    setLfgErr("");
+    const juego_id = parseInt(lfgGameId, 10);
+    if (!Number.isFinite(juego_id)) {
+      setLfgErr("Elige un juego de tu colección.");
+      return;
+    }
+    const mensaje = lfgMsg.trim();
+    if (!mensaje) {
+      setLfgErr("Escribe un mensaje (qué buscas, horario, plataforma…).");
+      return;
+    }
+    setLfgSubmitting(true);
+    try {
+      const res = await apiFetch(`${API_BASE}/api/social/lfg`, {
+        method: "POST",
+        body: JSON.stringify({
+          juego_id,
+          modo: lfgModo,
+          mensaje,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setLfgErr(data.error || "No se pudo publicar.");
+        return;
+      }
+      setLfgMsg("");
+      await refreshLfg();
+    } catch {
+      setLfgErr("Error de conexión.");
+    } finally {
+      setLfgSubmitting(false);
+    }
+  };
+
+  const deleteLfg = async (id) => {
+    if (!window.confirm("¿Eliminar esta publicación?")) return;
+    try {
+      const res = await apiFetch(`${API_BASE}/api/social/lfg/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) await refreshLfg();
+    } catch {
+      /* ignorar */
+    }
+  };
+
   const filteredUsers = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return users;
@@ -71,8 +235,21 @@ export default function Community() {
     );
   }, [users, query]);
 
+  const tabBtn = (id, label) => (
+    <button
+      type="button"
+      onClick={() => setTab(id)}
+      className={`rounded-full px-3 py-2 text-sm font-semibold transition-all duration-200 sm:px-4 ${
+        tab === id
+          ? "bg-brand-accent/18 text-brand-accent shadow-[inset_0_0_16px_-6px_rgba(45,212,191,0.35)] ring-1 ring-brand-accent/30"
+          : "text-slate-500 hover:text-slate-300"
+      }`}
+    >
+      {label}
+    </button>
+  );
+
   if (loading) {
-    // Skeleton mientras carga
     return (
       <div className="space-y-8">
         <header>
@@ -102,34 +279,28 @@ export default function Community() {
           Comunidad
         </h1>
         <p className="mt-2 max-w-2xl text-base text-brand-accent/90">
-          Conecta con otros jugadores y descubre las estadísticas globales
+          Miembros, estadísticas, actividad de quien sigues y buscar compañeros
+          para jugar (LFG). Las recomendaciones personales están en la campana
+          del encabezado.
         </p>
       </header>
 
-      <div className="inline-flex rounded-full bg-slate-900/90 p-1 ring-1 ring-brand-accent/15 shadow-[0_0_24px_-8px_rgba(45,212,191,0.25)]">
+      <div className="flex flex-wrap gap-1 rounded-full bg-slate-900/90 p-1 ring-1 ring-brand-accent/15 shadow-[0_0_24px_-8px_rgba(45,212,191,0.25)]">
         <button
           type="button"
           onClick={() => setTab("members")}
-          className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+          className={`flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition-all duration-200 sm:px-4 ${
             tab === "members"
               ? "bg-brand-accent/18 text-brand-accent shadow-[inset_0_0_16px_-6px_rgba(45,212,191,0.35)] ring-1 ring-brand-accent/30"
               : "text-slate-500 hover:text-slate-300"
           }`}
         >
-          <IconUsers className="h-4 w-4 opacity-90" />
+          <IconUsers className="h-4 w-4 shrink-0 opacity-90" />
           Miembros
         </button>
-        <button
-          type="button"
-          onClick={() => setTab("stats")}
-          className={`rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${
-            tab === "stats"
-              ? "bg-brand-accent/18 text-brand-accent shadow-[inset_0_0_16px_-6px_rgba(45,212,191,0.35)] ring-1 ring-brand-accent/30"
-              : "text-slate-500 hover:text-slate-300"
-          }`}
-        >
-          Estadísticas globales
-        </button>
+        {tabBtn("stats", "Estadísticas")}
+        {tabBtn("activity", "Actividad")}
+        {tabBtn("lfg", "Buscar grupo")}
       </div>
 
       {tab === "members" && (
@@ -147,27 +318,42 @@ export default function Community() {
               {filteredUsers.map((u) => {
                 const name = (u.nombre_usuario || "?").trim();
                 const num = u.num_juegos ?? 0;
+                const seg = u.num_seguidores ?? 0;
                 const plat = u.plataforma_ejemplo?.trim() || "—";
                 return (
                   <li key={u.id}>
-                    <Link
-                      to={`/user/${u.id}`}
-                      className="figma-panel-interactive flex items-center gap-4 p-4"
-                    >
-                      <UserAvatar
-                        avatarId={u.avatar_id}
-                        size="lg"
-                        title={`Avatar de ${name}`}
-                      />
-                      <div className="min-w-0">
-                        <p className="truncate font-semibold text-white">
-                          {u.nombre_usuario}
-                        </p>
-                        <p className="truncate text-sm text-slate-500">
-                          {num} juegos · {plat}
-                        </p>
-                      </div>
-                    </Link>
+                    <div className="figma-panel-interactive relative flex items-center gap-4 p-4">
+                      <Link
+                        to={`/user/${u.id}`}
+                        className="flex min-w-0 flex-1 items-center gap-4"
+                      >
+                        <UserAvatar
+                          avatarId={u.avatar_id}
+                          size="lg"
+                          title={`Avatar de ${name}`}
+                        />
+                        <div className="min-w-0">
+                          <p className="truncate font-semibold text-white">
+                            {u.nombre_usuario}
+                          </p>
+                          <p className="truncate text-sm text-slate-500">
+                            {num} {num === 1 ? "juego" : "juegos"} · {seg}{" "}
+                            {seg === 1 ? "seguidor" : "seguidores"} · {plat}
+                          </p>
+                        </div>
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={(e) => toggleFollowMember(u, e)}
+                        className={`shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-bold transition ${
+                          u.siguiendo
+                            ? "bg-white/[0.08] text-brand-accent ring-1 ring-brand-accent/25"
+                            : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                        }`}
+                      >
+                        {u.siguiendo ? "Siguiendo" : "Seguir"}
+                      </button>
+                    </div>
                   </li>
                 );
               })}
@@ -178,7 +364,6 @@ export default function Community() {
 
       {tab === "stats" && (
         <section>
-          {/* Solo el admin ve la nota técnica; el resto solo ve la tabla */}
           {isAdmin && (
             <p className="mb-5 max-w-2xl text-sm leading-relaxed text-slate-400">
               Puntuación media de cada juego calculada a partir de todas las
@@ -216,6 +401,211 @@ export default function Community() {
               </table>
             </div>
           )}
+        </section>
+      )}
+
+      {tab === "activity" && (
+        <section className="space-y-4">
+          <p className="max-w-2xl text-sm text-slate-400">
+            Comentarios y publicaciones LFG de personas a las que sigues. Sigue
+            perfiles desde la pestaña Miembros o desde su colección pública.
+          </p>
+          {activityLoading && (
+            <p className="text-sm text-slate-500">Cargando actividad…</p>
+          )}
+          {!activityLoading && activity.length === 0 && (
+            <div className="figma-panel px-6 py-10 text-center text-sm text-slate-400">
+              No hay actividad reciente. Sigue a otros miembros para ver
+              novedades aquí.
+            </div>
+          )}
+          <ul className="space-y-3">
+            {activity.map((row, i) => (
+              <li key={`${row.tipo}-${row.en}-${i}`}>
+                <div className="figma-panel px-4 py-3 text-sm">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <UserAvatar
+                      avatarId={row.actor_avatar_id}
+                      size="sm"
+                      title={row.actor_nombre}
+                    />
+                    <span className="font-semibold text-white">
+                      {row.actor_nombre}
+                    </span>
+                    <span className="text-slate-500">
+                      {row.tipo === "comentario"
+                        ? "comentó en"
+                        : "busca grupo en"}
+                    </span>
+                    <Link
+                      to={
+                        row.tipo === "comentario" && row.comentario_id
+                          ? `/juego/${row.juego_ficha_id}/discussion?c=${row.comentario_id}`
+                          : `/juego/${row.juego_ficha_id}/discussion`
+                      }
+                      className="font-medium text-brand-accent hover:text-teal-300"
+                    >
+                      {row.juego_titulo}
+                    </Link>
+                  </div>
+                  {row.tipo === "comentario" && row.resumen && (
+                    <p className="mt-2 line-clamp-2 text-slate-400">
+                      {row.resumen}
+                    </p>
+                  )}
+                  {row.tipo === "lfg" && (
+                    <p className="mt-2 text-slate-300">
+                      <span className="text-xs font-semibold uppercase tracking-wide text-brand-accent/90">
+                        {labelLfgModo(row.modo)}
+                      </span>
+                      {" · "}
+                      {row.lfg_mensaje}
+                    </p>
+                  )}
+                  <p className="mt-2 text-xs text-slate-600">
+                    {new Date(row.en).toLocaleString("es-ES")}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {tab === "lfg" && (
+        <section className="space-y-8">
+          <div className="figma-panel p-6">
+            <h2 className="text-lg font-bold text-white">Publicar búsqueda</h2>
+            <p className="mt-2 text-sm text-slate-400">
+              Indica en qué título de tu biblioteca quieres compañía y cómo
+              prefieres jugar (online, en local…). Tú eliges el modo; no
+              bloqueamos títulos “solo un jugador” porque a veces hay modos
+              opcionales o interpretaciones distintas.
+            </p>
+            <form onSubmit={submitLfg} className="mt-5 flex flex-col gap-4">
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-slate-400">
+                  Tu juego
+                </span>
+                <select
+                  className="figma-input py-3 text-sm"
+                  value={lfgGameId}
+                  onChange={(e) => setLfgGameId(e.target.value)}
+                  required
+                >
+                  <option value="">— Elegir —</option>
+                  {myGames.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.titulo}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-slate-400">
+                  Modo
+                </span>
+                <select
+                  className="figma-input py-3 text-sm"
+                  value={lfgModo}
+                  onChange={(e) => setLfgModo(e.target.value)}
+                >
+                  <option value="online">Online / multijugador</option>
+                  <option value="coop_local">Co-op local o pantalla compartida</option>
+                  <option value="otro">Otro</option>
+                </select>
+              </label>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-slate-400">
+                  Mensaje
+                </span>
+                <textarea
+                  className="figma-input min-h-[100px] py-3 text-sm"
+                  value={lfgMsg}
+                  onChange={(e) => setLfgMsg(e.target.value)}
+                  maxLength={500}
+                  placeholder="Ej.: Rankeds por la noche, EUW, con voz…"
+                  required
+                />
+              </label>
+              {lfgErr && (
+                <p className="text-sm text-red-400" role="alert">
+                  {lfgErr}
+                </p>
+              )}
+              <button
+                type="submit"
+                disabled={lfgSubmitting}
+                className="figma-btn-primary self-start"
+              >
+                {lfgSubmitting ? "Publicando…" : "Publicar"}
+              </button>
+            </form>
+          </div>
+
+          <div>
+            <h2 className="mb-4 text-lg font-bold text-white">
+              Publicaciones activas
+            </h2>
+            {lfgLoading && (
+              <p className="text-sm text-slate-500">Cargando…</p>
+            )}
+            {!lfgLoading && lfgList.length === 0 && (
+              <p className="figma-panel px-6 py-10 text-center text-sm text-slate-400">
+                Nadie ha publicado una búsqueda aún.
+              </p>
+            )}
+            <ul className="space-y-3">
+              {lfgList.map((row) => (
+                <li key={row.id}>
+                  <div className="figma-panel flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex gap-3">
+                      <UserAvatar
+                        avatarId={row.avatar_id}
+                        size="md"
+                        title={row.nombre_usuario}
+                      />
+                      <div>
+                        <p className="font-semibold text-white">
+                          {row.nombre_usuario}
+                        </p>
+                        <p className="text-sm text-brand-accent">
+                          {row.juego_titulo}{" "}
+                          <span className="text-slate-500">
+                            · {row.plataforma?.trim() || "—"}
+                          </span>
+                        </p>
+                        <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          {labelLfgModo(row.modo)}
+                        </p>
+                        <p className="mt-2 text-sm text-slate-300">
+                          {row.mensaje}
+                        </p>
+                        <p className="mt-2 text-xs text-slate-600">
+                          {new Date(row.created_at).toLocaleString("es-ES")}
+                        </p>
+                        <Link
+                          to={`/juego/${row.juego_id}/discussion`}
+                          className="mt-2 inline-block text-xs font-semibold text-brand-accent hover:text-teal-300"
+                        >
+                          Ver ficha y discusión →
+                        </Link>
+                      </div>
+                    </div>
+                    {(row.usuario_id === myId || isAdmin) && (
+                      <button
+                        type="button"
+                        onClick={() => deleteLfg(row.id)}
+                        className="self-end text-xs font-semibold text-red-400 hover:text-red-300 sm:self-start"
+                      >
+                        Eliminar
+                      </button>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         </section>
       )}
     </div>

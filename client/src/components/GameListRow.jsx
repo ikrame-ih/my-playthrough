@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { displayCoverUrl } from "../coverUrl";
 import { estadoBadgeClass, labelEstado } from "../gameLabels";
-import { IconImage, IconPencil, IconTrash } from "./icons";
+import { IconGift, IconImage, IconPencil, IconTrash } from "./icons";
 
 /**
  * Vista compacta (lista) de una ficha de juego.
@@ -10,6 +10,7 @@ export default function GameListRow({
   game,
   showActions,
   onDelete,
+  onRecommend,
   discussionTo,
 }) {
   const rawCover = game.url_imagen?.trim();
@@ -57,6 +58,17 @@ export default function GameListRow({
         )}
         {showActions && (
           <>
+            {onRecommend && (
+              <button
+                type="button"
+                onClick={() => onRecommend(game)}
+                className="rounded-lg p-2 text-slate-400 transition hover:bg-white/[0.06] hover:text-brand-accent"
+                title="Recomendar"
+                aria-label={`Recomendar ${game.titulo}`}
+              >
+                <IconGift className="h-4 w-4" />
+              </button>
+            )}
             <Link
               to={`/edit/${game.id}`}
               className="rounded-lg p-2 text-slate-400 transition hover:bg-white/[0.06] hover:text-white"

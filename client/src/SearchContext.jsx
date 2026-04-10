@@ -2,9 +2,9 @@ import { createContext, useContext, useState } from "react";
 
 /**
  * Contexto de React que comparte el término de búsqueda entre componentes.
- * Lo uso para que la barra de búsqueda de arriba (AppShell) pueda filtrar
- * los juegos o los usuarios sin tener que pasar el dato por cada componente
- * intermedio hasta llegar a GameList o Community.
+ * La barra superior (`AppShell`) escribe aquí; `GameList` y `Community` leen `query`
+ * para filtrar en cliente. En la ruta `/search`, `AppShell` sincroniza el input con
+ * el parámetro `?q=` de la URL para que el resultado global y el filtro local coincidan.
  * @type {React.Context<{query: string, setQuery: Function}|null>}
  */
 const SearchContext = createContext(null);

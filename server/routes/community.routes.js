@@ -3,6 +3,7 @@
  * @description Rutas de estadísticas globales y detalle público de juegos.
  *
  * Rutas definidas:
+ *   GET /api/community/search     → usuarios y fichas de juego por texto
  *   GET /api/community/stats      → nota media por juego entre todos los usuarios
  *   GET /api/community/games/:id  → detalle público de una ficha (para comentarios)
  */
@@ -12,8 +13,56 @@ const pool = require("../config/db");
 const { authMiddleware } = require("../middleware/auth.middleware");
 const { queryGamePublicById } = require("../utils/queries");
 const { serverErrorPayload } = require("../utils/normalize");
+const { coerceAvatarId } = require("../constants/avatars");
 
 const router = express.Router();
+
+/**
+ * Búsqueda global: miembros por nombre y fichas de juego por título (todas las colecciones).
+ *
+ * @route  GET /api/community/search?q=
+ * @access Private
+ */
+router.get("/search", authMiddleware, async (req, res) => {
+  const q = String(req.query.q || "").trim();
+  if (q.length < 1) {
+    return res.json({ users: [], games: [] });
+  }
+  const pat = `%${q}%`;
+  try {
+    const [usersR, gamesR] = await Promise.all([
+      pool.query(
+        `SELECT u.id, u.nombre_usuario, u.avatar_id
+         FROM usuarios u
+         WHERE u.nombre_usuario ILIKE $1
+         ORDER BY u.nombre_usuario ASC
+         LIMIT 25`,
+        [pat],
+      ),
+      pool.query(
+        `SELECT j.id, j.titulo, j.usuario_id, u.nombre_usuario AS propietario_nombre
+         FROM juegos j
+         JOIN usuarios u ON u.id = j.usuario_id
+         LEFT JOIN catalogo_juegos c ON c.id = j.catalogo_id
+         WHERE j.titulo ILIKE $1
+            OR COALESCE(c.titulo, '') ILIKE $1
+         ORDER BY j.titulo ASC, j.id ASC
+         LIMIT 40`,
+        [pat],
+      ),
+    ]);
+    res.json({
+      users: usersR.rows.map((r) => ({
+        ...r,
+        avatar_id: coerceAvatarId(r.avatar_id),
+      })),
+      games: gamesR.rows,
+    });
+  } catch (error) {
+    console.error("[GET /api/community/search]", error);
+    res.status(500).json(serverErrorPayload(error, "Error al buscar."));
+  }
+});
 
 /**
  * Devuelve la nota media de cada juego calculada a partir de las puntuaciones

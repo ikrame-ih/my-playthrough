@@ -1,6 +1,8 @@
 /**
- * Crea un usuario demo con juegos de ejemplo (idempotente).
+ * Crea un usuario demo con tres juegos y carátulas reales (idempotente).
  * Uso: cd server && npm run seed:demo
+ *
+ * Contraseña alineada con `seed:presentation`: Presentacion2026!
  */
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
@@ -10,32 +12,67 @@ const pool = require("../config/db");
 
 const DEMO_EMAIL = "demo@myplaythrough.local";
 const DEMO_USER = "Demo Jurado";
-const DEMO_PASS = "demo123456";
+const DEMO_PASS = "Presentacion2026!";
 
-/** Títulos con prefijo para no chocar con restricciones UNIQUE de título en BD heredadas. */
-const SAMPLE_GAMES = [
+const DEMO_GAMES = [
   {
-    titulo: "[Demo] Zelda BOTW — muestra",
+    titulo: "The Legend of Zelda: Breath of the Wild",
+    url_imagen:
+      "https://media.rawg.io/media/games/cc1/cc196a5ad763955d6532cdba236f730c.jpg",
+    rawg_id: 22511,
+    steam_app_id: null,
     estado: "Pendiente",
     plataforma: "Switch",
-    puntuacion: 0,
+    puntuacion: null,
     horas_jugadas: 0,
   },
   {
-    titulo: "[Demo] Hades — muestra",
+    titulo: "Hades",
+    url_imagen:
+      "https://cdn.cloudflare.steamstatic.com/steam/apps/1145360/header.jpg",
+    rawg_id: null,
+    steam_app_id: 1145360,
     estado: "Jugando",
     plataforma: "PC",
     puntuacion: 9,
     horas_jugadas: 42,
   },
   {
-    titulo: "[Demo] Portal 2 — muestra",
+    titulo: "Portal 2",
+    url_imagen:
+      "https://cdn.cloudflare.steamstatic.com/steam/apps/620/header.jpg",
+    rawg_id: null,
+    steam_app_id: 620,
     estado: "Completado",
     plataforma: "PC",
     puntuacion: 10,
     horas_jugadas: 18,
   },
 ];
+
+async function ensureCatalog(client, row) {
+  if (row.rawg_id) {
+    const r = await client.query(
+      "SELECT id FROM catalogo_juegos WHERE rawg_id = $1",
+      [row.rawg_id],
+    );
+    if (r.rows.length) return r.rows[0].id;
+  }
+  if (row.steam_app_id) {
+    const r = await client.query(
+      "SELECT id FROM catalogo_juegos WHERE steam_app_id = $1",
+      [row.steam_app_id],
+    );
+    if (r.rows.length) return r.rows[0].id;
+  }
+  const ins = await client.query(
+    `INSERT INTO catalogo_juegos (titulo, url_imagen, rawg_id, steam_app_id)
+     VALUES ($1, $2, $3, $4)
+     RETURNING id`,
+    [row.titulo, row.url_imagen, row.rawg_id, row.steam_app_id],
+  );
+  return ins.rows[0].id;
+}
 
 async function main() {
   const client = await pool.connect();
@@ -45,11 +82,15 @@ async function main() {
       [DEMO_EMAIL],
     );
     let userId;
+    const hash = await bcrypt.hash(DEMO_PASS, 10);
     if (ex.rows.length > 0) {
       userId = ex.rows[0].id;
-      console.log("Usuario demo ya existe (id %s). Comprobando juegos…", userId);
+      await client.query(
+        "UPDATE usuarios SET password_hash = $1, nombre_usuario = $2 WHERE id = $3",
+        [hash, DEMO_USER, userId],
+      );
+      console.log("Usuario demo actualizado (misma contraseña que seed:presentation).");
     } else {
-      const hash = await bcrypt.hash(DEMO_PASS, 10);
       const ins = await client.query(
         `INSERT INTO usuarios (nombre_usuario, email, password_hash, rol, avatar_id)
          VALUES ($1, $2, $3, 'user', 'robot-3')
@@ -65,14 +106,18 @@ async function main() {
       [userId],
     );
     if (count.rows[0].n > 0) {
-      console.log("La cuenta demo ya tiene juegos (%s). Nada que insertar.", count.rows[0].n);
+      console.log(
+        "La cuenta demo ya tiene juegos (%s). Nada que insertar.",
+        count.rows[0].n,
+      );
       return;
     }
 
-    for (const g of SAMPLE_GAMES) {
+    for (const g of DEMO_GAMES) {
+      const catId = await ensureCatalog(client, g);
       await client.query(
-        `INSERT INTO juegos (usuario_id, titulo, estado, plataforma, puntuacion, horas_jugadas)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
+        `INSERT INTO juegos (usuario_id, titulo, estado, plataforma, puntuacion, horas_jugadas, catalogo_id, url_imagen)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
         [
           userId,
           g.titulo,
@@ -80,10 +125,12 @@ async function main() {
           g.plataforma,
           g.puntuacion,
           g.horas_jugadas,
+          catId,
+          g.url_imagen,
         ],
       );
     }
-    console.log("Insertados %s juegos de ejemplo.", SAMPLE_GAMES.length);
+    console.log("Insertados %s juegos con carátulas.", DEMO_GAMES.length);
   } finally {
     client.release();
     await pool.end();

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useSearch } from "../SearchContext";
 import {
   IconCollection,
@@ -12,6 +12,8 @@ import {
   IconUsers,
 } from "./icons";
 import UserAvatar from "./UserAvatar";
+import NotificationBell from "./NotificationBell";
+import WelcomeTour from "./WelcomeTour";
 
 /**
  * Función de clases para los enlaces de navegación del sidebar.
@@ -44,11 +46,17 @@ export default function AppShell({ user, onLogout, children }) {
 
   const { query, setQuery } = useSearch();
   const location = useLocation();
+  const navigate = useNavigate();
   const [navOpen, setNavOpen] = useState(false);
 
   useEffect(() => {
-    setQuery("");
-  }, [location.pathname, setQuery]);
+    if (location.pathname === "/search") {
+      const q = new URLSearchParams(location.search).get("q") || "";
+      setQuery(q);
+    } else {
+      setQuery("");
+    }
+  }, [location.pathname, location.search, setQuery]);
 
   useEffect(() => {
     setNavOpen(false);
@@ -92,6 +100,7 @@ export default function AppShell({ user, onLogout, children }) {
           </span>
           <Link
             to="/"
+            data-tour="tour-welcome"
             className="text-[1.05rem] font-bold tracking-tight text-white"
             onClick={closeNav}
           >
@@ -102,22 +111,44 @@ export default function AppShell({ user, onLogout, children }) {
         <nav
           className="mt-8 flex flex-1 flex-col gap-1 px-3"
           aria-label="Principal"
+          data-tour="sidebar-nav"
         >
-          <NavLink to="/" end className={sideNav} onClick={closeNav}>
+          <NavLink
+            to="/"
+            end
+            className={sideNav}
+            onClick={closeNav}
+            data-tour="nav-coleccion"
+          >
             <IconCollection className="h-5 w-5 shrink-0 opacity-90" />
             Mi colección
           </NavLink>
-          <NavLink to="/community" className={sideNav} onClick={closeNav}>
+          <NavLink
+            to="/community"
+            className={sideNav}
+            onClick={closeNav}
+            data-tour="nav-comunidad"
+          >
             <IconUsers className="h-5 w-5 shrink-0 opacity-90" />
             Comunidad
           </NavLink>
           {user?.rol === "admin" && (
-            <NavLink to="/admin" className={sideNav} onClick={closeNav}>
+            <NavLink
+              to="/admin"
+              className={sideNav}
+              onClick={closeNav}
+              data-tour="nav-admin"
+            >
               <IconShield className="h-5 w-5 shrink-0 opacity-90" />
               Administración
             </NavLink>
           )}
-          <NavLink to="/settings" className={sideNav} onClick={closeNav}>
+          <NavLink
+            to="/settings"
+            className={sideNav}
+            onClick={closeNav}
+            data-tour="nav-perfil"
+          >
             <IconUser className="h-5 w-5 shrink-0 opacity-90" />
             Perfil
           </NavLink>
@@ -148,29 +179,43 @@ export default function AppShell({ user, onLogout, children }) {
           >
             <IconMenu className="h-6 w-6" />
           </button>
-          <div className="relative min-w-0 flex-1 sm:mx-auto sm:max-w-xl">
-            <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-[1.125rem] w-[1.125rem] -translate-y-1/2 text-brand-accent/50" />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar juegos, usuarios..."
-              className="figma-input w-full rounded-full py-2.5 pl-10 pr-4 text-sm"
-              aria-label="Buscar en la aplicación"
-            />
-          </div>
-          <Link
-            to="/settings"
-            className="shrink-0 rounded-[10px] outline-none ring-brand-accent/0 transition hover:ring-2 hover:ring-brand-accent/40 focus-visible:ring-2 focus-visible:ring-brand-accent/60"
-            title={user?.nombre_usuario || user?.email || "Perfil"}
-            aria-label="Ir a perfil y avatar"
+          <div
+            className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:mx-auto sm:max-w-3xl"
+            data-tour="header-tools"
           >
-            <UserAvatar
-              avatarId={user?.avatar_id}
-              size="md"
-              title={`Avatar de ${name}`}
-            />
-          </Link>
+            <div className="relative min-w-0 flex-1">
+              <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 h-[1.125rem] w-[1.125rem] -translate-y-1/2 text-brand-accent/50" />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key !== "Enter") return;
+                  const t = query.trim();
+                  if (!t) return;
+                  e.preventDefault();
+                  navigate(`/search?q=${encodeURIComponent(t)}`);
+                }}
+                placeholder="Buscar juegos, usuarios… (Intro)"
+                className="figma-input w-full rounded-full py-2.5 pl-10 pr-4 text-sm"
+                aria-label="Buscar en la aplicación"
+              />
+            </div>
+            <NotificationBell user={user} />
+            <Link
+              to="/settings"
+              data-tour="header-avatar"
+              className="shrink-0 rounded-[10px] outline-none ring-brand-accent/0 transition hover:ring-2 hover:ring-brand-accent/40 focus-visible:ring-2 focus-visible:ring-brand-accent/60"
+              title={user?.nombre_usuario || user?.email || "Perfil"}
+              aria-label="Ir a perfil y avatar"
+            >
+              <UserAvatar
+                avatarId={user?.avatar_id}
+                size="md"
+                title={`Avatar de ${name}`}
+              />
+            </Link>
+          </div>
         </header>
 
         <main
@@ -181,6 +226,7 @@ export default function AppShell({ user, onLogout, children }) {
           {children}
         </main>
       </div>
+      <WelcomeTour isAdmin={user?.rol === "admin"} />
     </div>
   );
 }

@@ -112,8 +112,11 @@
   <h1>Modelo lógico — tablas principales</h1>
   <p class="sub">
     Vista HTML del esquema alineada con <code>docs/schema.sql</code>. La tabla
-    <strong>usuarios</strong> incluye <code>avatar_id</code> (robots predefinidos
-    <code>robot-0</code> … <code>robot-9</code>).
+    <strong>usuarios</strong> incluye <code>avatar_id</code> y
+    <code>notificaciones_sonido</code>. Tras comentarios de juego:
+    <strong>juego_comentario_votos</strong> (voto útil/no útil por usuario).
+    Tablas sociales: <strong>usuario_seguimientos</strong>,
+    <strong>juego_recomendaciones</strong>, <strong>lfg_publicaciones</strong>.
   </p>
 
   <div class="grid">
@@ -127,6 +130,7 @@
         <tr><th>rol</th><td>VARCHAR(50) DEFAULT 'user'</td></tr>
         <tr><th>avatar_id</th><td>VARCHAR(32) NOT NULL DEFAULT 'robot-0'</td></tr>
         <tr><th>fecha_registro</th><td>TIMESTAMP DEFAULT NOW()</td></tr>
+        <tr><th>notificaciones_sonido</th><td>BOOLEAN NOT NULL DEFAULT TRUE</td></tr>
       </tbody>
     </table>
 
@@ -167,6 +171,52 @@
         <tr><th class="fk">parent_id</th><td>FK → juego_comentarios(id) CASCADE</td></tr>
         <tr><th>cuerpo</th><td>TEXT NOT NULL</td></tr>
         <tr><th>fecha_creacion</th><td>TIMESTAMPTZ DEFAULT NOW()</td></tr>
+      </tbody>
+    </table>
+
+    <table>
+      <caption>juego_comentario_votos</caption>
+      <tbody>
+        <tr><th class="fk">comentario_id</th><td>FK → juego_comentarios(id) CASCADE (PK compuesta)</td></tr>
+        <tr><th class="fk">usuario_id</th><td>FK → usuarios(id) CASCADE (PK compuesta)</td></tr>
+        <tr><th>valor</th><td>SMALLINT −1 o 1</td></tr>
+      </tbody>
+    </table>
+
+    <table>
+      <caption>usuario_seguimientos</caption>
+      <tbody>
+        <tr><th class="pk">id</th><td>SERIAL PK</td></tr>
+        <tr><th class="fk">seguidor_id</th><td>FK → usuarios(id) CASCADE</td></tr>
+        <tr><th class="fk">seguido_id</th><td>FK → usuarios(id) CASCADE</td></tr>
+        <tr><th>created_at</th><td>TIMESTAMPTZ DEFAULT NOW()</td></tr>
+        <tr><th>—</th><td>UNIQUE(seguidor_id, seguido_id); CHECK distintos</td></tr>
+      </tbody>
+    </table>
+
+    <table>
+      <caption>juego_recomendaciones</caption>
+      <tbody>
+        <tr><th class="pk">id</th><td>SERIAL PK</td></tr>
+        <tr><th class="fk">remitente_id</th><td>FK → usuarios(id) CASCADE</td></tr>
+        <tr><th class="fk">destinatario_id</th><td>FK → usuarios(id) CASCADE</td></tr>
+        <tr><th class="fk">juego_id</th><td>FK → juegos(id) CASCADE (ficha del remitente)</td></tr>
+        <tr><th>mensaje</th><td>TEXT opcional (≤500)</td></tr>
+        <tr><th>leida</th><td>BOOLEAN DEFAULT FALSE</td></tr>
+        <tr><th>created_at</th><td>TIMESTAMPTZ DEFAULT NOW()</td></tr>
+      </tbody>
+    </table>
+
+    <table>
+      <caption>lfg_publicaciones</caption>
+      <tbody>
+        <tr><th class="pk">id</th><td>SERIAL PK</td></tr>
+        <tr><th class="fk">usuario_id</th><td>FK → usuarios(id) CASCADE</td></tr>
+        <tr><th class="fk">juego_id</th><td>FK → juegos(id) CASCADE</td></tr>
+        <tr><th>modo</th><td>online | coop_local | otro</td></tr>
+        <tr><th>mensaje</th><td>TEXT NOT NULL (≤500)</td></tr>
+        <tr><th>activo</th><td>BOOLEAN DEFAULT TRUE</td></tr>
+        <tr><th>created_at</th><td>TIMESTAMPTZ DEFAULT NOW()</td></tr>
       </tbody>
     </table>
   </div>

@@ -4,20 +4,32 @@ import { API_BASE, apiFetch } from "../api";
 import GameCard from "./GameCard";
 import { GameCardSkeleton, ProfileHeaderSkeleton } from "./Skeletons";
 import UserAvatar from "./UserAvatar";
+import RecommendGameModal from "./RecommendGameModal";
+
+function getStoredUserId() {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "{}")?.id ?? null;
+  } catch {
+    return null;
+  }
+}
 
 /**
- * Perfil público de otro usuario: muestra su colección en modo solo lectura.
- * Los botones de editar y borrar están deshabilitados (`showActions={false}`)
- * para que el visitante solo pueda ver y acceder a la discusión de cada juego.
- * También usa la variable `cancelled` para no actualizar el estado si el usuario
- * navega a otra página mientras la petición sigue en curso.
- *
- * @component
+ * Perfil público de otro usuario: colección en solo lectura, seguir y recomendar.
  */
 export default function UserPublicProfile() {
   const { userId } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [following, setFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
+  const [recoOpen, setRecoOpen] = useState(false);
+  /** Ajuste local tras Seguir / Dejar de seguir para no esperar otro GET. */
+  const [followDelta, setFollowDelta] = useState(0);
+
+  const profileId = parseInt(userId, 10);
+  const myId = getStoredUserId();
+  const isSelf = Number.isFinite(profileId) && profileId === myId;
 
   useEffect(() => {
     let cancelled = false;
@@ -50,8 +62,57 @@ export default function UserPublicProfile() {
     };
   }, [userId]);
 
+  useEffect(() => {
+    setFollowDelta(0);
+  }, [userId]);
+
+  useEffect(() => {
+    if (!Number.isFinite(profileId) || isSelf) return;
+    let cancelled = false;
+    async function loadFollow() {
+      try {
+        const res = await apiFetch(
+          `${API_BASE}/api/social/follow-status/${profileId}`,
+        );
+        if (res.ok && !cancelled) {
+          const j = await res.json();
+          setFollowing(Boolean(j.following));
+        }
+      } catch {
+        /* ignorar */
+      }
+    }
+    loadFollow();
+    return () => {
+      cancelled = true;
+    };
+  }, [profileId, isSelf]);
+
+  const toggleFollow = async () => {
+    if (followLoading || isSelf) return;
+    setFollowLoading(true);
+    try {
+      if (following) {
+        const res = await apiFetch(
+          `${API_BASE}/api/social/follow/${profileId}`,
+          { method: "DELETE" },
+        );
+        if (res.ok) setFollowing(false);
+      } else {
+        const res = await apiFetch(
+          `${API_BASE}/api/social/follow/${profileId}`,
+          { method: "POST" },
+        );
+        if (res.ok || res.status === 201) setFollowing(true);
+      }
+    } catch {
+      /* ignorar */
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
   if (loading) {
-    // Skeleton mientras carga
     return (
       <div aria-busy="true" aria-label="Cargando perfil">
         <ProfileHeaderSkeleton />
@@ -87,9 +148,18 @@ export default function UserPublicProfile() {
   }
 
   const { user, games } = data;
+  const followers = Math.max(0, (user.num_seguidores ?? 0) + followDelta);
 
   return (
     <div>
+      <RecommendGameModal
+        open={recoOpen}
+        onClose={() => setRecoOpen(false)}
+        preselectedGame={null}
+        fixedRecipientId={user.id}
+        fixedRecipientName={user.nombre_usuario}
+      />
+
       <div className="mb-10 flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-start">
           <UserAvatar
@@ -103,9 +173,35 @@ export default function UserPublicProfile() {
             <h1 className="text-3xl font-bold tracking-tight text-white sm:text-[2.25rem]">
               Colección de {user.nombre_usuario}
             </h1>
+            <p className="mt-2 text-sm text-slate-500">
+              {followers}{" "}
+              {followers === 1 ? "seguidor" : "seguidores"}
+              {" · "}
+              {games.length}{" "}
+              {games.length === 1 ? "juego" : "juegos"}
+            </p>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-400">
               Vista solo lectura (no puedes editar ni borrar juegos ajenos).
             </p>
+            {!isSelf && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  disabled={followLoading}
+                  onClick={toggleFollow}
+                  className="figma-btn-primary !w-auto px-4 py-2 text-sm disabled:opacity-60"
+                >
+                  {following ? "Dejar de seguir" : "Seguir"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRecoOpen(true)}
+                  className="figma-btn-outline !w-auto border-brand-accent/25 px-4 py-2 text-sm text-brand-accent hover:bg-brand-accent/10"
+                >
+                  Recomendar un juego
+                </button>
+              </div>
+            )}
           </div>
         </div>
         <Link

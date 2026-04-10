@@ -8,7 +8,11 @@
     "test:watch": "vitest",
     "dev": "nodemon index.js",
     "migrate:avatar": "node scripts/run-add-avatar-column.js",
-    "seed:demo": "node scripts/seed-demo.js"
+    "migrate:social": "node scripts/run-add-social-features.js",
+    "migrate:votes": "node scripts/run-add-comentario-votos.js",
+    "migrate:username-unique": "node scripts/run-add-usuario-nombre-unique.js",
+    "seed:demo": "node scripts/seed-demo.js",
+    "seed:presentation": "node scripts/seed-presentation.js"
   },
   "keywords": [],
   "author": "",

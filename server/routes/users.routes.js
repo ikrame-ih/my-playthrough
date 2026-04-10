@@ -26,7 +26,7 @@ const router = express.Router();
  *
  * @route  GET /api/users
  * @access Private (requiere JWT válido)
- * @returns {object[]} 200 – Array de usuarios con `id`, `nombre_usuario`, `num_juegos`, `plataforma_ejemplo`.
+ * @returns {object[]} 200 – Array con `id`, `nombre_usuario`, `num_juegos`, `num_seguidores`, `plataforma_ejemplo`, `siguiendo`.
  */
 router.get("/", authMiddleware, async (req, res) => {
   try {
@@ -36,7 +36,12 @@ router.get("/", authMiddleware, async (req, res) => {
          u.nombre_usuario,
          u.avatar_id,
          (SELECT COUNT(*)::int FROM juegos j WHERE j.usuario_id = u.id) AS num_juegos,
-         (SELECT j.plataforma FROM juegos j WHERE j.usuario_id = u.id ORDER BY j.id DESC LIMIT 1) AS plataforma_ejemplo
+         (SELECT COUNT(*)::int FROM usuario_seguimientos s WHERE s.seguido_id = u.id) AS num_seguidores,
+         (SELECT j.plataforma FROM juegos j WHERE j.usuario_id = u.id ORDER BY j.id DESC LIMIT 1) AS plataforma_ejemplo,
+         EXISTS (
+           SELECT 1 FROM usuario_seguimientos s
+           WHERE s.seguidor_id = $1 AND s.seguido_id = u.id
+         ) AS siguiendo
        FROM usuarios u
        WHERE u.id <> $1
        ORDER BY u.nombre_usuario ASC`,
@@ -46,6 +51,7 @@ router.get("/", authMiddleware, async (req, res) => {
       result.rows.map((r) => ({
         ...r,
         avatar_id: coerceAvatarId(r.avatar_id),
+        siguiendo: Boolean(r.siguiendo),
       })),
     );
   } catch (error) {
@@ -72,7 +78,9 @@ router.get("/:userId/games", authMiddleware, async (req, res) => {
     }
 
     const userExists = await pool.query(
-      "SELECT id, nombre_usuario, avatar_id FROM usuarios WHERE id = $1",
+      `SELECT u.id, u.nombre_usuario, u.avatar_id,
+         (SELECT COUNT(*)::int FROM usuario_seguimientos s WHERE s.seguido_id = u.id) AS num_seguidores
+       FROM usuarios u WHERE u.id = $1`,
       [userId],
     );
     if (userExists.rows.length === 0) {

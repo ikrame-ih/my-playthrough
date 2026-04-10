@@ -1,3 +1,6 @@
+/**
+ * @file Utilidad para mostrar carátulas sin hotlink directo a Steam/RAWG (CORS / bloqueos).
+ */
 import { API_BASE } from "./api";
 
 /**

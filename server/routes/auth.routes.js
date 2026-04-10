@@ -13,7 +13,11 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const pool = require("../config/db");
 const { authMiddleware, createToken } = require("../middleware/auth.middleware");
-const { normalizeEmail, serverErrorPayload } = require("../utils/normalize");
+const {
+  normalizeEmail,
+  passwordPolicyMessage,
+  serverErrorPayload,
+} = require("../utils/normalize");
 const {
   isValidRobotAvatarId,
   coerceAvatarId,
@@ -31,7 +35,7 @@ const router = express.Router();
  * @access Public
  * @param  {string} req.body.nombre_usuario - Nombre visible en la comunidad.
  * @param  {string} req.body.email          - Email único de la cuenta.
- * @param  {string} req.body.password       - Contraseña en texto plano (mín. 6 caracteres).
+ * @param  {string} req.body.password       - Contraseña (mín. 8 caracteres, mayúscula, minúscula, número y símbolo).
  * @returns {object} 201 – `{ success, token, user }` | 400 – `{ error }` | 500 – `{ error }`
  */
 router.post("/register", async (req, res) => {
@@ -46,10 +50,9 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ error: "La contraseña debe tener al menos 6 caracteres." });
+    const pwdErr = passwordPolicyMessage(password);
+    if (pwdErr) {
+      return res.status(400).json({ error: pwdErr });
     }
 
     // Compruebo si ya existe antes de intentar insertar, así puedo dar un mensaje más claro
@@ -79,13 +82,17 @@ router.post("/register", async (req, res) => {
     const newUser = await pool.query(
       `INSERT INTO usuarios (nombre_usuario, email, password_hash, rol)
        VALUES ($1, $2, $3, $4)
-       RETURNING id, nombre_usuario, email, rol, avatar_id`,
+       RETURNING id, nombre_usuario, email, rol, avatar_id, notificaciones_sonido`,
       [nombre_usuario, email, password_hash, "user"],
     );
 
     // Devuelvo el token directamente para que el usuario quede logueado sin hacer login aparte
     const row = newUser.rows[0];
     row.avatar_id = coerceAvatarId(row.avatar_id);
+    row.notificaciones_sonido =
+      row.notificaciones_sonido !== undefined
+        ? Boolean(row.notificaciones_sonido)
+        : true;
     const token = createToken(row);
     return res.status(201).json({ success: true, token, user: row });
   } catch (error) {
@@ -109,29 +116,37 @@ router.post("/register", async (req, res) => {
  *
  * @route  POST /api/auth/login
  * @access Public
- * @param  {string} req.body.email    - Email de la cuenta.
+ * @param  {string} [req.body.login]  - Email o nombre de usuario (preferido).
+ * @param  {string} [req.body.email]  - Mismo uso que `login` (compatibilidad).
  * @param  {string} req.body.password - Contraseña en texto plano.
  * @returns {object} 200 – `{ success, token, user }` | 401 – `{ error }` | 500 – `{ error }`
  */
 router.post("/login", async (req, res) => {
   try {
-    const email = normalizeEmail(req.body.email);
+    const raw = String(req.body.login ?? req.body.email ?? "").trim();
     const password = req.body.password;
 
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ error: "Email y contraseña son obligatorios." });
+    if (!raw || !password) {
+      return res.status(400).json({
+        error: "Indica email o nombre de usuario y la contraseña.",
+      });
     }
 
-    const result = await pool.query(
-      "SELECT id, nombre_usuario, email, password_hash, rol, avatar_id FROM usuarios WHERE LOWER(TRIM(email)) = $1",
-      [email],
-    );
+    const looksLikeEmail = raw.includes("@");
+    const result = looksLikeEmail
+      ? await pool.query(
+          "SELECT id, nombre_usuario, email, password_hash, rol, avatar_id, notificaciones_sonido FROM usuarios WHERE LOWER(TRIM(email)) = $1",
+          [normalizeEmail(raw)],
+        )
+      : await pool.query(
+          "SELECT id, nombre_usuario, email, password_hash, rol, avatar_id, notificaciones_sonido FROM usuarios WHERE LOWER(TRIM(nombre_usuario)) = LOWER(TRIM($1))",
+          [raw],
+        );
 
     if (result.rows.length === 0) {
       return res.status(401).json({
-        error: "No existe ninguna cuenta con ese email. Regístrate primero.",
+        error:
+          "No existe ninguna cuenta con ese email o nombre de usuario. Regístrate primero.",
       });
     }
 
@@ -152,6 +167,10 @@ router.post("/login", async (req, res) => {
         email: user.email,
         rol: user.rol,
         avatar_id: coerceAvatarId(user.avatar_id),
+        notificaciones_sonido:
+          user.notificaciones_sonido !== undefined
+            ? Boolean(user.notificaciones_sonido)
+            : true,
       },
     });
   } catch {
@@ -171,7 +190,7 @@ router.post("/login", async (req, res) => {
 router.get("/me", authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, nombre_usuario, email, rol, avatar_id FROM usuarios WHERE id = $1",
+      "SELECT id, nombre_usuario, email, rol, avatar_id, notificaciones_sonido FROM usuarios WHERE id = $1",
       [req.user.id],
     );
 
@@ -181,6 +200,11 @@ router.get("/me", authMiddleware, async (req, res) => {
 
     const u = result.rows[0];
     u.avatar_id = coerceAvatarId(u.avatar_id);
+    if (u.notificaciones_sonido !== undefined) {
+      u.notificaciones_sonido = Boolean(u.notificaciones_sonido);
+    } else {
+      u.notificaciones_sonido = true;
+    }
     return res.json({ user: u });
   } catch {
     return res.status(500).json({ error: "Error al validar sesión." });
@@ -196,23 +220,44 @@ router.get("/me", authMiddleware, async (req, res) => {
 router.patch("/me", authMiddleware, async (req, res) => {
   try {
     const avatar_id = req.body?.avatar_id;
-    if (avatar_id === undefined || avatar_id === null) {
-      return res.status(400).json({ error: "Falta el campo avatar_id." });
+    const rawSound = req.body?.notificaciones_sonido;
+
+    const sets = [];
+    const vals = [];
+    let i = 1;
+
+    if (avatar_id !== undefined && avatar_id !== null) {
+      if (!isValidRobotAvatarId(String(avatar_id).trim())) {
+        return res.status(400).json({ error: "Avatar no válido." });
+      }
+      sets.push(`avatar_id = $${i++}`);
+      vals.push(String(avatar_id).trim());
     }
-    if (!isValidRobotAvatarId(String(avatar_id).trim())) {
-      return res.status(400).json({ error: "Avatar no válido." });
+
+    if (rawSound !== undefined) {
+      sets.push(`notificaciones_sonido = $${i++}`);
+      vals.push(Boolean(rawSound));
     }
-    const id = String(avatar_id).trim();
+
+    if (sets.length === 0) {
+      return res.status(400).json({
+        error:
+          "Indica al menos un campo: avatar_id o notificaciones_sonido (boolean).",
+      });
+    }
+
+    vals.push(req.user.id);
     const result = await pool.query(
-      `UPDATE usuarios SET avatar_id = $1 WHERE id = $2
-       RETURNING id, nombre_usuario, email, rol, avatar_id`,
-      [id, req.user.id],
+      `UPDATE usuarios SET ${sets.join(", ")} WHERE id = $${i}
+       RETURNING id, nombre_usuario, email, rol, avatar_id, notificaciones_sonido`,
+      vals,
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Usuario no encontrado." });
     }
     const u = result.rows[0];
     u.avatar_id = coerceAvatarId(u.avatar_id);
+    u.notificaciones_sonido = Boolean(u.notificaciones_sonido);
     return res.json({ user: u });
   } catch (error) {
     console.error("[PATCH /api/auth/me]", error);

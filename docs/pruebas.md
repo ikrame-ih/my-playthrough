@@ -19,7 +19,7 @@ Este documento describe **qué se ha probado**, **cómo** y **con qué resultado
 
 | Tipo | Descripción breve |
 |------|-------------------|
-| Manuales funcionales | Comprobación de flujos de usuario (registro, colección, comunidad, admin, comentarios). |
+| Manuales funcionales | Comprobación de flujos de usuario (registro, colección, comunidad, social ampliado, admin, comentarios). |
 | Seguridad básica | Acceso a rutas protegidas sin token, permisos, límites de cuerpo, endpoint de diagnóstico en producción. |
 | Validación de datos | Normalización de entradas (email, título, estado, plataforma) coherente con el backend. |
 | Unitarias automáticas | Tests repetibles sobre lógica pura (sin navegador ni base de datos), ejecutados con Vitest 3. |
@@ -45,8 +45,8 @@ Se ejecutan en terminal, desde la carpeta de cada paquete, **sin** levantar obli
 
 | Ubicación | Comando | Ficheros / ámbito |
 |-----------|---------|-------------------|
-| Backend (`server/`) | `npm test` | `server/utils/normalize.js` (email, título, plataforma, estado, referencia catálogo, payload de error según `NODE_ENV`). |
-| Frontend (`client/`) | `npm test` | `gameLabels.js`, `coverUrl.js`. |
+| Backend (`server/`) | `npm test` | `server/utils/normalize.js` (email, contraseña fuerte, título, plataforma, estado, referencia catálogo, payload de error según `NODE_ENV`). |
+| Frontend (`client/`) | `npm test` | `gameLabels.js`, `coverUrl.js`, `passwordPolicy.js`. |
 
 - Modo vigilancia (opcional): `npm run test:watch` en `server` o `client`.
 - **Herramienta:** Vitest 3 (compatible con Vite en el cliente y con Node en el servidor).
@@ -63,7 +63,7 @@ Se ejecutan en terminal, desde la carpeta de cada paquete, **sin** levantar obli
 |----|------|-----------------|----------|----------|--------|
 | P-01 | Registro válido | Login → Crear cuenta → datos válidos → Registrarse | Redirección al dashboard; JWT en `localStorage` | Colección vacía visible; sesión iniciada | OK |
 | P-02 | Email duplicado | Registrar de nuevo el mismo email | Error claro; no duplicado | Mensaje de error mostrado | OK |
-| P-03 | Contraseña corta | Contraseña de menos de 6 caracteres | Validación; no se envía | Mensaje en formulario | OK |
+| P-03 | Contraseña corta | Contraseña de menos de 8 caracteres | Validación; no se envía | Mensaje en formulario (política fuerte en servidor) | OK |
 | P-04 | Login correcto | Email y contraseña válidos | JWT y acceso al dashboard | Dashboard accesible | OK |
 | P-05 | Contraseña incorrecta | Email válido, contraseña errónea | 401; sin acceso | Error mostrado | OK |
 | P-06 | Email inexistente | Email no registrado | 401; mensaje coherente | Error mostrado | OK |
@@ -96,7 +96,7 @@ Se ejecutan en terminal, desde la carpeta de cada paquete, **sin** levantar obli
 
 | ID | Caso | Pasos | Esperado | Obtenido | Estado |
 |----|------|-------|----------|----------|--------|
-| P-19 | Lista de miembros | Entrar en Comunidad | Lista con número de juegos | Correcta | OK |
+| P-19 | Lista de miembros | Entrar en Comunidad | Lista con juegos, seguidores y plataforma de ejemplo | Correcta | OK |
 | P-20 | Perfil ajeno | Clic en miembro | Colección ajena solo lectura | Sin edición | OK |
 | P-21 | Sin token | Acceder a `/community` sin sesión | 401; redirección a login | Bloqueado | OK |
 
@@ -124,6 +124,29 @@ Se ejecutan en terminal, desde la carpeta de cada paquete, **sin** levantar obli
 | P-29 | Borrar propio | Eliminar comentario propio | Desaparece del hilo | Eliminado correctamente | OK |
 | P-30 | Borrar ajeno (API) | Thunder Client: borrar comentario de otra persona | 403 | Bloqueado | OK |
 
+### 5.8. RF-07 — Social ampliado (seguimientos, recomendaciones, LFG, actividad)
+
+| ID | Caso | Pasos (resumen) | Esperado | Obtenido | Estado |
+|----|------|-----------------|----------|----------|--------|
+| P-31 | Seguir desde perfil | Comunidad → perfil ajeno → Seguir | `POST /api/social/follow/:id`; estado coherente | Correcto | OK |
+| P-32 | Dejar de seguir | Perfil → Dejar de seguir | `DELETE`; puede volver a seguir | Correcto | OK |
+| P-33 | Seguir desde tarjeta | Comunidad → Miembros → Seguir en la tarjeta | Pasa a «Siguiendo» | Correcto | OK |
+| P-34 | Recomendar sin seguir (API) | Thunder: `POST /api/social/recommendations` sin relación de seguimiento | 403 | Rechazado | OK |
+| P-35 | Recomendar desde colección | Icono regalo en ficha propia → destinatario seguido → enviar | En bandeja del destinatario | Correcto | OK |
+| P-36 | Bandeja y leídas | Campana → Recomendaciones → marcar leída / discusión | Contador y estado coherentes | Correcto | OK |
+| P-37 | Publicar LFG | Comunidad → Buscar grupo → formulario válido | Aparece en listado | Correcto | OK |
+| P-38 | Listado LFG | Varios usuarios publican | Orden reciente; autor y juego | Correcto | OK |
+| P-39 | Borrar LFG propia | Eliminar en tarjeta (autor o admin) | Desaparece | Correcto | OK |
+| P-40 | Actividad de seguidos | Tras seguir: comentario o LFG del seguido → pestaña Actividad | Entradas con enlace a ficha | Correcto | OK |
+
+### 5.9. RF-08 — Preferencias y presentación (tour, notificaciones, métricas sociales)
+
+| ID | Caso | Pasos (resumen) | Esperado | Obtenido | Estado |
+|----|------|-----------------|----------|----------|--------|
+| P-41 | Tour guiado repetible | Perfil → Iniciar tour guiado | Recorrido por la interfaz; se puede cerrar | Correcto | OK |
+| P-42 | Tono de recomendaciones | Probar según README («Cómo probar el sonido…») | Contador de la campana y tono opcional coherentes con Perfil | Correcto | OK |
+| P-43 | Contador de seguidores | Comunidad → Miembros y perfil público | Número de seguidores visible y coherente con la API | Correcto | OK |
+
 ---
 
 ## 6. Pruebas de seguridad (API / configuración)
@@ -136,6 +159,7 @@ Se ejecutan en terminal, desde la carpeta de cada paquete, **sin** levantar obli
 | S-04 | Admin sin rol | `GET /api/admin/users` con JWT de usuario | 403 | Mensaje de permisos | OK |
 | S-05 | test-db en producción | `NODE_ENV=production` y `GET /api/test-db` | 404 | Endpoint oculto | OK |
 | S-06 | Body > 50 KB | Registro con payload grande | 413 | Rechazado | OK |
+| S-07 | Social sin token | `GET /api/social/lfg` sin `Authorization` | 401 | Rechazado | OK |
 
 ---
 
@@ -154,27 +178,27 @@ Se ejecutan en terminal, desde la carpeta de cada paquete, **sin** levantar obli
 
 **Comprobación del recuento (por ID):**
 
-- **P-01 … P-30** → **30** casos (autenticación, biblioteca, comunidad, estadísticas, administración y comentarios en ficha).
-- **S-01 … S-06** → **6** casos (seguridad API / configuración).
+- **P-01 … P-43** → **43** casos (incluye RF-07 social ampliado y RF-08: tour, sonido de recomendaciones y contador de seguidores).
+- **S-01 … S-07** → **7** casos (seguridad API / configuración).
 - **V-01 … V-04** → **4** casos (validación de datos coherente con el backend).
 
-**Suma manual: 30 + 6 + 4 = 40.**  
-*(En borradores anteriores a veces se citaba **37** al sumar solo los casos agrupados en RF-01…RF-06 **sin** los tres casos de comentarios **P-28…P-30**, más seguridad y validación: 27 + 6 + 4 = 37. Este documento usa el inventario completo por identificador P/S/V.)*
+**Suma manual: 43 + 7 + 4 = 54.**  
+*Nota rápida: antes a veces salía **37** “de cabeza” si alguien sumaba solo los bloques RF viejos y se dejaba fuera los tres casos de comentarios (P-28…P-30); aquí el total sale de contar **todos** los IDs P, S y V sin saltos.*
 
 | Categoría | Total | Pasadas | Fallidas |
 |-----------|-------|---------|----------|
-| Flujo de aplicación (P-01 … P-30) | 30 | 30 | 0 |
-| Seguridad API / configuración (S-01 … S-06) | 6 | 6 | 0 |
+| Flujo de aplicación (P-01 … P-43) | 43 | 43 | 0 |
+| Seguridad API / configuración (S-01 … S-07) | 7 | 7 | 0 |
 | Validación de datos (V-01 … V-04) | 4 | 4 | 0 |
-| **Total pruebas manuales** | **40** | **40** | **0** |
-| Unitarias automáticas (Vitest) | 22 | 22 | 0 |
+| **Total pruebas manuales** | **54** | **54** | **0** |
+| Unitarias automáticas (Vitest) | 27 | 27 | 0 |
 
-*Las 22 pruebas unitarias corresponden a 14 tests en `server` (`npm test` en `server/`) y 8 en `client` (`npm test` en `client/`).*
+*Las 27 pruebas unitarias corresponden a 17 tests en `server` y 10 en `client` (`npm test` en cada carpeta).*
 
 ---
 
 ## 9. Mejoras detectadas durante las pruebas (líneas futuras)
 
-1. **Intentos de login:** no hay límite de reintentos; en producción convendría *rate limiting* (p. ej. `express-rate-limit`).
-2. **Errores en producción:** unificar el envío de errores hacia `next(error)` para que todo pase por el manejador central y no se filtre `error.message` en rutas sueltas.
-3. **Duplicados de ficha:** el flujo de fusión de duplicados en edición puede simplificarse cuando ambas fichas comparten el mismo `catalogo_id`.
+1. **Intentos de login:** ahora mismo puedes probar contraseñas una y otra vez sin límites; en un despliegue real convendría **frenar** eso (por ejemplo con `express-rate-limit`), para que no sea tan fácil ir a lo bruto.
+2. **Errores en producción:** en algunas rutas el error se “escupe” al cliente de forma distinta; lo ideal sería que **todo** pasara por el mismo sitio central y en producción no se enseñaran detalles internos técnicos.
+3. **Duplicados de ficha:** si en el futuro hubiera que **juntar** dos fichas del mismo juego, sería más sencillo cuando ambas ya comparten el mismo `catalogo_id`.

@@ -27,7 +27,10 @@ Plataformas como HowLongToBeat o Backloggd son útiles, pero suelen saturarse. M
 - **Interfaz de la aplicación** — textos, mensajes y flujos en **español**, para que la evaluación de usabilidad y contenido sea inmediata.
 - **Este README** — bloque **Español primero**; el inglés va después para reutilizar el repositorio o ampliar el proyecto sin duplicar código.
 - **Código fuente** — nombres de carpetas, archivos, variables y rutas API en **inglés** (convención habitual en PERN y documentación de librerías). Los **comentarios de documentación** (`@description`, rutas) están en **español** en el backend y componentes principales.
+- **Registro** — la contraseña debe tener **al menos 8 caracteres** e incluir **mayúscula, minúscula, número y un símbolo** (validación en servidor y aviso en el formulario). El **nombre de usuario** es **único** (no puede repetirse la misma variante en minúsculas; índice en BD).
+- **Inicio de sesión** — acepta **correo** o **nombre de usuario** (el mismo que se muestra en comunidad).
 - **Carpeta `docs/`** — índice en [`docs/README.md`](docs/README.md): plan de pruebas, SQL y diagramas; los contenidos redactados para memoria están en **español** salvo etiquetas técnicas inevitables.
+- **Diseño de interfaz** — [`DESIGN.md`](DESIGN.md) (inglés, referencia para desarrollo); [`DESIGN_ES.md`](DESIGN_ES.md) (español, misma información para evaluación o tutoría).
 
 ### Stack tecnológico
 
@@ -46,7 +49,8 @@ Plataformas como HowLongToBeat o Backloggd son útiles, pero suelen saturarse. M
 - **Colección personal** — alta, edición y borrado de juegos (estado, plataforma, nota, horas).
 - **Búsqueda de carátulas** — combina Steam y RAWG (`RAWG_API_KEY` opcional pero recomendada). Las imágenes pasan por un proxy en el servidor para evitar bloqueos CORS.
 - **Catálogo compartido** — `catalogo_juegos` enlaza cada ficha a un ID canónico para compartir portada entre usuarios.
-- **Comunidad** — listado de miembros, perfiles públicos en solo lectura y medias globales por título (SQL `GROUP BY`).
+- **Comunidad** — miembros (seguir desde tarjeta o perfil), estadísticas globales, **actividad** de quien sigues (comentarios y LFG) y **buscar grupo (LFG)** con modos online / co-op local / otro.
+- **Recomendaciones** — enviar un juego de tu biblioteca solo a usuarios a los que sigues; bandeja en `/recommendations`, campana con contador y **tono opcional** (silenciable en Perfil).
 - **Avatares** — 10 robots predefinidos (SVG); el usuario elige el suyo en **Perfil** (`/settings`); se guarda en `usuarios.avatar_id` y se muestra en barra superior, comunidad, perfiles y comentarios.
 - **Hilos de comentarios** — comentarios anidados por juego (`/juego/:id/discussion`).
 - **Panel de administración** — usuarios, borrado de cuentas y moderación de fichas. El rol se comprueba en base de datos en cada petición.
@@ -56,6 +60,15 @@ Plataformas como HowLongToBeat o Backloggd son útiles, pero suelen saturarse. M
 - **Colección** — resumen (juegos, horas, completados), ordenación (reciente, título, estado, nota) y vista **cuadrícula** o **lista compacta**; estado vacío con mensaje propio.
 - **Accesibilidad** — enlace “Saltar al contenido”, foco al `<main>`, etiquetas en controles de vista y ordenación.
 - **Cuenta demo** — ver apartado siguiente.
+- **Tour guiado** — la primera vez que entras con sesión se ofrece un recorrido (react-joyride) por menú, búsqueda y recomendaciones; puedes repetirlo en **Perfil**.
+- **Tono de recomendaciones** — pitido opcional al subir el contador de la campana (ver Perfil y nota de prueba más abajo).
+
+### Cómo probar el sonido de recomendaciones
+
+1. En **Perfil**, deja el sonido **activado** y haz **un clic** en la página (requisito del navegador).
+2. Abre **otra ventana o navegador**, inicia sesión con **otra cuenta** que **siga** a la primera.
+3. Desde esa segunda cuenta, **recomienda un juego** al usuario de la primera (solo a quien sigues).
+4. Vuelve a la primera ventana: en **como mucho ~45 segundos** la app vuelve a consultar al servidor y verá el nuevo contador; si la pestaña está **visible**, suena el tono.
 
 ### Arquitectura del servidor
 
@@ -65,7 +78,7 @@ server/
 ├── config/db.js
 ├── middleware/auth.middleware.js
 ├── utils/normalize.js, queries.js, covers.js
-└── routes/auth, games, users, community, admin, covers.routes.js
+└── routes/auth, games, users, community, social, admin, covers.routes.js
 ```
 
 ### Estructura del repositorio
@@ -100,9 +113,30 @@ Backend: `cd server && npm install` — copia `server/.env.example` a `server/.e
 
 Frontend: `cd client && npm install && npm run dev` (puerto 5173). Si la API no está en la URL por defecto, crea `client/.env` con `VITE_API_URL=...`.
 
-Base de datos manual: ejecuta `docs/schema.sql` una vez. Si ya tenías una BD anterior, aplica también `docs/add-avatar-id-usuarios.sql`. Para promover admin, usa `docs/promover-admin.sql`.
+Base de datos manual: ejecuta `docs/schema.sql` una vez. Si ya tenías una BD anterior, aplica migraciones en orden: `docs/add-avatar-id-usuarios.sql` si falta `avatar_id`, **`docs/add-social-features.sql`** para seguimientos, recomendaciones, LFG y `notificaciones_sonido` (`npm run migrate:social`), **`docs/add-comentario-votos.sql`** para votos en reseñas (`npm run migrate:votes`), y **`docs/add-usuario-nombre-unique.sql`** para unicidad del nombre público (`npm run migrate:username-unique`). Para promover admin, usa `docs/promover-admin.sql`.
 
-**Datos de demostración (opcional):** desde `server/`, `npm run seed:demo` crea la cuenta demo y tres juegos si la cuenta aún no tiene fichas.
+**Login falla tras actualizar el código:** suele ser la BD desactualizada (falta columna `notificaciones_sonido`, tablas sociales, `juego_comentario_votos` o el índice de nombre). Ejecuta `npm run migrate:social`, `npm run migrate:votes` y `npm run migrate:username-unique` en `server/` (o el SQL a mano) y reinicia el backend.
+
+**Datos de demostración (opcional):**
+
+- **`npm run seed:demo`** (en `server/`) — crea solo la cuenta **demo** con tres juegos y **carátulas reales** (Steam/RAWG) si esa cuenta aún no tiene fichas.
+- **`npm run seed:presentation`** — **población completa** para videollamada: varios usuarios (**Rufleto**, **Tizza**, **ElOtro**, **Knekro**, **SequianCalvísimo**, **LaQueTeCuento>:(**, **Demo Jurado**), **todos con la misma contraseña**, juegos con notas, comentarios, seguimientos y recomendaciones. Unifica la contraseña de **todas** las filas en `usuarios`, deja **admin** solo a **Tizza**, **Rufleto** y **Demo Jurado**, pone **usuario** a **ikihga2223@gmail.com** si esa cuenta existe, y borra el duplicado **rufleto@gmail.com** si existía. Corrige restricciones antiguas `UNIQUE` en título de juego si las hubiera.
+
+**Contraseña para todas las cuentas** tras el seed (y la que unifica el script): **`Presentacion2026!`**
+
+En el login: **«Rellenar cuenta demo»** rellena **Demo Jurado** y esa contraseña (también `demo@myplaythrough.local`).
+
+**Cuentas de ejemplo** (misma contraseña **`Presentacion2026!`** si ejecutaste `seed:presentation`; login con **email** o **nombre**). **Panel de administración:** Tizza, Rufleto y Demo Jurado.
+
+| Nombre público   | Email                       | Rol tras seed |
+| ---------------- | --------------------------- | ------------- |
+| Tizza            | tizza@myplaythrough.local   | admin         |
+| Rufleto          | rufleto@myplaythrough.local | admin         |
+| Demo Jurado      | demo@myplaythrough.local    | admin         |
+| ElOtro           | elotro@myplaythrough.local  | usuario       |
+| Knekro           | knekro@myplaythrough.local  | usuario       |
+| SequianCalvísimo | sequian@myplaythrough.local | usuario       |
+| LaQueTeCuento>:( | laquete@myplaythrough.local | usuario       |
 
 #### ¿Para qué sirve la cuenta demo?
 
@@ -110,20 +144,22 @@ Base de datos manual: ejecuta `docs/schema.sql` una vez. Si ya tenías una BD an
 - Ahorrar tiempo en **defensa oral** o revisión: no hace falta crear usuario y añadir juegos a mano.
 - **No sustituye** las pruebas con usuario real; es solo un atajo para demostración.
 
-Tras `npm run seed:demo`: usuario `demo@myplaythrough.local` / contraseña `demo123456`. En la pantalla de login: **«Rellenar cuenta demo»**.
-
 **Capturas para documentación:** puedes añadir imágenes en `docs/` (p. ej. `docs/screenshots/`) y enlazarlas desde la memoria del proyecto.
 
 ### Referencia rápida de la API
 
-| Método              | Ruta                                 | Descripción                                | Auth |
-| ------------------- | ------------------------------------ | ------------------------------------------ | ---- |
-| GET                 | `/api/auth/me`                       | Usuario actual                             | ✓    |
-| PATCH               | `/api/auth/me`                       | Actualizar `avatar_id` (robots permitidos) | ✓    |
-| GET/POST/PUT/DELETE | `/api/games`…                        | CRUD de colección                          | ✓    |
-| GET                 | `/api/users`, `/api/users/:id/games` | Comunidad                                  | ✓    |
-| GET                 | `/api/community/stats`               | Medias globales                            | ✓    |
-| …                   | …                                    | Comentarios, admin, proxy de imágenes      | …    |
+| Método              | Ruta                                                   | Descripción                             | Auth |
+| ------------------- | ------------------------------------------------------ | --------------------------------------- | ---- |
+| GET                 | `/api/auth/me`                                         | Usuario actual                          | ✓    |
+| PATCH               | `/api/auth/me`                                         | `avatar_id` y/o `notificaciones_sonido` | ✓    |
+| GET/POST/PUT/DELETE | `/api/games`…                                          | CRUD de colección                       | ✓    |
+| GET                 | `/api/users`, `/api/users/:id/games`                   | Comunidad (lista incluye `siguiendo`)   | ✓    |
+| GET                 | `/api/community/stats`                                 | Medias globales                         | ✓    |
+| GET/POST/DELETE     | `/api/social/follow/…`, `following`, `follow-status/…` | Seguimientos                            | ✓    |
+| GET/POST/PATCH      | `/api/social/recommendations…`                         | Recomendaciones y no leídas             | ✓    |
+| GET/POST/DELETE     | `/api/social/lfg…`                                     | Buscar grupo (LFG)                      | ✓    |
+| GET                 | `/api/social/activity`                                 | Actividad de seguidos                   | ✓    |
+| …                   | …                                                      | Comentarios, admin, proxy de imágenes   | …    |
 
 (Listado completo en el código y en la documentación de entrega.)
 
@@ -149,6 +185,12 @@ Platforms like HowLongToBeat or Backloggd are useful, but they tend to get clutt
 
 **Language:** The **UI** is **Spanish** (primary audience). This README lists **Spanish first**, then English. **Code identifiers** follow English naming (common in PERN stacks); **inline docs** in main server routes are in Spanish. See [`docs/README.md`](docs/README.md) for the documentation index.
 
+**Registration:** passwords must be **at least 8 characters** and include **uppercase, lowercase, a digit, and a symbol** (enforced server-side; the form shows a hint). **Display names** (`nombre_usuario`) are **unique** (case-insensitive; enforced with a DB index).
+
+**Login:** accepts **email** or **username** (same public name as in the community).
+
+**UI design reference:** [`DESIGN.md`](DESIGN.md) (English, canonical for the repo); [`DESIGN_ES.md`](DESIGN_ES.md) (Spanish translation for reviewers).
+
 ### Tech stack
 
 **PERN** — PostgreSQL · Express · React · Node.js
@@ -166,7 +208,8 @@ Platforms like HowLongToBeat or Backloggd are useful, but they tend to get clutt
 - **Personal collection** — add, edit, and delete games (status, platform, score, hours played).
 - **Cover art search** — combines Steam and [RAWG](https://rawg.io/apidocs) (`RAWG_API_KEY` optional but recommended). Images are served through a server-side proxy to avoid CDN hotlink blocks in the browser.
 - **Shared catalogue** — `catalogo_juegos` links each entry to a canonical RAWG/Steam ID so the same title shares artwork across users when picked from the search.
-- **Community** — member list with preset robot avatars, read-only public profiles, and aggregated average scores per title (SQL `GROUP BY`).
+- **Community** — member list with follow actions, read-only public profiles, global averages (SQL `GROUP BY`), **activity feed** from people you follow (comments + LFG posts), and **LFG** (“looking for group”) posts tied to your library (online / local co-op / other).
+- **Recommendations** — send a game from your library only to users you follow; inbox at `/recommendations`, header bell with unread count, optional **chime** (mutable in Profile).
 - **Avatars** — 10 preset robots (SVG); pick yours under **Profile** (`/settings`); stored in `usuarios.avatar_id` and shown in the header, community, profiles, and comments.
 - **Discussion threads** — threaded comments per game entry (`/juego/:id/discussion`).
 - **Admin panel** — list users, delete accounts, and moderate any game entry. Role is verified against the database on every request.
@@ -185,7 +228,7 @@ server/
 ├── config/db.js
 ├── middleware/auth.middleware.js
 ├── utils/normalize.js, queries.js, covers.js
-└── routes/auth, games, users, community, admin, covers.routes.js
+└── routes/auth, games, users, community, social, admin, covers.routes.js
 ```
 
 ### Project structure
@@ -220,23 +263,29 @@ Starts the API on port 3000 and PostgreSQL on port 5432. The database schema is 
 VITE_API_URL=http://localhost:3000
 ```
 
-**Database (manual):** run `docs/schema.sql` once. If you upgraded from an older schema, also run `docs/add-avatar-id-usuarios.sql`. To promote a user to `admin`, use `docs/promover-admin.sql` and update the email in that file.
+**Database (manual):** run `docs/schema.sql` once. If you upgraded from an older schema, run `docs/add-avatar-id-usuarios.sql` if needed, then **`docs/add-social-features.sql`** for follow/recommend/LFG tables and `notificaciones_sonido` (`npm run migrate:social`), **`docs/add-comentario-votos.sql`** for review votes (`npm run migrate:votes`), and **`docs/add-usuario-nombre-unique.sql`** for unique display names (`npm run migrate:username-unique`). To promote a user to `admin`, use `docs/promover-admin.sql` and update the email in that file.
 
-**Demo data (optional):** from `server/`, run `npm run seed:demo` to create the demo user and three games if that account has no entries yet.
+**Login fails after pulling new code:** the database is often out of date (missing `notificaciones_sonido`, social tables, `juego_comentario_votos`, or the username unique index). Run `npm run migrate:social`, `npm run migrate:votes`, and `npm run migrate:username-unique` in `server/` and restart the API.
 
-**Why the demo account?** So reviewers can log in **without signing up** and see the app **with sample data** (collection, stats, grid/list). Saves time in demos; it does **not** replace testing with your own account. Credentials: `demo@myplaythrough.local` / `demo123456`. Login: **“Rellenar cuenta demo”**.
+**Demo / presentation data (optional, from `server/`):**
+
+- `npm run seed:demo` — demo user only, three games with real cover art, if the demo account has no games yet.
+- `npm run seed:presentation` — full population for demos (several users, games, comments, follows, recommendations); **unifies every row’s password** in `usuarios` to `Presentacion2026!`, sets **admin** only for **Tizza**, **Rufleto**, and **Demo Jurado**.
+
+**Why the demo account?** So reviewers can log in **without signing up** and see the app **with sample data**. Password for all seeded accounts: **`Presentacion2026!`**. **“Rellenar cuenta demo”** fills **Demo Jurado** (or use `demo@myplaythrough.local`) and that password.
 
 **Screenshots for documentation:** add images under `docs/` (e.g. `docs/screenshots/`) and link them from your project report.
 
 ### API reference (summary)
 
-| Method              | Route                                | Description                            | Auth |
-| ------------------- | ------------------------------------ | -------------------------------------- | ---- |
-| GET                 | `/api/auth/me`                       | Current user                           | ✓    |
-| PATCH               | `/api/auth/me`                       | Update `avatar_id` (allowed robot ids) | ✓    |
-| GET/POST/PUT/DELETE | `/api/games`…                        | Collection CRUD                        | ✓    |
-| GET                 | `/api/users`, `/api/users/:id/games` | Community                              | ✓    |
-| GET                 | `/api/community/stats`               | Global averages                        | ✓    |
+| Method              | Route                                | Description                                | Auth |
+| ------------------- | ------------------------------------ | ------------------------------------------ | ---- |
+| GET                 | `/api/auth/me`                       | Current user                               | ✓    |
+| PATCH               | `/api/auth/me`                       | `avatar_id` and/or `notificaciones_sonido` | ✓    |
+| GET/POST/PUT/DELETE | `/api/games`…                        | Collection CRUD                            | ✓    |
+| GET                 | `/api/users`, `/api/users/:id/games` | Community (list includes `siguiendo`)      | ✓    |
+| GET                 | `/api/community/stats`               | Global averages                            | ✓    |
+| various             | `/api/social/…`                      | Follows, recommendations, LFG, activity    | ✓    |
 
 (Full list in the codebase and delivery documentation.)
 

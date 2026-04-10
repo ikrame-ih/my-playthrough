@@ -7,6 +7,7 @@ import GameListRow from "./GameListRow";
 import EmptyCollection from "./EmptyCollection";
 import CollectionStats from "./CollectionStats";
 import { GameCardSkeleton } from "./Skeletons";
+import RecommendGameModal from "./RecommendGameModal";
 
 const LS_SORT = "myplaythrough_sort";
 const LS_VIEW = "myplaythrough_view";
@@ -24,6 +25,7 @@ function estadoRank(estado) {
 export default function GameList() {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [recoGame, setRecoGame] = useState(null);
   const { query } = useSearch();
 
   const [sort, setSort] = useState(
@@ -150,6 +152,13 @@ export default function GameList() {
 
   return (
     <div>
+      <RecommendGameModal
+        open={Boolean(recoGame)}
+        onClose={() => setRecoGame(null)}
+        preselectedGame={recoGame}
+        fixedRecipientId={null}
+        onSent={() => fetchGames()}
+      />
       <CollectionStats games={games} />
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -209,6 +218,7 @@ export default function GameList() {
               game={game}
               showActions
               onDelete={eliminarJuego}
+              onRecommend={setRecoGame}
               discussionTo={`/juego/${game.id}/discussion`}
             />
           ))}
@@ -221,6 +231,7 @@ export default function GameList() {
                 game={game}
                 showActions
                 onDelete={eliminarJuego}
+                onRecommend={setRecoGame}
                 discussionTo={`/juego/${game.id}/discussion`}
               />
             </div>

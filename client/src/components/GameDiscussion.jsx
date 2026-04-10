@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { API_BASE, apiFetch } from "../api";
 import { displayCoverUrl } from "../coverUrl";
+import { IconThumbDown, IconThumbUp } from "./icons";
 import UserAvatar from "./UserAvatar";
 
 /**
  * Lee y parsea el usuario actual del localStorage.
- * Encapsula el try-catch para no repetirlo en cada componente que lo necesite.
  * @returns {object|null} Objeto de usuario o null si no hay sesión.
  */
 function parseUser() {
@@ -19,21 +19,7 @@ function parseUser() {
 }
 
 /**
- * Bloque recursivo que renderiza un comentario y sus respuestas anidadas.
- * Se llama a sí mismo (recursivamente) para los comentarios hijos,
- * aumentando la sangría (`depth`) en cada nivel.
- * Puede borrar: el autor del comentario, el dueño del juego o un admin.
- *
- * @component
- * @param {object}   props
- * @param {object}   props.c             - Datos del comentario actual.
- * @param {object[]} props.childrenList  - Lista de comentarios hijos directos.
- * @param {number}   props.depth         - Nivel de anidamiento actual (0 = raíz).
- * @param {string}   props.gameId        - ID del juego al que pertenece el comentario.
- * @param {number}   props.gameOwnerId   - ID del propietario de la ficha de juego.
- * @param {Function} props.onDeleted     - Callback para recargar los comentarios tras borrar.
- * @param {Function} props.onReply       - Callback para marcar este comentario como "respondiendo a".
- * @param {Map}      props.allByParent   - Mapa completo de `parentId → [comentarios hijos]`.
+ * Bloque recursivo: reseña o respuesta. Las reseñas raíz incluyen votación estilo Steam.
  */
 function CommentBlock({
   c,
@@ -44,6 +30,9 @@ function CommentBlock({
   onDeleted,
   onReply,
   allByParent,
+  onVote,
+  voteBusyId,
+  highlightId,
 }) {
   const me = parseUser();
   const canDelete =
@@ -52,65 +41,128 @@ function CommentBlock({
       me.id === gameOwnerId ||
       me.rol === "admin");
 
+  const isRoot = depth === 0;
+  const mi = c.mi_voto;
+  const up = c.votos_arriba ?? 0;
+  const down = c.votos_abajo ?? 0;
+
   return (
     <div
       className={`${depth > 0 ? "ml-6 border-l border-white/[0.08] pl-4" : ""}`}
     >
-      <div className="rounded-xl border border-white/[0.06] bg-slate-900/40 px-4 py-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="flex min-w-0 items-center gap-2">
-            <UserAvatar
-              avatarId={c.autor_avatar_id}
-              size="sm"
-              title={`Avatar de ${c.autor_nombre || "Usuario"}`}
-            />
-            <span className="truncate font-semibold text-brand-accent">
-              {c.autor_nombre || "Usuario"}
+      <div
+        id={`comment-${c.id}`}
+        className={`flex gap-3 ${isRoot ? "sm:gap-4" : ""}`}
+      >
+        {isRoot && (
+          <div
+            className="flex shrink-0 flex-col items-center gap-1 rounded-xl border border-white/[0.08] bg-[#0d1520] px-2 py-2 shadow-inner"
+            aria-label="Valoración de la reseña"
+          >
+            <span className="text-[0.7rem] font-bold tabular-nums text-slate-500">
+              {up}
             </span>
-          </span>
-          <time
-            className="text-xs text-slate-500"
-            dateTime={c.fecha_creacion}
-          >
-            {c.fecha_creacion
-              ? new Date(c.fecha_creacion).toLocaleString("es-ES", {
-                  dateStyle: "short",
-                  timeStyle: "short",
-                })
-              : ""}
-          </time>
-        </div>
-        <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
-          {c.cuerpo}
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => onReply(c.id)}
-            className="text-xs font-medium text-slate-400 hover:text-brand-accent"
-          >
-            Responder
-          </button>
-          {canDelete && (
             <button
               type="button"
-              onClick={async () => {
-                if (!window.confirm("¿Eliminar este comentario?")) return;
-                try {
-                  const res = await apiFetch(
-                    `${API_BASE}/api/games/${gameId}/comments/${c.id}`,
-                    { method: "DELETE" },
-                  );
-                  if (res.ok) onDeleted();
-                } catch {
-                  alert("No se pudo eliminar.");
-                }
-              }}
-              className="text-xs font-medium text-red-400/90 hover:text-red-300"
+              disabled={voteBusyId === c.id}
+              onClick={() => onVote(c.id, mi === 1 ? 0 : 1)}
+              className={`rounded-lg p-1.5 transition ${
+                mi === 1
+                  ? "bg-emerald-500/20 text-emerald-400"
+                  : "text-slate-500 hover:bg-white/[0.06] hover:text-slate-200"
+              }`}
+              title={mi === 1 ? "Quitar voto positivo" : "Útil"}
+              aria-pressed={mi === 1}
+              aria-label="Voto positivo"
             >
-              Eliminar
+              <IconThumbUp className="h-5 w-5" />
             </button>
-          )}
+            <button
+              type="button"
+              disabled={voteBusyId === c.id}
+              onClick={() => onVote(c.id, mi === -1 ? 0 : -1)}
+              className={`rounded-lg p-1.5 transition ${
+                mi === -1
+                  ? "bg-rose-500/20 text-rose-400"
+                  : "text-slate-500 hover:bg-white/[0.06] hover:text-slate-200"
+              }`}
+              title={mi === -1 ? "Quitar voto negativo" : "No recomendado"}
+              aria-pressed={mi === -1}
+              aria-label="Voto negativo"
+            >
+              <IconThumbDown className="h-5 w-5" />
+            </button>
+            <span className="text-[0.7rem] font-bold tabular-nums text-slate-500">
+              {down}
+            </span>
+          </div>
+        )}
+
+        <div
+          className={`min-w-0 flex-1 rounded-xl border border-white/[0.06] bg-slate-900/40 px-4 py-3 transition-shadow ${
+            highlightId === String(c.id)
+              ? "ring-2 ring-brand-accent/40 shadow-[0_0_24px_-8px_rgba(45,212,191,0.35)]"
+              : ""
+          }`}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <Link
+              to={`/user/${c.usuario_id}`}
+              className="flex min-w-0 items-center gap-2 hover:opacity-90"
+            >
+              <UserAvatar
+                avatarId={c.autor_avatar_id}
+                size="sm"
+                title={`Avatar de ${c.autor_nombre || "Usuario"}`}
+              />
+              <span className="truncate font-semibold text-brand-accent">
+                {c.autor_nombre || "Usuario"}
+              </span>
+            </Link>
+            <time
+              className="text-xs text-slate-500"
+              dateTime={c.fecha_creacion}
+            >
+              {c.fecha_creacion
+                ? new Date(c.fecha_creacion).toLocaleString("es-ES", {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  })
+                : ""}
+            </time>
+          </div>
+          <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
+            {c.cuerpo}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => onReply(c.id)}
+              className="text-xs font-medium text-slate-400 hover:text-brand-accent"
+            >
+              Responder
+            </button>
+            {canDelete && (
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!window.confirm("¿Eliminar este comentario?")) return;
+                  try {
+                    const res = await apiFetch(
+                      `${API_BASE}/api/games/${gameId}/comments/${c.id}`,
+                      { method: "DELETE" },
+                    );
+                    if (res.ok) onDeleted();
+                  } catch {
+                    alert("No se pudo eliminar.");
+                  }
+                }}
+                className="text-xs font-medium text-red-400/90 hover:text-red-300"
+              >
+                Eliminar
+              </button>
+            )}
+          </div>
         </div>
       </div>
       {(childrenList || []).map((ch) => (
@@ -124,6 +176,9 @@ function CommentBlock({
           onDeleted={onDeleted}
           onReply={onReply}
           allByParent={allByParent}
+          onVote={onVote}
+          voteBusyId={voteBusyId}
+          highlightId={highlightId}
         />
       ))}
     </div>
@@ -131,15 +186,13 @@ function CommentBlock({
 }
 
 /**
- * Página de discusión y reseñas de una ficha de juego.
- * Carga en paralelo los datos del juego y su hilo de comentarios.
- * Los comentarios se organizan en árbol usando un Map de `parentId → hijos`
- * para renderizar las respuestas anidadas sin recursión extra de datos.
- *
- * @component
+ * Reseñas y discusión de una ficha (vista pública). Votación en reseñas raíz.
  */
 export default function GameDiscussion() {
   const { gameId } = useParams();
+  const [searchParams] = useSearchParams();
+  const highlightId = searchParams.get("c");
+
   const [game, setGame] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -147,6 +200,7 @@ export default function GameDiscussion() {
   const [text, setText] = useState("");
   const [replyTo, setReplyTo] = useState(null);
   const [posting, setPosting] = useState(false);
+  const [voteBusyId, setVoteBusyId] = useState(null);
 
   const load = async () => {
     setErr("");
@@ -186,7 +240,55 @@ export default function GameDiscussion() {
   useEffect(() => {
     setLoading(true);
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- recargar solo al cambiar ficha
   }, [gameId]);
+
+  useEffect(() => {
+    if (loading || !highlightId) return;
+    const t = window.setTimeout(() => {
+      document
+        .getElementById(`comment-${highlightId}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+    return () => window.clearTimeout(t);
+  }, [loading, highlightId, comments]);
+
+  const onVote = useCallback(
+    async (commentId, val) => {
+      setVoteBusyId(commentId);
+      try {
+        const res = await apiFetch(
+          `${API_BASE}/api/games/${gameId}/comments/${commentId}/vote`,
+          {
+            method: "PUT",
+            body: JSON.stringify({ val }),
+          },
+        );
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          alert(data.error || "No se pudo votar.");
+          return;
+        }
+        setComments((prev) =>
+          prev.map((row) =>
+            row.id === commentId
+              ? {
+                  ...row,
+                  votos_arriba: data.votos_arriba,
+                  votos_abajo: data.votos_abajo,
+                  mi_voto: data.mi_voto,
+                }
+              : row,
+          ),
+        );
+      } catch {
+        alert("Error de conexión.");
+      } finally {
+        setVoteBusyId(null);
+      }
+    },
+    [gameId],
+  );
 
   const submit = async (e) => {
     e.preventDefault();
@@ -246,7 +348,13 @@ export default function GameDiscussion() {
     if (!byParent.has(k)) byParent.set(k, []);
     byParent.get(k).push(c);
   }
-  const roots = byParent.get(0) || [];
+  const rootsRaw = byParent.get(0) || [];
+  const roots = rootsRaw.slice().sort((a, b) => {
+    const netA = (a.votos_arriba || 0) - (a.votos_abajo || 0);
+    const netB = (b.votos_arriba || 0) - (b.votos_abajo || 0);
+    if (netB !== netA) return netB - netA;
+    return new Date(a.fecha_creacion) - new Date(b.fecha_creacion);
+  });
 
   return (
     <div>
@@ -292,9 +400,14 @@ export default function GameDiscussion() {
       )}
 
       <section className="figma-panel p-6 sm:p-8">
-        <h2 className="mb-6 text-lg font-bold text-white">
-          Discusión y reseñas
+        <h2 className="mb-1 text-lg font-bold text-white">
+          Reseñas y discusión
         </h2>
+        <p className="mb-6 text-sm text-slate-500">
+          Cualquier miembro puede leer y publicar. Las reseñas de primer nivel
+          admiten votación útil / no recomendado (como en Steam). Las respuestas
+          van en hilo.
+        </p>
 
         <form onSubmit={submit} className="mb-8 space-y-3">
           {replyTo != null && (
@@ -312,7 +425,7 @@ export default function GameDiscussion() {
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Escribe tu reseña o comentario…"
+            placeholder="Escribe tu reseña o respuesta…"
             rows={4}
             className="figma-input resize-y"
             maxLength={8000}
@@ -329,7 +442,7 @@ export default function GameDiscussion() {
         <div className="space-y-4">
           {roots.length === 0 ? (
             <p className="text-sm text-slate-500">
-              Aún no hay mensajes. Sé el primero en comentar.
+              Aún no hay reseñas. Sé el primero en opinar.
             </p>
           ) : (
             roots.map((c) => (
@@ -343,6 +456,9 @@ export default function GameDiscussion() {
                 onDeleted={load}
                 onReply={(id) => setReplyTo(id)}
                 allByParent={byParent}
+                onVote={onVote}
+                voteBusyId={voteBusyId}
+                highlightId={highlightId}
               />
             ))
           )}

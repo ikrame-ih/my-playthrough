@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { API_BASE } from "../api";
+import { passwordPolicyMessage } from "../passwordPolicy";
 import { IconController } from "./icons";
 
 /**
@@ -24,7 +25,7 @@ export default function AuthPage({ onAuthSuccess }) {
   const [remember, setRemember] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("rememberEmail");
+    const saved = localStorage.getItem("rememberLogin");
     if (saved) {
       setFormData((f) => ({ ...f, email: saved }));
       setRemember(true);
@@ -39,6 +40,13 @@ export default function AuthPage({ onAuthSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError("");
+    if (mode === "register") {
+      const pwdErr = passwordPolicyMessage(formData.password);
+      if (pwdErr) {
+        setFormError(pwdErr);
+        return;
+      }
+    }
     setLoading(true);
 
     const endpoint =
@@ -47,14 +55,17 @@ export default function AuthPage({ onAuthSuccess }) {
         : `${API_BASE}/api/auth/login`;
 
     try {
-      const email = formData.email.trim().toLowerCase();
+      const emailNorm = formData.email.trim().toLowerCase();
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
           mode === "register"
-            ? { ...formData, email }
-            : { email, password: formData.password },
+            ? { ...formData, email: emailNorm }
+            : {
+                login: formData.email.trim(),
+                password: formData.password,
+              },
         ),
       });
 
@@ -86,9 +97,9 @@ export default function AuthPage({ onAuthSuccess }) {
 
       if (mode === "login") {
         if (remember) {
-          localStorage.setItem("rememberEmail", email);
+          localStorage.setItem("rememberLogin", formData.email.trim());
         } else {
-          localStorage.removeItem("rememberEmail");
+          localStorage.removeItem("rememberLogin");
         }
       }
 
@@ -155,19 +166,31 @@ export default function AuthPage({ onAuthSuccess }) {
               htmlFor="email"
               className="mb-1.5 block text-sm font-medium text-slate-400"
             >
-              Correo electrónico
+              {mode === "login"
+                ? "Email o nombre de usuario"
+                : "Correo electrónico"}
             </label>
             <input
               id="email"
-              type="email"
+              type={mode === "login" ? "text" : "email"}
               name="email"
-              placeholder="tu@email.com"
+              placeholder={
+                mode === "login"
+                  ? "tu@email.com o nombre de usuario"
+                  : "tu@email.com"
+              }
               value={formData.email}
               onChange={handleChange}
               required
-              autoComplete="email"
+              autoComplete={mode === "login" ? "username" : "email"}
               className="figma-input"
             />
+            {mode === "login" && (
+              <p className="mt-1.5 text-xs text-slate-500">
+                Puedes entrar con el correo o con el nombre público (el mismo que
+                en comunidad).
+              </p>
+            )}
           </div>
 
           <div>
@@ -185,12 +208,19 @@ export default function AuthPage({ onAuthSuccess }) {
               value={formData.password}
               onChange={handleChange}
               required
-              minLength={6}
+              minLength={mode === "register" ? 8 : undefined}
               autoComplete={
                 mode === "login" ? "current-password" : "new-password"
               }
               className="figma-input"
             />
+            {mode === "register" && (
+              <p className="mt-2 text-xs leading-relaxed text-slate-500">
+                Mínimo 8 caracteres, con mayúscula, minúscula, número y un símbolo
+                (por ejemplo <span className="font-mono text-slate-400">!</span>{" "}
+                o <span className="font-mono text-slate-400">?</span>).
+              </p>
+            )}
           </div>
 
           {mode === "login" && (
@@ -213,8 +243,8 @@ export default function AuthPage({ onAuthSuccess }) {
                 onClick={() =>
                   setFormData((f) => ({
                     ...f,
-                    email: "demo@myplaythrough.local",
-                    password: "demo123456",
+                    email: "Demo Jurado",
+                    password: "Presentacion2026!",
                   }))
                 }
               >
