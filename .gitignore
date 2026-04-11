@@ -21,6 +21,3 @@ Thumbs.db
 .cursor/
 .agents/
 skills-lock.json
-
-# Carpeta local de entrega (PDF, anexos); no subir con el código
-material_entrega/
