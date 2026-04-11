@@ -1,8 +1,11 @@
 /**
  * @module social.routes
- * @description Funcionalidad “social” en sentido amplio: seguir usuarios, recomendar un juego
- * de tu biblioteca a alguien que sigues, publicar LFG (buscar grupo), leer actividad
- * de seguidos y contar recomendaciones no leídas (para la campana del header).
+ * @description Red social ligada a la biblioteca: seguir a otro usuario, recomendarle
+ * un título que tú tienes en tu colección (solo si tú eres quien sigue a él), LFG
+ * (buscar grupo) anclado a un juego tuyo, actividad agregada de gente a la que sigues
+ * y conteo de recomendaciones no leídas para la campana del header.
+ *
+ * La regla “solo recomiendo a quien sigo” evita spam de mensajes a desconocidos.
  */
 
 const express = require("express");
@@ -76,7 +79,7 @@ router.post("/follow/:userId", authMiddleware, async (req, res) => {
     if (error.code === "42P01") {
       return res.status(500).json({
         error:
-          "Faltan tablas sociales. Ejecuta docs/add-social-features.sql en la base de datos.",
+          "Faltan tablas sociales. Ejecuta docs/sql/add-social-features.sql en la base de datos.",
       });
     }
     return res.status(500).json(serverErrorPayload(error, "Error al seguir."));

@@ -27,7 +27,7 @@ export default function RecommendGameModal({
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadLists, setLoadLists] = useState(false);
-  /** Solo true en el primer render con el modal abierto (evita borrar el mensaje al variar el id). */
+  /** Evita vaciar el texto del mensaje si el id del juego cambia de tipo o se actualiza con el modal ya abierto. */
   const prevOpenRef = useRef(false);
 
   const stablePreId =

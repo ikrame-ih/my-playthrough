@@ -7,14 +7,14 @@ import { IconBell } from "./icons";
 /**
  * Campana con contador de recomendaciones no leídas (`/api/social/recommendations/unread-count`).
  *
- * Cada ~45 s la app **vuelve a preguntar al servidor** el número de no leídas
+ * Cada ~45 s la app vuelve a preguntar al servidor el número de no leídas
  * (no hay conexión en tiempo real permanente: es una consulta repetida por intervalo).
  * El tono (`playRecommendationChime`) solo suena si:
  * - el usuario tiene `notificaciones_sonido` activo en perfil,
  * - ya hubo al menos una consulta anterior (evita sonido al cargar la página),
- * - el contador **sube** respecto al valor anterior,
- * - el usuario ha hecho **un clic o toque** en la página (los navegadores suelen bloquear audio sin gesto previo),
- * - la pestaña está **visible** (`document.visibilityState === 'visible'`).
+ * - el contador sube respecto al valor anterior,
+ * - el usuario ha hecho un clic o toque en la página (los navegadores suelen bloquear audio sin gesto previo),
+ * - la pestaña está visible (`document.visibilityState === 'visible'`).
  *
  * @param {{ user?: { notificaciones_sonido?: boolean } }} props
  */

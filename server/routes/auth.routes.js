@@ -1,7 +1,8 @@
 /**
  * @module auth.routes
- * @description Rutas públicas de autenticación.
- * No requieren token porque son precisamente las rutas donde el token se obtiene.
+ * @description Registro y login: aquí aún no hay JWT en la petición; si todo va bien,
+ * la respuesta incluye `token` + datos de usuario. El cliente lo guarda y lo reutiliza en el resto
+ * de la API. `GET /me` sirve para comprobar que el token sigue válido y refrescar perfil (avatar, sonido).
  *
  * Rutas definidas:
  *   POST /api/auth/register → crear nueva cuenta
@@ -12,7 +13,10 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const pool = require("../config/db");
-const { authMiddleware, createToken } = require("../middleware/auth.middleware");
+const {
+  authMiddleware,
+  createToken,
+} = require("../middleware/auth.middleware");
 const {
   normalizeEmail,
   passwordPolicyMessage,
@@ -55,14 +59,15 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: pwdErr });
     }
 
-    // Compruebo si ya existe antes de intentar insertar, así puedo dar un mensaje más claro
+    // Se comprueba duplicado antes del INSERT para devolver un mensaje claro al cliente
     const byEmail = await pool.query(
       "SELECT id FROM usuarios WHERE LOWER(TRIM(email)) = $1",
       [email],
     );
     if (byEmail.rows.length > 0) {
       return res.status(400).json({
-        error: "Ese email ya está registrado. Usa «Inicia sesión» con esa cuenta.",
+        error:
+          "Ese email ya está registrado. Usa «Inicia sesión» con esa cuenta.",
       });
     }
 
@@ -99,13 +104,14 @@ router.post("/register", async (req, res) => {
     console.error("[POST /api/auth/register]", error);
     if (error.code === "23505") {
       return res.status(400).json({
-        error: "Ese email o nombre de usuario ya existe. Prueba a iniciar sesión.",
+        error:
+          "Ese email o nombre de usuario ya existe. Prueba a iniciar sesión.",
         detail: error.detail,
       });
     }
-    return res.status(500).json(
-      serverErrorPayload(error, "Error al registrar usuario."),
-    );
+    return res
+      .status(500)
+      .json(serverErrorPayload(error, "Error al registrar usuario."));
   }
 });
 
@@ -262,16 +268,19 @@ router.patch("/me", authMiddleware, async (req, res) => {
   } catch (error) {
     console.error("[PATCH /api/auth/me]", error);
     // Columna avatar_id ausente en BD antigua (PostgreSQL: 42703 = undefined_column)
-    if (error?.code === "42703" && String(error?.message || "").includes("avatar_id")) {
+    if (
+      error?.code === "42703" &&
+      String(error?.message || "").includes("avatar_id")
+    ) {
       return res.status(500).json({
         error:
-          "La base de datos no tiene la columna avatar_id. Ejecuta una vez el script docs/add-avatar-id-usuarios.sql (o vuelve a crear la BD desde docs/schema.sql) y reinicia el servidor.",
+          "La base de datos no tiene la columna avatar_id. Ejecuta una vez el script docs/sql/add-avatar-id-usuarios.sql (o vuelve a crear la BD desde docs/sql/schema.sql) y reinicia el servidor.",
         code: error.code,
       });
     }
-    return res.status(500).json(
-      serverErrorPayload(error, "Error al actualizar el perfil."),
-    );
+    return res
+      .status(500)
+      .json(serverErrorPayload(error, "Error al actualizar el perfil."));
   }
 });
 

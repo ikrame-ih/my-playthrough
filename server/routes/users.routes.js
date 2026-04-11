@@ -1,7 +1,8 @@
 /**
  * @module users.routes
- * @description Rutas para explorar los perfiles públicos de otros usuarios.
- * Forman la base de la funcionalidad de comunidad (RF-06).
+ * @description Datos de otros usuarios para la red social: listado en Comunidad (sin incluirte
+ * a ti mismo) y colección pública de un usuario concreto (`/user/:id` en el front).
+ * Cada petición exige JWT; los datos devueltos son solo lectura desde el punto de vista del visitante.
  *
  * Rutas definidas:
  *   GET /api/users              → lista de todos los usuarios excepto el propio

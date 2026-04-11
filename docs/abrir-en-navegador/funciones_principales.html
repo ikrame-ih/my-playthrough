@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Funciones de código — MyPlaythrough (guía con repaso de conceptos)</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --panel: #161d2f;
+      --accent: #2dd4bf;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.08);
+      --warn: #fbbf24;
+      --hard: #f87171;
+      --gloss: rgba(45, 212, 191, 0.06);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0 auto;
+      max-width: 840px;
+      padding: 2rem 1.25rem 3rem;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 0.96rem;
+    }
+    h1 { font-size: 1.38rem; margin: 0 0 0.5rem; color: var(--accent); }
+    .lead { color: var(--muted); font-size: 0.92rem; margin-bottom: 1.35rem; }
+    h2 { font-size: 1.08rem; margin: 2.1rem 0 0.65rem; border-bottom: 1px solid var(--border); padding-bottom: 0.35rem; color: #cbd5e1; }
+    h3 { font-size: 0.98rem; margin: 1.25rem 0 0.45rem; color: var(--accent); }
+    p { margin: 0.55rem 0; }
+    a { color: var(--accent); }
+    code, .path { font-size: 0.84em; background: var(--panel); padding: 0.12em 0.38em; border-radius: 4px; }
+    pre {
+      margin: 0.6rem 0;
+      padding: 0.85rem 1rem;
+      background: #0d1424;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+    pre code { background: none; padding: 0; font-size: inherit; }
+    ul { margin: 0.4rem 0 0.6rem 1.15rem; padding: 0; }
+    li { margin: 0.35rem 0; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      margin: 1rem 0;
+    }
+    .card .path { display: block; margin-bottom: 0.5rem; color: #a5b4fc; font-size: 0.82rem; }
+    .prob { color: var(--warn); font-size: 0.8rem; font-weight: 600; margin-top: 0.35rem; }
+    .dif { display: inline-block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.18rem 0.45rem; border-radius: 6px; margin-left: 0.35rem; vertical-align: middle; }
+    .dif-baja { background: rgba(45, 212, 191, 0.15); color: var(--accent); }
+    .dif-media { background: rgba(251, 191, 36, 0.15); color: var(--warn); }
+    .dif-alta { background: rgba(248, 113, 113, 0.12); color: var(--hard); }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .toolbar button {
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: rgba(45, 212, 191, 0.12);
+      color: var(--accent);
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+    }
+    .doc-nav { font-size: 0.82rem; color: var(--muted); margin: 0 0 1.25rem; }
+    .doc-nav a { margin-right: 1rem; }
+    .gloss {
+      background: var(--gloss);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem 1.15rem;
+      margin: 1.25rem 0;
+    }
+    .gloss h3 { margin-top: 0; color: #cbd5e1; font-size: 1rem; }
+    .gloss p, .gloss li { color: #e2e8f0; }
+    .gloss strong { color: var(--accent); font-weight: 600; }
+    @media print {
+      body { background: #fff; color: #111; max-width: 100%; }
+      .toolbar { display: none; }
+      a { color: #0a5; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button type="button" id="btn-print" aria-label="Imprimir o guardar como PDF">Imprimir / PDF</button>
+  </div>
+  <p class="doc-nav">
+    <a href="../README.md">Índice docs</a>
+    <a href="diagrama_bd.html">Diagrama BD</a>
+    <a href="plan_pruebas.html">Plan de pruebas</a>
+  </p>
+
+  <h1>Funciones de código y repaso de conceptos</h1>
+  <p class="lead">
+    Este documento acompaña al código del proyecto: no es una lista de pantallas, sino <strong>funciones concretas</strong> que implementé (JavaScript en servidor y cliente) y, antes, un <strong>repaso en lenguaje claro</strong> de términos que en clase y en tutoriales aparecen una y otra vez. Lo escribo como quien <strong>vuelve sobre apuntes</strong>: si algo suena obvio para quien ya trabaja en backend, aquí lo dejo fijado para mí y para quien revise el repositorio.
+  </p>
+
+  <h2>Repaso: conceptos que uso en casi todo el flujo de login y API</h2>
+
+  <div class="gloss">
+    <h3>Petición HTTP y códigos de respuesta</h3>
+    <p>
+      Cada vez que el navegador (o Thunder Client) llama a nuestra API, el servidor contesta con un <strong>código numérico</strong>. Los que más uso en este proyecto son:
+    </p>
+    <ul>
+      <li><strong>200</strong> (y 201): todo fue bien; el cuerpo de la respuesta trae datos JSON.</li>
+      <li><strong>400</strong>: la petición estaba mal formada o faltaban datos (validación).</li>
+      <li><strong>401 Unauthorized</strong>: el servidor <strong>no puede identificar al usuario</strong> con lo enviado en la petición. Típico: no hay token, el token está caducado o la firma no cuadra. No equivale a “sin permiso de rol”; en la práctica significa identidad no válida o ausente.</li>
+      <li><strong>403 Forbidden</strong>: el servidor <strong>identifica al usuario</strong> (token válido), pero <strong>esa identidad no puede realizar la acción solicitada</strong>. Ejemplo: usuario normal en rutas de administración.</li>
+      <li><strong>404</strong>: recurso no encontrado.</li>
+      <li><strong>500</strong>: error interno del servidor (bug o fallo de base de datos).</li>
+    </ul>
+    <p>
+      <strong>Recuerdo:</strong> 401 = identidad; 403 = identidad clara pero acción prohibida.
+    </p>
+  </div>
+
+  <div class="gloss">
+    <h3>JWT (JSON Web Token): qué es y qué es el payload</h3>
+    <p>
+      Un <strong>JWT</strong> es un <strong>texto largo en una sola cadena</strong> que el servidor genera al hacer login o registro correcto. Visualmente parece tres trozos separados por puntos (<code>xxxxx.yyyyy.zzzzz</code>). No es una contraseña del usuario: es un <strong>recibo firmado</strong> que dice “quien presente esto es la persona con id X, email Y, rol Z”, dentro de un tiempo limitado.
+    </p>
+    <p>
+      La parte central (el <strong>payload</strong>) lleva datos en JSON codificados (por ejemplo <code>id</code>, <code>email</code>, <code>rol</code>). Cualquiera puede <em>leer</em> esa parte si decodifica el Base64 (no es cifrado total), pero <strong>no puede falsificarla</strong> sin conocer el secreto del servidor, porque la tercera parte es la <strong>firma</strong>.
+    </p>
+    <p>
+      <strong>JWT_SECRET</strong> (en el <code>.env</code>) es la “clave maestra” solo del servidor: con ella se <strong>firma</strong> el token al crearlo y se <strong>verifica</strong> al recibirlo. Por eso en los apuntes se llama <strong>secreto</strong>: si alguien lo roba, podría fabricar tokens falsos. No se sube a Git ni se envía al navegador.
+    </p>
+  </div>
+
+  <div class="gloss">
+    <h3>Sesión “sin guardar sesiones” en el servidor</h3>
+    <p>
+      Otra forma clásica de login es que el servidor guarde en memoria o en base de datos una tabla de sesiones (“usuario 7 conectado con id de sesión S”). Aquí no hace falta esa tabla para el día a día: confiamos en el <strong>JWT</strong> que el cliente guarda (en <code>localStorage</code>) y envía en cada petición. El servidor solo tiene que <strong>verificar la firma</strong> y la caducidad. Eso es lo que suelo resumir como: <strong>identificar al usuario en cada petición sin almacenar yo misma la lista de sesiones</strong>.
+    </p>
+  </div>
+
+  <div class="gloss">
+    <h3>Cabecera <code>Authorization: Bearer …</code></h3>
+    <p>
+      Es el <strong>formato estándar</strong> acordado en la web para mandar un token junto a la petición. La cabecera se llama <code>Authorization</code>; el valor empieza por la palabra <strong>Bearer</strong>, un espacio, y después el JWT completo. Ejemplo mental: <code>Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…</code>. Mi función <code>authHeaders()</code> en el cliente monta exactamente eso cuando hay token guardado.
+    </p>
+  </div>
+
+  <div class="gloss">
+    <h3>Middleware en Express</h3>
+    <p>
+      En Express, un <strong>middleware</strong> es una <strong>función intermedia</strong> que se ejecuta <strong>antes</strong> del controlador que responde “de negocio” (por ejemplo antes de listar juegos). Puede leer cabeceras, rechazar la petición con 401, o llamar a <code>next()</code> para dejar pasar al siguiente paso. <code>authMiddleware</code> es, en la práctica, el “portero” que exige JWT válido en rutas privadas.
+    </p>
+  </div>
+
+  <div class="gloss">
+    <h3>Por qué trato el 401 en el cliente con <code>apiFetch</code></h3>
+    <p>
+      Si el token caducó, cualquier ruta protegida puede devolver <strong>401</strong>. Si no reacciono, la interfaz seguiría mostrando al usuario como logueado aunque el servidor ya no lo acepte. Por eso centralicé: si la respuesta es 401, <strong>borro token y usuario del <code>localStorage</code></strong> y <strong>recargo la página</strong> para volver a la pantalla de login con un estado limpio.
+    </p>
+  </div>
+
+  <h2>1. Autenticación: crear el token y comprobarlo en cada petición</h2>
+
+  <div class="card">
+    <span class="path">server/middleware/auth.middleware.js → <code>createToken(user)</code></span>
+    <p class="prob">Qué problema resolvía</p>
+    <p>
+      Después de un login o registro correcto, el backend tiene que entregar al cliente una forma <strong>portátil</strong> de demostrar quién es en las siguientes peticiones, sin que yo tenga que consultar primero una tabla de “sesiones abiertas” en cada caso (el enfoque con JWT ya lo expliqué arriba).
+    </p>
+    <p><strong>Qué hace la función:</strong> usa <code>jwt.sign</code> para generar un JWT cuyo <strong>payload</strong> incluye <code>id</code>, <code>email</code> y <code>rol</code>, firmado con <code>JWT_SECRET</code> y con caducidad de 7 días. Ese string es el que el navegador guarda y reenvía en <code>Authorization: Bearer …</code>.</p>
+    <pre><code>jwt.sign(
+  { id: user.id, email: user.email, rol: user.rol || "user" },
+  JWT_SECRET,
+  { expiresIn: "7d" },
+);</code></pre>
+    <p>
+      <strong>Recuerdo:</strong> el payload del JWT ayuda al front a mostrar menús, pero para acciones sensibles (como admin) el servidor vuelve a mirar el rol en base de datos cuando hace falta, porque el token podría estar desactualizado.
+    </p>
+    <p><span class="dif dif-media">Media</span> Configurar bien variables de entorno y no confundir “datos en el token” con “permisos definitivos”.</p>
+  </div>
+
+  <div class="card">
+    <span class="path">server/middleware/auth.middleware.js → <code>authMiddleware</code></span>
+    <p class="prob">Qué problema resolvía</p>
+    <p>
+      Sin esto, en cada ruta tendría que copiar el mismo código: leer la cabecera <code>Authorization</code>, comprobar que empiece por <code>Bearer</code>, extraer el token, llamar a <code>jwt.verify</code> y devolver JSON de error si algo falla.
+    </p>
+    <p><strong>Qué hace:</strong> es el <strong>middleware</strong> que encapsula todo eso: si el token es válido, rellena <code>req.user</code> con lo que venía en el payload; si no, responde <strong>401</strong> con un mensaje claro.</p>
+    <p><span class="dif dif-baja">Baja</span> Patrón muy documentado en Express; lo importante es encadenarlo bien en el router.</p>
+  </div>
+
+  <div class="card">
+    <span class="path">server/middleware/auth.middleware.js → <code>usuarioEsAdmin(usuarioId)</code> y <code>adminMiddleware</code></span>
+    <p class="prob">Qué problema resolvía</p>
+    <p>
+      El JWT podría haberse emitido <strong>antes</strong> de que en base de datos cambiara el rol. No basta con leer <code>rol</code> solo del payload si quiero estar segura de quién es administradora ahora mismo.
+    </p>
+    <p><strong>Qué hace:</strong> <code>usuarioEsAdmin</code> ejecuta <code>SELECT rol FROM usuarios WHERE id = $1</code>. <code>adminMiddleware</code> va <strong>después</strong> de <code>authMiddleware</code> y, si el rol en BD no es admin, responde <strong>403</strong> (aquí sí: identidad conocida, acción no permitida).</p>
+    <p><span class="dif dif-media">Media</span> Mantener claros los mensajes y no mezclar 401 con 403.</p>
+  </div>
+
+  <h2>2. Cliente: cabeceras y un solo sitio para el 401</h2>
+
+  <div class="card">
+    <span class="path">client/src/api.js → <code>authHeaders()</code> y <code>apiFetch(url, opts)</code></span>
+    <p class="prob">Qué problema resolvía</p>
+    <p>
+      Sin capa común, cada componente repetiría cómo montar JSON y el <code>Bearer</code>, y tendría que copiar el mismo <code>if (res.status === 401)</code> una y otra vez.
+    </p>
+    <p><strong>Qué hace:</strong> <code>authHeaders</code> devuelve <code>Content-Type: application/json</code> y, si existe token en <code>localStorage</code>, la cabecera <code>Authorization: Bearer …</code>. <code>apiFetch</code> envuelve a <code>fetch</code> y, si la respuesta es 401, limpia almacenamiento y recarga (como expliqué en el recuadro del 401).</p>
+    <pre><code>if (res.status === 401) {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.location.reload();
+  throw new Error("Sesión expirada");
+}</code></pre>
+    <p><span class="dif dif-media">Media</span> Un solo lugar donde mantener el comportamiento ante sesión caducada.</p>
+  </div>
+
+  <h2>3. Normalización de datos antes de guardar</h2>
+
+  <div class="card">
+    <span class="path">server/utils/normalize.js</span>
+    <p class="prob">Qué problema resolvía</p>
+    <p>
+      Misma persona escribiendo <code>Usuario@Gmail.com</code> y <code>usuario@gmail.com</code>: sin normalizar, la base de datos los trataría como dos emails distintos.
+    </p>
+    <p><strong>Qué hace:</strong> funciones <strong>puras</strong> (sin tocar base de datos) que dejan emails, títulos y estados en una forma única; las uso en rutas y las cubro con tests en <code>normalize.test.js</code>.</p>
+    <p><span class="dif dif-baja">Baja</span>–<span class="dif dif-media">Media</span> La dificultad está en no duplicar reglas entre cliente y servidor.</p>
+  </div>
+
+  <h2>4. Colección, SQL reutilizable y carátulas (CORS)</h2>
+
+  <div class="card">
+    <span class="path">server/utils/queries.js → <code>queryGamesListForUser(usuarioId)</code></span>
+    <p class="prob">Qué problema resolvía</p>
+    <p>
+      Quería un solo sitio con el <code>LEFT JOIN</code> al catálogo para mostrar título e imagen oficiales cuando la ficha está enlazada, en lugar de repetir la consulta en cada ruta.
+    </p>
+    <p><strong>Qué hace:</strong> un <code>SELECT</code> con <code>COALESCE</code>: en castellano, “si el catálogo tiene título, úsalo; si no, el de la ficha del usuario”. Igual para la URL de imagen.</p>
+    <p>
+      <strong>Recuerdo rápido de <code>COALESCE(a,b)</code>:</strong> devuelve el primer valor que no sea nulo. Así priorizo datos del catálogo sin perder lo manual.
+    </p>
+    <p><span class="dif dif-media">Media</span> Sintaxis SQL y cuidar <code>NULL</code> y espacios en URLs.</p>
+  </div>
+
+  <div class="card">
+    <span class="path">server/utils/queries.js → <code>queryGamePublicById(gameId)</code></span>
+    <p class="prob">Qué problema resolvía</p>
+    <p>
+      La vista de discusión muestra juegos de <strong>cualquier</strong> usuario; el endpoint “solo mis juegos” no sirve para eso.
+    </p>
+    <p><strong>Qué hace:</strong> trae la ficha pública con datos del propietario (nombre, etc.) para enlaces y cabecera.</p>
+    <p><span class="dif dif-media">Media</span> Separar bien “leer ficha ajena en comunidad” frente a “editar mi colección”.</p>
+  </div>
+
+  <div class="card">
+    <span class="path">client/src/coverUrl.js → <code>displayCoverUrl(url)</code></span>
+    <p class="prob">Qué problema resolvía</p>
+    <p>
+      <strong>CORS</strong> (Cross-Origin Resource Sharing) es el mecanismo por el que el navegador decide si una página en un origen (mi React) puede cargar recursos de otro (CDN de Steam/RAWG). A veces la imagen no se muestra si el navegador la pide directamente al dominio externo.
+    </p>
+    <p><strong>Qué hace:</strong> sustituye la URL por una petición a nuestro backend <code>/api/covers/proxy?u=…</code>, que descarga la imagen y la sirve desde el mismo origen que la API, evitando ese bloqueo en la práctica.</p>
+    <p><span class="dif dif-baja">Baja</span> Pocas líneas, pero imprescindible para ver carátulas.</p>
+  </div>
+
+  <h2>5. Discusión: agrupar comentarios y votar</h2>
+
+  <div class="card">
+    <span class="path">client/src/components/GameDiscussion.jsx → <code>Map</code> por <code>parent_id</code></span>
+    <p class="prob">Qué problema resolvía</p>
+    <p>
+      El servidor devuelve una <strong>lista plana</strong> de filas; en pantalla necesito <strong>árbol</strong> (respuestas bajo su padre) y un orden razonable para las reseñas raíz.
+    </p>
+    <p><strong>Qué hace:</strong> construyo un <code>Map</code> de JavaScript donde cada clave es un <code>parent_id</code> (o 0 para raíz) y el valor es un array de hijos. Luego ordeno las raíces por saldo de votos y fecha. Eso alimenta el componente recursivo <code>CommentBlock</code>.</p>
+    <p>
+      <strong>Recuerdo:</strong> un <code>Map</code> aquí es solo una estructura clave → lista, cómoda para agrupar sin anidar a mano cientos de <code>if</code>.
+    </p>
+    <p><span class="dif dif-alta">Alta</span> Visualizar el árbol y no romper el renderizado fue lo más delicado.</p>
+  </div>
+
+  <div class="card">
+    <span class="path">client/src/components/GameDiscussion.jsx → <code>onVote</code> (<code>useCallback</code>)</span>
+    <p class="prob">Qué problema resolvía</p>
+    <p>
+      Tras votar, actualizar solo la fila afectada en el estado de React sin recargar toda la página.
+    </p>
+    <p><strong>Qué hace:</strong> <code>PUT</code> al endpoint de voto y actualización del array de comentarios con los contadores y <code>mi_voto</code> que devuelve el servidor. <code>voteBusyId</code> evita doble clic.</p>
+    <p><span class="dif dif-media">Media</span></p>
+  </div>
+
+  <div class="card">
+    <span class="path">server/routes/games.routes.js → <code>PUT …/comments/:commentId/vote</code></span>
+    <p class="prob">Qué problema resolvía</p>
+    <p>
+      Un usuario solo puede tener un voto por comentario; las reseñas valorables son solo las de primer nivel (<code>parent_id</code> nulo).
+    </p>
+    <p><strong>Qué hace:</strong> valida juego y comentario; si <code>val === 0</code> borra el voto; si no, <code>INSERT … ON CONFLICT DO UPDATE</code> para mantener una fila por par (comentario, usuario). Luego agrega votos con <code>SUM</code> y devuelve <code>mi_voto</code>.</p>
+    <p><span class="dif dif-alta">Alta</span> Probar bien con herramientas tipo Thunder Client.</p>
+  </div>
+
+  <h2>6. Campana de recomendaciones (sin WebSockets)</h2>
+
+  <div class="card">
+    <span class="path">client/src/components/NotificationBell.jsx</span>
+    <p class="prob">Qué problema resolvía</p>
+    <p>
+      Avisar de recomendaciones nuevas sin montar una conexión en tiempo real permanente (<strong>WebSockets</strong> sería otra arquitectura: canal bidireccional largo). Aquí uso <strong>polling</strong>: cada cierto tiempo pregunto al servidor cuántas hay sin leer.
+    </p>
+    <p><strong>Qué hace:</strong> intervalo ~45 s, <code>useRef</code> para comparar con el conteo anterior y para saber si ya hubo gesto del usuario (los navegadores restringen el audio automático), y comprobar si la pestaña está visible antes de sonar.</p>
+    <p><span class="dif dif-media">Media</span> Las reglas de autoplay del audio dan más guerra de lo que parece.</p>
+  </div>
+
+  <h2>7. Partes del proyecto que más tiempo me llevaron</h2>
+  <ul>
+    <li><strong>Discusión y votos</strong> (cliente + servidor): árbol de comentarios, orden, deep link <code>?c=</code> y reglas de voto coherentes.</li>
+    <li><strong>Red social en SQL</strong> (<code>social.routes.js</code>): recomendaciones condicionadas al seguimiento, actividad mezclando comentarios y LFG, muchas consultas encadenadas.</li>
+  </ul>
+
+  <p class="lead" style="margin-top:2rem;">
+    Modelo de datos: <a href="diagrama_bd.html">diagrama_bd.html</a>.
+    Pruebas: <a href="../pruebas.md">pruebas.md</a> y <a href="plan_pruebas.html">plan_pruebas.html</a>.
+  </p>
+
+  <script>
+    (function () {
+      var btn = document.getElementById("btn-print");
+      if (btn) btn.addEventListener("click", function () { window.print(); });
+    })();
+  </script>
+</body>
+</html>

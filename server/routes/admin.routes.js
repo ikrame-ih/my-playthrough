@@ -1,19 +1,24 @@
 /**
  * @module admin.routes
- * @description Rutas del panel de administración. Solo accesibles con rol 'admin'.
- * El doble middleware `authMiddleware + adminMiddleware` se aplica a nivel de router
- * para proteger todas las rutas de este módulo de una sola vez.
+ * @description Panel de moderación: operaciones que un usuario normal no puede hacer
+ * (listar todo, borrar cuentas ajenas, borrar fichas ajenas, ver todas las LFG).
+ * `router.use(authMiddleware, adminMiddleware)` protege todas las rutas de una vez;
+ * el rol `admin` se confirma en base de datos en cada petición.
  *
  * Rutas definidas:
  *   GET    /api/admin/users      → listado de todas las cuentas
  *   DELETE /api/admin/users/:id  → eliminar una cuenta (moderación)
  *   GET    /api/admin/games      → listado de todos los juegos
  *   DELETE /api/admin/games/:id  → eliminar cualquier ficha de juego
+ *   GET    /api/admin/lfg        → publicaciones «buscar grupo» (moderación)
  */
 
 const express = require("express");
 const pool = require("../config/db");
-const { authMiddleware, adminMiddleware } = require("../middleware/auth.middleware");
+const {
+  authMiddleware,
+  adminMiddleware,
+} = require("../middleware/auth.middleware");
 const { serverErrorPayload } = require("../utils/normalize");
 const { coerceAvatarId } = require("../constants/avatars");
 
@@ -42,7 +47,9 @@ router.get("/users", async (req, res) => {
     );
   } catch (error) {
     console.error("[GET /api/admin/users]", error);
-    res.status(500).json(serverErrorPayload(error, "Error al cargar usuarios."));
+    res
+      .status(500)
+      .json(serverErrorPayload(error, "Error al cargar usuarios."));
   }
 });
 
@@ -78,7 +85,9 @@ router.delete("/users/:id", async (req, res) => {
     res.json({ success: true, message: "Usuario eliminado." });
   } catch (error) {
     console.error("[DELETE /api/admin/users/:id]", error);
-    res.status(500).json(serverErrorPayload(error, "Error al eliminar usuario."));
+    res
+      .status(500)
+      .json(serverErrorPayload(error, "Error al eliminar usuario."));
   }
 });
 
@@ -142,6 +151,37 @@ router.delete("/games/:id", async (req, res) => {
   } catch (error) {
     console.error("[DELETE /api/admin/games/:id]", error);
     res.status(500).json(serverErrorPayload(error, "Error al eliminar juego."));
+  }
+});
+
+/**
+ * Listado de publicaciones LFG (buscar grupo) para el panel de administración.
+ * El borrado sigue usando `DELETE /api/social/lfg/:id` (autor o admin).
+ *
+ * @route  GET /api/admin/lfg
+ * @access Private – Admin only
+ * @returns {object[]} 200 – Filas con id, mensaje, modo, activo, created_at, usuario, email, juego_id, juego_titulo.
+ */
+router.get("/lfg", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT l.id, l.mensaje, l.modo, l.activo, l.created_at,
+              l.usuario_id, l.juego_id,
+              u.nombre_usuario, u.email,
+              COALESCE(c.titulo, j.titulo) AS juego_titulo
+       FROM lfg_publicaciones l
+       JOIN usuarios u ON u.id = l.usuario_id
+       JOIN juegos j ON j.id = l.juego_id
+       LEFT JOIN catalogo_juegos c ON j.catalogo_id = c.id
+       ORDER BY l.created_at DESC
+       LIMIT 300`,
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error("[GET /api/admin/lfg]", error);
+    res
+      .status(500)
+      .json(serverErrorPayload(error, "Error al cargar publicaciones LFG."));
   }
 });
 

@@ -1,9 +1,9 @@
 # MyPlaythrough
 
 <p align="center">
-  <a href="#readme-es"><img src="https://img.shields.io/badge/README-Espa%C3%B1ol%20(primero)-2DD4BF?style=for-the-badge&labelColor=0B1120" alt="Español" /></a>
+  <a href="#readme-es"><img src="https://img.shields.io/badge/README-Espa%C3%B1ol-115e59?style=for-the-badge&labelColor=0f172a" alt="Español" /></a>
   &nbsp;
-  <a href="#readme-en"><img src="https://img.shields.io/badge/README-English%20(below)-64748B?style=for-the-badge&labelColor=0B1120" alt="English" /></a>
+  <a href="#readme-en"><img src="https://img.shields.io/badge/README-English-475569?style=for-the-badge&labelColor=0f172a" alt="English" /></a>
 </p>
 
 <p align="center"><b>Bilingüe · Bilingual</b><br />
@@ -22,15 +22,15 @@ Plataformas como HowLongToBeat o Backloggd son útiles, pero suelen saturarse. M
 
 > Proyecto intermodular final — Ciclo Formativo de Grado Superior en Desarrollo de Aplicaciones Web (DAW) · CESUR Málaga Este · 2025/2026.
 
-### Idioma y convención (revisión en español)
+### Idioma y convención
 
-- **Interfaz de la aplicación** — textos, mensajes y flujos en **español**, para que la evaluación de usabilidad y contenido sea inmediata.
-- **Este README** — bloque **Español primero**; el inglés va después para reutilizar el repositorio o ampliar el proyecto sin duplicar código.
-- **Código fuente** — nombres de carpetas, archivos, variables y rutas API en **inglés** (convención habitual en PERN y documentación de librerías). Los **comentarios de documentación** (`@description`, rutas) están en **español** en el backend y componentes principales.
-- **Registro** — la contraseña debe tener **al menos 8 caracteres** e incluir **mayúscula, minúscula, número y un símbolo** (validación en servidor y aviso en el formulario). El **nombre de usuario** es **único** (no puede repetirse la misma variante en minúsculas; índice en BD).
-- **Inicio de sesión** — acepta **correo** o **nombre de usuario** (el mismo que se muestra en comunidad).
-- **Carpeta `docs/`** — índice en [`docs/README.md`](docs/README.md): plan de pruebas, SQL y diagramas; los contenidos redactados para memoria están en **español** salvo etiquetas técnicas inevitables.
-- **Diseño de interfaz** — [`DESIGN.md`](DESIGN.md) (inglés, referencia para desarrollo); [`DESIGN_ES.md`](DESIGN_ES.md) (español, misma información para evaluación o tutoría).
+- **Diseño de interfaz** — [`DESIGN_ES.md`](DESIGN_ES.md) (español) y [`DESIGN.md`](DESIGN.md) (inglés): decisiones visuales, componentes y flujos de pantalla.
+- **Interfaz de la aplicación** — textos y mensajes al usuario en **español**.
+- **Este README** — sección en **español** primero; después, resumen en **inglés** para quien prefiera leer en ese idioma.
+- **Código** — carpetas, archivos, variables y rutas API en **inglés** (convención habitual en stacks PERN). En el backend, los bloques JSDoc principales están en **español**.
+- **Registro** — contraseña de **al menos 8 caracteres** con **mayúscula, minúscula, número y símbolo** (validación en servidor y aviso en el formulario). El **nombre de usuario** público es **único** (sin distinguir mayúsculas; índice en BD).
+- **Inicio de sesión** — **correo** o **nombre de usuario** (el que aparece en comunidad).
+- **Documentación en `docs/`** — índice en [`docs/README.md`](docs/README.md): scripts SQL en `docs/sql/`, documentación HTML en `docs/abrir-en-navegador/`, plan de pruebas en Markdown; redactado en **español** salvo nombres técnicos de ficheros.
 
 ### Stack tecnológico
 
@@ -50,25 +50,17 @@ Plataformas como HowLongToBeat o Backloggd son útiles, pero suelen saturarse. M
 - **Búsqueda de carátulas** — combina Steam y RAWG (`RAWG_API_KEY` opcional pero recomendada). Las imágenes pasan por un proxy en el servidor para evitar bloqueos CORS.
 - **Catálogo compartido** — `catalogo_juegos` enlaza cada ficha a un ID canónico para compartir portada entre usuarios.
 - **Comunidad** — miembros (seguir desde tarjeta o perfil), estadísticas globales, **actividad** de quien sigues (comentarios y LFG) y **buscar grupo (LFG)** con modos online / co-op local / otro.
-- **Recomendaciones** — enviar un juego de tu biblioteca solo a usuarios a los que sigues; bandeja en `/recommendations`, campana con contador y **tono opcional** (silenciable en Perfil).
+- **Recomendaciones** — enviar un juego de tu biblioteca solo a usuarios a los que sigues; bandeja en `/recommendations`, campana con contador y **tono opcional** al recibir nuevas (activar o silenciar en **Perfil**; el navegador puede exigir un clic previo en la página para reproducir audio).
 - **Avatares** — 10 robots predefinidos (SVG); el usuario elige el suyo en **Perfil** (`/settings`); se guarda en `usuarios.avatar_id` y se muestra en barra superior, comunidad, perfiles y comentarios.
 - **Hilos de comentarios** — comentarios anidados por juego (`/juego/:id/discussion`).
-- **Panel de administración** — usuarios, borrado de cuentas y moderación de fichas. El rol se comprueba en base de datos en cada petición.
+- **Panel de administración** — listado de usuarios, de todas las fichas y de publicaciones **LFG** (buscar grupo), con borrado donde la API lo permite; borrado de cuentas (en cascada: juegos y comentarios de ese usuario) y borrado de cualquier ficha. En la **discusión** de un juego, un **admin** puede borrar un comentario ajeno (misma regla que autor o dueño de la ficha). El rol se comprueba en base de datos en cada petición.
 - **Roles** — visitante (pantalla de login), usuario registrado, administrador.
 - **Carga con skeletons** — placeholders animados mientras llegan los datos.
 - **Sesión centralizada** — `apiFetch()` unifica peticiones autenticadas y expiración del token.
 - **Colección** — resumen (juegos, horas, completados), ordenación (reciente, título, estado, nota) y vista **cuadrícula** o **lista compacta**; estado vacío con mensaje propio.
 - **Accesibilidad** — enlace “Saltar al contenido”, foco al `<main>`, etiquetas en controles de vista y ordenación.
 - **Cuenta demo** — ver apartado siguiente.
-- **Tour guiado** — la primera vez que entras con sesión se ofrece un recorrido (react-joyride) por menú, búsqueda y recomendaciones; puedes repetirlo en **Perfil**.
-- **Tono de recomendaciones** — pitido opcional al subir el contador de la campana (ver Perfil y nota de prueba más abajo).
-
-### Cómo probar el sonido de recomendaciones
-
-1. En **Perfil**, deja el sonido **activado** y haz **un clic** en la página (requisito del navegador).
-2. Abre **otra ventana o navegador**, inicia sesión con **otra cuenta** que **siga** a la primera.
-3. Desde esa segunda cuenta, **recomienda un juego** al usuario de la primera (solo a quien sigues).
-4. Vuelve a la primera ventana: en **como mucho ~45 segundos** la app vuelve a consultar al servidor y verá el nuevo contador; si la pestaña está **visible**, suena el tono.
+- **Tour guiado** — se ofrece la **primera vez en ese navegador** tras iniciar sesión (se guarda preferencia en `localStorage`; no depende del alta en servidor). La **cuenta demo** en un perfil limpio también lo verá, para facilitar la demostración. Se puede **volver a lanzar** desde **Perfil**.
 
 ### Arquitectura del servidor
 
@@ -83,50 +75,50 @@ server/
 
 ### Estructura del repositorio
 
-Orden típico **PERN**: frontend (`client/`), backend (`server/`), documentación (`docs/`), marca (`brand/`). **Empieza por** [`docs/README.md`](docs/README.md) para ver qué hay en `docs/`.
+Orden típico **PERN**: frontend (`client/`), backend (`server/`), documentación (`docs/`), marca (`brand/`). El índice de `docs/` está en [`docs/README.md`](docs/README.md).
 
 ```
 MyPlaythrough/
 ├── client/          # Frontend React + Vite (UI en español)
 ├── server/          # API Express + rutas por carpeta routes/
-├── docs/            # SQL, plan de pruebas, diagrama BD — índice: docs/README.md
+├── docs/            # docs/README.md — sql/, abrir-en-navegador/, pruebas.md
 ├── brand/           # Guía de marca: brand-book.html (exportar PNG)
 ├── docker-compose.yml
-└── README.md        # Este archivo (español primero, inglés después)
+└── README.md        # Este archivo (español e inglés)
 ```
 
 ### Puesta en marcha local
 
-**Requisitos:** Node.js 18+ · PostgreSQL 14+ (o Docker Compose incluido)
+**Requisitos:** Node.js 18+ y PostgreSQL 14+, o Docker.
 
-**Opción A — Docker**
+#### Opción A — Docker (API + base de datos)
 
 ```bash
 docker compose up --build
 ```
 
-API en el puerto 3000 y PostgreSQL en 5432. El esquema se aplica desde `docs/schema.sql` la primera vez que el volumen está vacío.
+- API en el puerto **3000**, PostgreSQL en **5432**.
+- Con volumen de datos vacío, el esquema se crea desde `docs/sql/schema.sql`.
 
-**Opción B — Manual**
+#### Opción B — Manual (cuatro pasos)
 
-Backend: `cd server && npm install` — copia `server/.env.example` a `server/.env` y configura `DB_*`, `JWT_SECRET`, `CORS_ORIGIN`, opcionalmente `RAWG_API_KEY`. Ejecuta `npm run dev`.
+1. **Base de datos** — Crea una base en PostgreSQL y ejecuta **`docs/sql/schema.sql`** una vez.
+2. **Migraciones** (solo si vienes de una versión antigua del proyecto): aplica lo que falte, en este orden habitual — `docs/sql/add-avatar-id-usuarios.sql` si no existe `avatar_id`; en la carpeta `server/`, **`npm run migrate:social`**, **`npm run migrate:votes`** y **`npm run migrate:username-unique`** (equivalentes a los SQL de `docs/sql/add-social-features.sql`, `add-comentario-votos.sql`, `add-usuario-nombre-unique.sql`). Para dar rol admin a un correo concreto, edita y ejecuta `docs/sql/promover-admin.sql`.
+3. **Backend** — `cd server`, `npm install`, copia `server/.env.example` a `server/.env` y configura `DB_*`, `JWT_SECRET`, `CORS_ORIGIN` y, si quieres más resultados en el buscador de carátulas, `RAWG_API_KEY`. Arranque: `npm run dev`.
+4. **Frontend** — `cd client`, `npm install`, `npm run dev` (puerto **5173**). Si la API no está en `http://localhost:3000`, crea `client/.env` con `VITE_API_URL=http://…`.
 
-Frontend: `cd client && npm install && npm run dev` (puerto 5173). Si la API no está en la URL por defecto, crea `client/.env` con `VITE_API_URL=...`.
+**Si el login falla tras actualizar el repositorio:** casi siempre falta una migración (columna `notificaciones_sonido`, tablas sociales, votos en comentarios o índice de nombre único). Ejecuta los comandos `migrate:*` anteriores y reinicia el servidor.
 
-Base de datos manual: ejecuta `docs/schema.sql` una vez. Si ya tenías una BD anterior, aplica migraciones en orden: `docs/add-avatar-id-usuarios.sql` si falta `avatar_id`, **`docs/add-social-features.sql`** para seguimientos, recomendaciones, LFG y `notificaciones_sonido` (`npm run migrate:social`), **`docs/add-comentario-votos.sql`** para votos en reseñas (`npm run migrate:votes`), y **`docs/add-usuario-nombre-unique.sql`** para unicidad del nombre público (`npm run migrate:username-unique`). Para promover admin, usa `docs/promover-admin.sql`.
+**Datos de demostración (opcional, siempre desde `server/`):**
 
-**Login falla tras actualizar el código:** suele ser la BD desactualizada (falta columna `notificaciones_sonido`, tablas sociales, `juego_comentario_votos` o el índice de nombre). Ejecuta `npm run migrate:social`, `npm run migrate:votes` y `npm run migrate:username-unique` en `server/` (o el SQL a mano) y reinicia el backend.
+- **`npm run seed:demo`** — Cuenta **demo** con tres juegos y carátulas reales (Steam/RAWG), solo si esa cuenta aún no tiene fichas.
+- **`npm run seed:presentation`** — Población completa de ejemplo: **Tizza**, **Rufleto** y **Demo Jurado** como **administradores**; **ElOtro**, **Knekro**, **SequianCalvísimo** y **LaQueTeCuento>:(** como usuarios normales; juegos, comentarios, seguimientos y recomendaciones. Todas las filas de `usuarios` quedan con la **misma contraseña** y los roles de admin según esa tabla.
 
-**Datos de demostración (opcional):**
+**Contraseña** tras `seed:presentation` (y la que aplica el script a los usuarios del seed): **`Presentacion2026!`**
 
-- **`npm run seed:demo`** (en `server/`) — crea solo la cuenta **demo** con tres juegos y **carátulas reales** (Steam/RAWG) si esa cuenta aún no tiene fichas.
-- **`npm run seed:presentation`** — **población completa** para videollamada: varios usuarios (**Rufleto**, **Tizza**, **ElOtro**, **Knekro**, **SequianCalvísimo**, **LaQueTeCuento>:(**, **Demo Jurado**), **todos con la misma contraseña**, juegos con notas, comentarios, seguimientos y recomendaciones. Unifica la contraseña de **todas** las filas en `usuarios`, deja **admin** solo a **Tizza**, **Rufleto** y **Demo Jurado**, pone **usuario** a **ikihga2223@gmail.com** si esa cuenta existe, y borra el duplicado **rufleto@gmail.com** si existía. Corrige restricciones antiguas `UNIQUE` en título de juego si las hubiera.
+En el login, **«Rellenar cuenta demo»** usa **Demo Jurado** y esa contraseña (`demo@myplaythrough.local`).
 
-**Contraseña para todas las cuentas** tras el seed (y la que unifica el script): **`Presentacion2026!`**
-
-En el login: **«Rellenar cuenta demo»** rellena **Demo Jurado** y esa contraseña (también `demo@myplaythrough.local`).
-
-**Cuentas de ejemplo** (misma contraseña **`Presentacion2026!`** si ejecutaste `seed:presentation`; login con **email** o **nombre**). **Panel de administración:** Tizza, Rufleto y Demo Jurado.
+**Cuentas del seed** (misma contraseña si ejecutaste `seed:presentation`; entra con **email** o **nombre público**). Administración: Tizza, Rufleto y Demo Jurado.
 
 | Nombre público   | Email                       | Rol tras seed |
 | ---------------- | --------------------------- | ------------- |
@@ -138,13 +130,11 @@ En el login: **«Rellenar cuenta demo»** rellena **Demo Jurado** y esa contrase
 | SequianCalvísimo | sequian@myplaythrough.local | usuario       |
 | LaQueTeCuento>:( | laquete@myplaythrough.local | usuario       |
 
-#### ¿Para qué sirve la cuenta demo?
+#### Cuenta demo en la pantalla de login
 
-- Que **quien evalúe el proyecto** (profesor, tribunal) pueda entrar **sin registrarse** y ver la app **con datos** (colección con varios juegos, estadísticas, vista lista/cuadrícula).
-- Ahorrar tiempo en **defensa oral** o revisión: no hace falta crear usuario y añadir juegos a mano.
-- **No sustituye** las pruebas con usuario real; es solo un atajo para demostración.
+Permite entrar **sin registrarse** y ver la aplicación **con datos de ejemplo** (colección, estadísticas, vistas lista y cuadrícula). Sirve para demostración rápida; conviene probar también con un usuario registrado a mano.
 
-**Capturas para documentación:** puedes añadir imágenes en `docs/` (p. ej. `docs/screenshots/`) y enlazarlas desde la memoria del proyecto.
+**Capturas u otras imágenes** del proyecto pueden guardarse en `docs/` (por ejemplo `docs/screenshots/`) y citarse en la **memoria o informe** del trabajo, o adjuntarse en el **paquete** que subas a la plataforma de entrega (Aula Virtual, ZIP, etc.).
 
 ### Referencia rápida de la API
 
@@ -159,17 +149,25 @@ En el login: **«Rellenar cuenta demo»** rellena **Demo Jurado** y esa contrase
 | GET/POST/PATCH      | `/api/social/recommendations…`                         | Recomendaciones y no leídas             | ✓    |
 | GET/POST/DELETE     | `/api/social/lfg…`                                     | Buscar grupo (LFG)                      | ✓    |
 | GET                 | `/api/social/activity`                                 | Actividad de seguidos                   | ✓    |
-| …                   | …                                                      | Comentarios, admin, proxy de imágenes   | …    |
+| GET                 | `/api/admin/lfg`                                       | Listado LFG (moderación)                | admin |
+| …                   | …                                                      | Comentarios, más rutas admin, proxy     | …    |
 
-(Listado completo en el código y en la documentación de entrega.)
+(Listado completo en el código fuente de `server/routes/`.)
 
 ### Seguridad (resumen)
 
-Consultas parametrizadas, bcrypt, JWT, CORS restringido, cuerpo limitado a 50 kb, lista blanca en el proxy de imágenes, `/api/test-db` oculto en producción.
+- **SQL** — Consultas **parametrizadas** (`pg`): los valores del usuario no se interpolan en el texto SQL, lo que evita **inyección SQL**.
+- **Contraseñas** — Se almacenan con **bcrypt** (hash irreversible), nunca en claro.
+- **API** — **JWT** firmado con un secreto del servidor; rutas privadas exigen token válido.
+- **Permisos** — En administración, el **rol** se comprueba en **base de datos** en cada petición, no solo en el cliente.
+- **CORS** — Solo el origen configurado en `CORS_ORIGIN` puede usar la API desde el navegador.
+- **Peticiones** — Tamaño máximo del cuerpo JSON: **50 kb**.
+- **Proxy de carátulas** — Solo se reenvían URLs de dominios permitidos (Steam, RAWG, etc.).
+- **Producción** — Con `NODE_ENV=production`, el endpoint de prueba `/api/test-db` responde **404** (no se expone al público).
 
 ### Estado
 
-Funcionalidades principales implementadas y probadas. Plan de pruebas: `docs/pruebas.md` y versión maquetada `docs/plan_pruebas.html`.
+Funcionalidades principales implementadas y probadas. Plan de pruebas: `docs/pruebas.md` y versión maquetada `docs/abrir-en-navegador/plan_pruebas.html`.
 
 ---
 
@@ -183,13 +181,11 @@ Platforms like HowLongToBeat or Backloggd are useful, but they tend to get clutt
 
 > Final intermodular project — Higher Degree in Web Application Development (DAW) · CESUR Málaga Este · 2025/2026.
 
-**Language:** The **UI** is **Spanish** (primary audience). This README lists **Spanish first**, then English. **Code identifiers** follow English naming (common in PERN stacks); **inline docs** in main server routes are in Spanish. See [`docs/README.md`](docs/README.md) for the documentation index.
+**Language & layout:** [`DESIGN_ES.md`](DESIGN_ES.md) (Spanish) and [`DESIGN.md`](DESIGN.md) (English) describe the UI. The **app strings** are **Spanish**. This README is **Spanish first**, then **English**. **Code identifiers** use English naming (typical for PERN). Main server JSDoc blocks are in Spanish. Documentation index: [`docs/README.md`](docs/README.md).
 
-**Registration:** passwords must be **at least 8 characters** and include **uppercase, lowercase, a digit, and a symbol** (enforced server-side; the form shows a hint). **Display names** (`nombre_usuario`) are **unique** (case-insensitive; enforced with a DB index).
+**Registration:** passwords must be **at least 8 characters** with **uppercase, lowercase, a digit, and a symbol** (server-side + form hint). **Display names** (`nombre_usuario`) are **unique** (case-insensitive; DB index).
 
-**Login:** accepts **email** or **username** (same public name as in the community).
-
-**UI design reference:** [`DESIGN.md`](DESIGN.md) (English, canonical for the repo); [`DESIGN_ES.md`](DESIGN_ES.md) (Spanish translation for reviewers).
+**Login:** **email** or **username** (same public name as in the community).
 
 ### Tech stack
 
@@ -209,16 +205,17 @@ Platforms like HowLongToBeat or Backloggd are useful, but they tend to get clutt
 - **Cover art search** — combines Steam and [RAWG](https://rawg.io/apidocs) (`RAWG_API_KEY` optional but recommended). Images are served through a server-side proxy to avoid CDN hotlink blocks in the browser.
 - **Shared catalogue** — `catalogo_juegos` links each entry to a canonical RAWG/Steam ID so the same title shares artwork across users when picked from the search.
 - **Community** — member list with follow actions, read-only public profiles, global averages (SQL `GROUP BY`), **activity feed** from people you follow (comments + LFG posts), and **LFG** (“looking for group”) posts tied to your library (online / local co-op / other).
-- **Recommendations** — send a game from your library only to users you follow; inbox at `/recommendations`, header bell with unread count, optional **chime** (mutable in Profile).
+- **Recommendations** — send a game from your library only to users you follow; inbox at `/recommendations`, header bell with unread count, optional **chime** for new items (toggle in **Profile**; browsers may require a click on the page before playing sound).
 - **Avatars** — 10 preset robots (SVG); pick yours under **Profile** (`/settings`); stored in `usuarios.avatar_id` and shown in the header, community, profiles, and comments.
 - **Discussion threads** — threaded comments per game entry (`/juego/:id/discussion`).
-- **Admin panel** — list users, delete accounts, and moderate any game entry. Role is verified against the database on every request.
+- **Admin panel** — list users, all game rows, and **LFG** posts; delete accounts (cascades games and comments), delete any game, delete LFG (same rule as in Community). On a game’s **discussion** page, **admins** may delete someone else’s comment. Role is checked in the database on every request.
 - **Roles** — visitor (login wall), registered user, administrator.
 - **Skeleton loading screens** — animated placeholders while data loads.
 - **Centralised session handling** — `apiFetch()` wraps all authenticated requests; a single place handles token expiry across the whole frontend.
 - **Collection UX** — summary stats (games, hours, completed), sorting (recent, title, status, score), grid or compact list view, custom empty state.
 - **Accessibility** — skip link to main content, focus target on `<main>`, labels on sort/view controls.
 - **Demo account** — see “Demo data” below.
+- **Welcome tour** — shown the **first time in that browser** after login (`localStorage` flag; not tied to server-side “new user”). The **demo** account on a clean browser profile will see it too, which helps demos. **Restart from Profile** anytime.
 
 ### Server architecture
 
@@ -243,38 +240,33 @@ MyPlaythrough/
 
 ### Local setup
 
-**Prerequisites:** Node.js 18+ · PostgreSQL 14+ (or the included Docker Compose setup)
+**Prerequisites:** Node.js 18+ and PostgreSQL 14+, or Docker.
 
-**Option A — Docker**
+#### Option A — Docker (API + database)
 
 ```bash
 docker compose up --build
 ```
 
-Starts the API on port 3000 and PostgreSQL on port 5432. The database schema is initialised automatically from `docs/schema.sql` the first time the volume is empty.
+API on port **3000**, PostgreSQL on **5432**. Empty volume → schema from `docs/sql/schema.sql`.
 
-**Option B — Manual setup**
+#### Option B — Manual (four steps)
 
-**Backend:** `cd server && npm install` — copy `server/.env.example` to `server/.env` and set `DB_*`, `JWT_SECRET`, `CORS_ORIGIN`, optionally `RAWG_API_KEY`. Run `npm run dev`.
+1. **Database** — Create a database and run **`docs/sql/schema.sql`** once.
+2. **Migrations** (only if upgrading an old checkout): apply what you still need, in order — `docs/sql/add-avatar-id-usuarios.sql` if `avatar_id` is missing; in **`server/`**, `npm run migrate:social`, `npm run migrate:votes`, `npm run migrate:username-unique` (same as the SQL files under `docs/sql/`). Edit and run `docs/sql/promover-admin.sql` to grant `admin` to a specific email.
+3. **Backend** — `cd server`, `npm install`, copy `.env.example` to `.env`, set `DB_*`, `JWT_SECRET`, `CORS_ORIGIN`, optional `RAWG_API_KEY`. Run `npm run dev`.
+4. **Frontend** — `cd client`, `npm install`, `npm run dev` (port **5173**). If the API is not at `http://localhost:3000`, add `client/.env` with `VITE_API_URL=...`.
 
-**Frontend:** `cd client && npm install && npm run dev` (port 5173). If the API is not at the default address, create `client/.env`:
+**Login fails after `git pull`:** run the `migrate:*` commands above; the DB is usually missing social tables, sound column, comment votes, or the username index.
 
-```env
-VITE_API_URL=http://localhost:3000
-```
+**Optional demo data (from `server/`):**
 
-**Database (manual):** run `docs/schema.sql` once. If you upgraded from an older schema, run `docs/add-avatar-id-usuarios.sql` if needed, then **`docs/add-social-features.sql`** for follow/recommend/LFG tables and `notificaciones_sonido` (`npm run migrate:social`), **`docs/add-comentario-votos.sql`** for review votes (`npm run migrate:votes`), and **`docs/add-usuario-nombre-unique.sql`** for unique display names (`npm run migrate:username-unique`). To promote a user to `admin`, use `docs/promover-admin.sql` and update the email in that file.
+- `npm run seed:demo` — Demo account with three games and real covers, only if it has no games yet.
+- `npm run seed:presentation` — Full sample dataset: **Tizza**, **Rufleto**, **Demo Jurado** as **admins**; **ElOtro**, **Knekro**, **SequianCalvísimo**, **LaQueTeCuento>:(** as normal users; games, comments, follows, recommendations. **One password** for every `usuarios` row created/updated by the script.
 
-**Login fails after pulling new code:** the database is often out of date (missing `notificaciones_sonido`, social tables, `juego_comentario_votos`, or the username unique index). Run `npm run migrate:social`, `npm run migrate:votes`, and `npm run migrate:username-unique` in `server/` and restart the API.
+**Password after `seed:presentation`:** **`Presentacion2026!`**. The login shortcut **“Rellenar cuenta demo”** uses **Demo Jurado** / `demo@myplaythrough.local`.
 
-**Demo / presentation data (optional, from `server/`):**
-
-- `npm run seed:demo` — demo user only, three games with real cover art, if the demo account has no games yet.
-- `npm run seed:presentation` — full population for demos (several users, games, comments, follows, recommendations); **unifies every row’s password** in `usuarios` to `Presentacion2026!`, sets **admin** only for **Tizza**, **Rufleto**, and **Demo Jurado**.
-
-**Why the demo account?** So reviewers can log in **without signing up** and see the app **with sample data**. Password for all seeded accounts: **`Presentacion2026!`**. **“Rellenar cuenta demo”** fills **Demo Jurado** (or use `demo@myplaythrough.local`) and that password.
-
-**Screenshots for documentation:** add images under `docs/` (e.g. `docs/screenshots/`) and link them from your project report.
+**Screenshots** for reports can live under `docs/` (e.g. `docs/screenshots/`).
 
 ### API reference (summary)
 
@@ -286,23 +278,21 @@ VITE_API_URL=http://localhost:3000
 | GET                 | `/api/users`, `/api/users/:id/games` | Community (list includes `siguiendo`)      | ✓    |
 | GET                 | `/api/community/stats`               | Global averages                            | ✓    |
 | various             | `/api/social/…`                      | Follows, recommendations, LFG, activity    | ✓    |
+| GET                 | `/api/admin/lfg`                     | LFG list (moderation)                      | admin |
 
-(Full list in the codebase and delivery documentation.)
+(Full list in `server/routes/` source files.)
 
 ### Security overview
 
-| Control                    | Implementation                                            |
-| -------------------------- | --------------------------------------------------------- |
-| SQL injection              | Parameterized queries (`pg` library) throughout           |
-| Password storage           | bcrypt (cost factor 10)                                   |
-| Authentication             | JWT — required on all private routes via `authMiddleware` |
-| Authorization              | Role verified from DB on every admin request              |
-| CORS                       | Restricted to `CORS_ORIGIN` env variable                  |
-| JWT secret                 | Mandatory — server refuses to start without it            |
-| Request body size          | Limited to 50 kb (`express.json({ limit: "50kb" })`)      |
-| Image proxy host allowlist | Only known CDN domains accepted                           |
-| Diagnostic endpoint        | `/api/test-db` returns 404 when `NODE_ENV=production`     |
+- **SQL injection** — **Parameterized queries** everywhere: user input is never concatenated into SQL strings.
+- **Passwords** — **bcrypt** hashes (cost 10); plaintext is never stored.
+- **Auth** — **JWT** signed with `JWT_SECRET`; private routes use `authMiddleware`.
+- **Authorization** — **Admin role** is read from the **database** on each admin request.
+- **CORS** — Allowed browser origin comes from **`CORS_ORIGIN`**.
+- **Request size** — JSON body limited to **50 kb**.
+- **Image proxy** — Only approved CDN hostnames are fetched.
+- **Production** — `/api/test-db` returns **404** when `NODE_ENV=production`.
 
 ### Status
 
-Core features implemented and tested. Test plan: `docs/pruebas.md` and formatted `docs/plan_pruebas.html`.
+Core features implemented and tested. Test plan: `docs/pruebas.md` and formatted `docs/abrir-en-navegador/plan_pruebas.html`.

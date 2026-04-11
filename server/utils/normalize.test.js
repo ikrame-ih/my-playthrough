@@ -1,7 +1,7 @@
 /**
  * Pruebas automáticas (unitarias) para normalize.js.
  * Las corro con `npm test` en la carpeta server. Vitest las ejecuta solas.
- * Complementan el plan de pruebas manuales que está en docs/pruebas.md.
+ * Complementan el plan de pruebas manuales que está en `docs/pruebas.md`.
  */
 const {
   normalizeEmail,

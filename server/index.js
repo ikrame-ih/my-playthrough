@@ -1,18 +1,17 @@
 /**
- * @file Punto de entrada del backend MyPlaythrough (API REST con Express).
+ * @file Arranque del servidor Express: una sola app que escucha en un puerto y enruta
+ * todo lo que empieza por `/api/` hacia ficheros en `routes/`.
  *
- * Flujo general:
- * 1. Carga variables de entorno (`dotenv`) y crea la app Express.
- * 2. Aplica middleware global: CORS restringido al origen del front y límite de
- *    tamaño del JSON (50 kb) para reducir superficie de abuso.
- * 3. Monta un router por ámbito funcional bajo `/api/...` (auth, juegos, usuarios,
- *    comunidad, social, admin, carátulas). Las rutas de `covers` se registran
- *    también antes que el CRUD de juegos para que `/api/games/cover-search` no
- *    se interprete como `/api/games/:id`.
- * 4. Arranca el servidor HTTP en `PORT` (3000 por defecto).
+ * Orden práctico:
+ * 1. `dotenv` lee `.env` (contraseña de BD, `JWT_SECRET`, `CORS_ORIGIN`, etc.).
+ * 2. CORS limita qué web puede llamar a la API desde el navegador.
+ * 3. express.json con tope de 50 kb evita cuerpos enormes.
+ * 4. Los routers se montan por tema (`/api/auth`, `/api/games`, …). Ojo: las rutas de
+ *    carátulas van antes que `/api/games/:id` para que `cover-search` no se confunda con un id numérico.
+ * 5. `listen(PORT)` deja el proceso a la escucha (3000 por defecto).
  *
- * Cada carpeta `routes/*.routes.js` documenta sus endpoints; la lógica de negocio
- * pesada suele estar en `utils/` o en consultas SQL parametrizadas.
+ * La descripción de cada endpoint está en el JSDoc de cada `*.routes.js`; las consultas SQL
+ * van con parámetros (`$1`, `$2`) para no mezclar datos del usuario en el texto de la query.
  */
 
 const express = require("express");

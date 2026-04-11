@@ -1,12 +1,13 @@
 /**
  * @module games.routes
- * @description CRUD de la colección personal y comentarios/reseñas por ficha.
+ * @description Colección de juegos por usuario y hilo de discusión por ficha.
  *
- * Regla de aislamiento: casi todas las consultas filtran por `usuario_id = req.user.id`
- * salvo las lecturas de comentarios, que son sobre una ficha concreta (visible en comunidad)
- * y los votos de “útil / no útil” en reseñas raíz.
+ * Colección: cada persona solo ve y edita sus propias filas en `juegos` (`usuario_id` del token).
+ * Discusión: los comentarios van ligados a un `juego_id` concreto; cualquier usuario logueado
+ * puede leerlos en esa ficha (sirve para la comunidad y enlaces desde actividad/LFG).
+ * Borrado de comentario: autor, dueño de la ficha o administradora (consulta de rol en BD).
  *
- * Todas las rutas llevan `authMiddleware` (JWT en `Authorization: Bearer`).
+ * Todas las rutas usan `authMiddleware` (cabecera `Authorization: Bearer <JWT>`).
  *
  * Rutas definidas:
  *   GET    /api/games                              → lista mis juegos
@@ -515,8 +516,7 @@ router.post("/:gameId/comments", authMiddleware, async (req, res) => {
 });
 
 /**
- * Elimina un comentario. Pueden borrarlo: su autor, el dueño de la ficha o un admin.
- * Esta política de tres niveles permite la auto-moderación sin depender siempre del admin.
+ * Elimina un comentario: autor, dueño de la ficha o usuario con rol admin.
  *
  * @route  DELETE /api/games/:gameId/comments/:commentId
  * @access Private (requiere JWT válido)

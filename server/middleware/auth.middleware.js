@@ -1,18 +1,23 @@
 /**
  * @module auth.middleware
- * @description Middlewares de autenticación y autorización para Express.
+ * @description Autenticación (¿quién eres?) y autorización admin (¿puedes gestionar a otros?).
  *
- * - `authMiddleware`  → verifica que la petición lleve un JWT válido.
- * - `adminMiddleware` → verifica que el usuario autenticado tenga rol 'admin'.
- * - `createToken`     → genera un JWT firmado con los datos del usuario.
- * - `usuarioEsAdmin`  → consulta el rol actual en BD (fuente de verdad).
+ * JWT en una frase: al hacer login el servidor devuelve un token (texto firmado con
+ * `JWT_SECRET`). El navegador lo guarda y lo envía en `Authorization: Bearer …` en cada
+ * petición. Si la firma es válida y no ha caducado, `req.user` lleva id, email y rol del
+ * payload. Eso basta para pantallas; para el rol admin se vuelve a leer el rol en PostgreSQL
+ * porque el token podría haberse emitido antes de un cambio de permisos.
+ *
+ * - `authMiddleware` — exige token válido (401 si falta o es inválido).
+ * - `adminMiddleware` — tras auth, exige rol `admin` en BD (403 si no).
+ * - `createToken` — emite el JWT al registrar o al hacer login.
+ * - `usuarioEsAdmin` — consulta útil en rutas sueltas (p. ej. borrar comentario ajeno).
  */
 
 const jwt = require("jsonwebtoken");
 const pool = require("../config/db");
 
-// Si no hay secreto configurado, el servidor no puede firmar ni verificar tokens.
-// Es mejor parar en arranque que arrancar con seguridad comprometida.
+// Sin JWT_SECRET no hay firma verificable: el proceso termina al arrancar.
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
   console.error(

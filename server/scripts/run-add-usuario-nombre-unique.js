@@ -1,5 +1,5 @@
 /**
- * Ejecuta docs/add-usuario-nombre-unique.sql (nombre de usuario único).
+ * Ejecuta docs/sql/add-usuario-nombre-unique.sql (nombre de usuario único).
  * Uso: desde server → npm run migrate:username-unique
  */
 const path = require("path");
@@ -13,6 +13,7 @@ const sqlPath = path.join(
   "..",
   "..",
   "docs",
+  "sql",
   "add-usuario-nombre-unique.sql",
 );
 const sql = fs.readFileSync(sqlPath, "utf8");

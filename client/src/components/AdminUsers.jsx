@@ -1,24 +1,34 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { API_BASE, apiFetch } from "../api";
 import { IconShield, IconTrash, IconUsers } from "./icons";
 import UserAvatar from "./UserAvatar";
 
 /**
- * Panel de administración: listados de usuarios y juegos con capacidad de borrado.
- * Solo accesible para cuentas con rol 'admin'; muestra un mensaje de acceso
- * denegado para el resto. La búsqueda se filtra localmente con `useMemo`
- * para no hacer peticiones al servidor en cada pulsación de tecla.
+ * Panel de administración (solo rol `admin` en base de datos).
+ *
+ * Aquí se concentran acciones de moderación que afectan a cualquier usuario:
+ * borrar cuentas (y en cascada sus juegos y comentarios), borrar fichas de juego
+ * ajenas y revisar o eliminar publicaciones LFG (buscar grupo). Los comentarios
+ * concretos se moderan en la vista de discusión de cada juego (la API permite
+ * borrar si eres admin, autor o dueño de la ficha).
+ *
+ * Los listados se filtran en el cliente con `useMemo` para no recargar la API en cada tecla.
  *
  * @component
  */
 export default function AdminUsers() {
+  // --- Estado: datos de API y búsquedas locales (sin petición por tecla) ---
   const [users, setUsers] = useState([]);
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
   const [userSearch, setUserSearch] = useState("");
   const [gameSearch, setGameSearch] = useState("");
+  const [lfgPosts, setLfgPosts] = useState([]);
+  const [lfgSearch, setLfgSearch] = useState("");
 
+  // --- Carga inicial: usuarios, juegos y LFG (solo admin pasa del 403) ---
   const loadUsers = async () => {
     try {
       const res = await apiFetch(`${API_BASE}/api/admin/users`);
@@ -49,12 +59,25 @@ export default function AdminUsers() {
     }
   };
 
+  const loadLfg = async () => {
+    try {
+      const res = await apiFetch(`${API_BASE}/api/admin/lfg`);
+      if (res.status === 403) return;
+      if (res.ok) {
+        setLfgPosts(await res.json());
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
       setLoading(true);
       await loadUsers();
       await loadGames();
+      await loadLfg();
       if (!cancelled) setLoading(false);
     })();
     return () => {
@@ -84,6 +107,19 @@ export default function AdminUsers() {
     );
   }, [games, gameSearch]);
 
+  const filteredLfg = useMemo(() => {
+    const q = lfgSearch.trim().toLowerCase();
+    if (!q) return lfgPosts;
+    return lfgPosts.filter(
+      (row) =>
+        (row.mensaje || "").toLowerCase().includes(q) ||
+        (row.nombre_usuario || "").toLowerCase().includes(q) ||
+        (row.juego_titulo || "").toLowerCase().includes(q) ||
+        String(row.id || "").includes(q),
+    );
+  }, [lfgPosts, lfgSearch]);
+
+  // --- Acciones destructivas: DELETE y recarga del bloque afectado ---
   const eliminarUsuario = async (id, nombre) => {
     if (
       !window.confirm(
@@ -107,6 +143,7 @@ export default function AdminUsers() {
 
       loadUsers();
       loadGames();
+      loadLfg();
     } catch (e) {
       alert("Error de conexión.");
     }
@@ -130,6 +167,24 @@ export default function AdminUsers() {
         return;
       }
       loadGames();
+      loadLfg();
+    } catch {
+      alert("Error de conexión.");
+    }
+  };
+
+  const eliminarLfg = async (id) => {
+    if (!window.confirm("¿Eliminar esta publicación de buscar grupo?")) return;
+    try {
+      const res = await apiFetch(`${API_BASE}/api/social/lfg/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(data.error || "No se pudo eliminar.");
+        return;
+      }
+      loadLfg();
     } catch {
       alert("Error de conexión.");
     }
@@ -148,6 +203,7 @@ export default function AdminUsers() {
     }
   };
 
+  // --- Vista: estados de carga / sin permiso / panel con tres bloques (usuarios, juegos, LFG) ---
   if (loading) {
     return (
       <div className="figma-panel py-16 text-center text-lg font-medium text-brand-accent animate-pulse">
@@ -177,12 +233,13 @@ export default function AdminUsers() {
               Administración
             </h1>
             <p className="mt-1 text-sm text-slate-400">
-              Gestión de usuarios y moderación de fichas de juego.
+              Usuarios, fichas de juego y publicaciones LFG (buscar grupo).
             </p>
           </div>
         </div>
       </div>
 
+      {/* Bloque 1: listado de cuentas (eliminar usuario) */}
       <div className="figma-panel mb-10 p-5 sm:p-6">
         <div className="mb-4">
           <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-slate-500">
@@ -263,6 +320,7 @@ export default function AdminUsers() {
         </div>
       </div>
 
+      {/* Bloque 2: todas las fichas de juego (eliminar ficha ajena) */}
       <div className="mb-4 flex items-center gap-3">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-accent/10 text-brand-accent ring-1 ring-brand-accent/20">
           <IconUsers className="h-5 w-5" />
@@ -334,6 +392,92 @@ export default function AdminUsers() {
         {filteredGames.length === 0 && (
           <p className="py-8 text-center text-sm text-slate-500">
             No hay juegos que coincidan.
+          </p>
+        )}
+      </div>
+
+      {/* Bloque 3: publicaciones LFG (misma regla de borrado que en Comunidad vía API) */}
+      <div className="mb-4 mt-12 flex items-center gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-[0.65rem] font-bold tracking-tight text-amber-400 ring-1 ring-amber-500/20">
+          LFG
+        </span>
+        <div>
+          <h2 className="text-xl font-bold text-white">Buscar grupo (LFG)</h2>
+          <p className="text-sm text-slate-500">
+            Publicaciones de la comunidad; el borrado usa la misma regla que en
+            Comunidad (admin o autora).
+          </p>
+        </div>
+      </div>
+
+      <div className="figma-panel p-5 sm:p-6">
+        <div className="mb-4">
+          <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-slate-500">
+            Buscar en LFG
+          </label>
+          <input
+            type="search"
+            value={lfgSearch}
+            onChange={(e) => setLfgSearch(e.target.value)}
+            placeholder="Mensaje, usuario, juego o ID…"
+            className="figma-input max-w-md"
+          />
+        </div>
+        <div className="figma-table-wrap -mx-5 border-x-0 border-b-0 border-t border-white/[0.06] sm:-mx-6">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-white/[0.06] bg-slate-900/40 text-[0.7rem] font-semibold uppercase tracking-wider text-slate-500">
+              <tr>
+                <th className="p-4">Fecha</th>
+                <th className="p-4">Usuario</th>
+                <th className="p-4">Juego</th>
+                <th className="p-4">Modo</th>
+                <th className="p-4">Mensaje</th>
+                <th className="w-24 p-4 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredLfg.map((row) => (
+                <tr
+                  key={row.id}
+                  className="border-t border-white/[0.04] transition hover:bg-slate-900/35"
+                >
+                  <td className="p-4 whitespace-nowrap text-slate-500">
+                    {formatDate(row.created_at)}
+                  </td>
+                  <td className="p-4">
+                    <p className="text-slate-200">{row.nombre_usuario}</p>
+                    <p className="text-xs text-slate-500">{row.email}</p>
+                  </td>
+                  <td className="p-4">
+                    <Link
+                      to={`/juego/${row.juego_id}/discussion`}
+                      className="font-medium text-brand-accent hover:text-teal-300"
+                    >
+                      {row.juego_titulo || `ID ${row.juego_id}`}
+                    </Link>
+                  </td>
+                  <td className="p-4 text-slate-400">{row.modo || "—"}</td>
+                  <td className="max-w-[220px] p-4">
+                    <p className="line-clamp-2 text-slate-300">{row.mensaje}</p>
+                  </td>
+                  <td className="p-4 text-right">
+                    <button
+                      type="button"
+                      onClick={() => eliminarLfg(row.id)}
+                      className="inline-flex rounded-lg p-2 text-slate-500 transition hover:bg-red-500/10 hover:text-red-400"
+                      title="Eliminar publicación"
+                    >
+                      <IconTrash className="h-5 w-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {filteredLfg.length === 0 && (
+          <p className="py-8 text-center text-sm text-slate-500">
+            No hay publicaciones LFG que coincidan.
           </p>
         )}
       </div>

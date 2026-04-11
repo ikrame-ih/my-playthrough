@@ -1,0 +1,1018 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MyPlaythrough — Diagrama lógico de base de datos</title>
+    <style>
+      :root {
+        --bg: #0b1120;
+        --panel: #161d2f;
+        --accent: #2dd4bf;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --border: rgba(255, 255, 255, 0.08);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+        padding: 2rem 1.5rem 3rem;
+      }
+      h1 {
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem;
+      }
+      p.sub {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin: 0 0 2rem;
+        max-width: 42rem;
+      }
+      .grid {
+        display: grid;
+        gap: 1.25rem;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        max-width: 1200px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8rem;
+        background: var(--panel);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0 0 1px var(--border);
+      }
+      caption {
+        text-align: left;
+        font-weight: 700;
+        font-size: 0.95rem;
+        padding: 0.75rem 1rem;
+        background: rgba(45, 212, 191, 0.08);
+        border-bottom: 1px solid var(--border);
+        color: var(--accent);
+      }
+      th,
+      td {
+        padding: 0.45rem 0.75rem;
+        text-align: left;
+        border-top: 1px solid var(--border);
+      }
+      th {
+        color: var(--muted);
+        font-weight: 600;
+        width: 38%;
+      }
+      .pk {
+        color: var(--accent);
+      }
+      .fk {
+        color: #a5b4fc;
+      }
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 0 0 1.25rem;
+      }
+      .toolbar button {
+        cursor: pointer;
+        border: 1px solid var(--border);
+        background: rgba(45, 212, 191, 0.12);
+        color: var(--accent);
+        font: inherit;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 0.45rem 0.9rem;
+        border-radius: 8px;
+        transition:
+          background 0.15s ease,
+          border-color 0.15s ease;
+      }
+      .toolbar button:hover {
+        background: rgba(45, 212, 191, 0.2);
+        border-color: rgba(45, 212, 191, 0.35);
+      }
+      .toolbar .hint {
+        font-size: 0.75rem;
+        color: var(--muted);
+        max-width: 28rem;
+        line-height: 1.4;
+      }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem 1.5rem;
+        margin: 0 0 1.5rem;
+        padding: 0.85rem 1rem;
+        background: var(--panel);
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        font-size: 0.82rem;
+        max-width: 1200px;
+      }
+      .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+      .dot-pk {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        background: var(--accent);
+      }
+      .dot-fk {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        background: #a5b4fc;
+      }
+      .diagram-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        max-width: 1200px;
+        margin: 0 0 2rem;
+        padding: 1rem;
+        background: var(--panel);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        overflow-x: auto;
+      }
+      .diagram-fig {
+        margin: 0 0 1.5rem;
+        padding: 1rem 1rem 1.1rem;
+        background: rgba(11, 17, 32, 0.55);
+        border-radius: 10px;
+        border: 1px solid var(--border);
+      }
+      .diagram-fig:last-child {
+        margin-bottom: 0;
+      }
+      .diagram-fig h3 {
+        margin: 0 0 0.65rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #94a3b8;
+        letter-spacing: 0.02em;
+      }
+      .diagram-fig svg {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+        height: auto;
+      }
+      .doc-nav {
+        font-size: 0.82rem;
+        color: var(--muted);
+        margin: 0 0 1rem;
+        max-width: 1200px;
+      }
+      .doc-nav a {
+        margin-right: 1rem;
+      }
+      .fk-matrix {
+        width: 100%;
+        max-width: 1200px;
+        border-collapse: collapse;
+        font-size: 0.78rem;
+        margin: 0 0 2rem;
+        background: var(--panel);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0 0 1px var(--border);
+      }
+      .fk-matrix th,
+      .fk-matrix td {
+        padding: 0.5rem 0.65rem;
+        text-align: left;
+        border-top: 1px solid var(--border);
+      }
+      .fk-matrix thead th {
+        background: rgba(45, 212, 191, 0.08);
+        color: var(--accent);
+        font-weight: 700;
+        border-top: none;
+      }
+      .fk-matrix code {
+        background: transparent;
+        padding: 0;
+      }
+      h2.section {
+        font-size: 1rem;
+        margin: 2rem 0 0.75rem;
+        color: #cbd5e1;
+        max-width: 1200px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toolbar">
+      <button
+        type="button"
+        id="btn-download-html"
+        aria-label="Descargar este diagrama como archivo HTML"
+      >
+        Descargar HTML
+      </button>
+      <span class="hint">
+        Descarga: copia del HTML de esta página. En GitHub, la vista
+        <strong>Raw</strong> muestra el mismo contenido como página independiente.
+      </span>
+    </div>
+    <p class="doc-nav">
+      <a href="../README.md">Índice docs (README)</a>
+      <a href="funciones_principales.html">Funciones en código</a>
+      <a href="plan_pruebas.html">Plan de pruebas (HTML)</a>
+      <a href="../pruebas.md">Plan de pruebas (Markdown)</a>
+    </p>
+    <h1>Modelo lógico — base de datos</h1>
+    <p class="sub">
+      Contenido alineado con <code>docs/sql/schema.sql</code>. El diagrama está
+      partido en tres bloques para que las flechas no se crucen; la tabla de FKs
+      y el detalle de columnas siguen siendo la referencia exacta.
+    </p>
+
+    <div class="legend" aria-label="Leyenda">
+      <span><span class="dot-pk" aria-hidden></span> Clave primaria (PK)</span>
+      <span
+        ><span class="dot-fk" aria-hidden></span> Clave foránea (FK): apunta a
+        otra tabla</span
+      >
+      <span
+        >Las líneas en el esquema SVG indican «esta tabla depende de
+        otra».</span
+      >
+    </div>
+
+    <div class="diagram-wrap">
+      <div class="diagram-fig">
+        <h3>
+          1. Núcleo de la aplicación (quién es el dueño y de dónde sale el
+          título oficial)
+        </h3>
+        <svg
+          viewBox="0 0 460 150"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <defs>
+            <marker
+              id="mk1"
+              markerWidth="7"
+              markerHeight="7"
+              refX="6"
+              refY="3.5"
+              orient="auto"
+            >
+              <path d="M0,0 L7,3.5 L0,7 Z" fill="#2dd4bf" />
+            </marker>
+          </defs>
+          <rect
+            x="32"
+            y="72"
+            width="118"
+            height="40"
+            rx="6"
+            fill="#161d2f"
+            stroke="#2dd4bf"
+            stroke-width="1.4"
+          />
+          <text
+            x="91"
+            y="96"
+            fill="#e2e8f0"
+            font-size="12"
+            text-anchor="middle"
+            font-family="Segoe UI,sans-serif"
+          >
+            usuarios
+          </text>
+          <rect
+            x="210"
+            y="24"
+            width="132"
+            height="40"
+            rx="6"
+            fill="#161d2f"
+            stroke="#64748b"
+            stroke-width="1.2"
+          />
+          <text
+            x="276"
+            y="48"
+            fill="#e2e8f0"
+            font-size="11"
+            text-anchor="middle"
+            font-family="Segoe UI,sans-serif"
+          >
+            catalogo_juegos
+          </text>
+          <rect
+            x="210"
+            y="92"
+            width="132"
+            height="40"
+            rx="6"
+            fill="#161d2f"
+            stroke="#2dd4bf"
+            stroke-width="1.4"
+          />
+          <text
+            x="276"
+            y="116"
+            fill="#e2e8f0"
+            font-size="12"
+            text-anchor="middle"
+            font-family="Segoe UI,sans-serif"
+          >
+            juegos
+          </text>
+          <line
+            x1="276"
+            y1="64"
+            x2="276"
+            y2="92"
+            stroke="#2dd4bf"
+            stroke-width="1.6"
+            marker-end="url(#mk1)"
+          />
+          <path
+            d="M 150 92 L 205 92 L 205 112 L 210 112"
+            fill="none"
+            stroke="#2dd4bf"
+            stroke-width="1.6"
+            marker-end="url(#mk1)"
+          />
+        </svg>
+      </div>
+      <div class="diagram-fig">
+        <h3>
+          2. Discusión en una ficha (comentarios enlazan a juego y autor; votos
+          enlazan a comentario y votante)
+        </h3>
+        <svg
+          viewBox="0 0 520 210"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <defs>
+            <marker
+              id="mk2"
+              markerWidth="7"
+              markerHeight="7"
+              refX="6"
+              refY="3.5"
+              orient="auto"
+            >
+              <path d="M0,0 L7,3.5 L0,7 Z" fill="#a78bfa" />
+            </marker>
+          </defs>
+          <rect
+            x="28"
+            y="28"
+            width="108"
+            height="38"
+            rx="6"
+            fill="#161d2f"
+            stroke="#2dd4bf"
+            stroke-width="1.2"
+          />
+          <text
+            x="82"
+            y="51"
+            fill="#e2e8f0"
+            font-size="11"
+            text-anchor="middle"
+            font-family="Segoe UI,sans-serif"
+          >
+            usuarios
+          </text>
+          <rect
+            x="28"
+            y="118"
+            width="108"
+            height="38"
+            rx="6"
+            fill="#161d2f"
+            stroke="#2dd4bf"
+            stroke-width="1.2"
+          />
+          <text
+            x="82"
+            y="141"
+            fill="#e2e8f0"
+            font-size="11"
+            text-anchor="middle"
+            font-family="Segoe UI,sans-serif"
+          >
+            juegos
+          </text>
+          <rect
+            x="268"
+            y="36"
+            width="148"
+            height="38"
+            rx="6"
+            fill="#161d2f"
+            stroke="#a78bfa"
+            stroke-width="1.2"
+          />
+          <text
+            x="342"
+            y="59"
+            fill="#e2e8f0"
+            font-size="11"
+            text-anchor="middle"
+            font-family="Segoe UI,sans-serif"
+          >
+            juego_comentarios
+          </text>
+          <rect
+            x="268"
+            y="132"
+            width="148"
+            height="36"
+            rx="6"
+            fill="#161d2f"
+            stroke="#a78bfa"
+            stroke-width="1.2"
+          />
+          <text
+            x="342"
+            y="154"
+            fill="#e2e8f0"
+            font-size="10"
+            text-anchor="middle"
+            font-family="Segoe UI,sans-serif"
+          >
+            juego_comentario_votos
+          </text>
+          <path
+            d="M 136 47 L 220 47 L 220 55 L 266 55"
+            fill="none"
+            stroke="#a78bfa"
+            stroke-width="1.5"
+            marker-end="url(#mk2)"
+          />
+          <path
+            d="M 136 137 L 230 137 L 230 74 L 266 74"
+            fill="none"
+            stroke="#a78bfa"
+            stroke-width="1.5"
+            marker-end="url(#mk2)"
+          />
+          <path
+            d="M 342 74 L 342 132"
+            fill="none"
+            stroke="#a78bfa"
+            stroke-width="1.5"
+            marker-end="url(#mk2)"
+          />
+        </svg>
+      </div>
+      <div class="diagram-fig">
+        <h3>
+          3. Red social (cada tabla tiene FKs claras; las líneas van en
+          “carriles” distintos para no tocarse)
+        </h3>
+        <svg
+          viewBox="0 0 560 248"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <defs>
+            <marker
+              id="mk3"
+              markerWidth="7"
+              markerHeight="7"
+              refX="6"
+              refY="3.5"
+              orient="auto"
+            >
+              <path d="M0,0 L7,3.5 L0,7 Z" fill="#38bdf8" />
+            </marker>
+          </defs>
+          <rect
+            x="32"
+            y="28"
+            width="108"
+            height="36"
+            rx="6"
+            fill="#161d2f"
+            stroke="#2dd4bf"
+            stroke-width="1.2"
+          />
+          <text
+            x="86"
+            y="50"
+            fill="#e2e8f0"
+            font-size="11"
+            text-anchor="middle"
+            font-family="Segoe UI,sans-serif"
+          >
+            usuarios
+          </text>
+          <rect
+            x="32"
+            y="118"
+            width="108"
+            height="36"
+            rx="6"
+            fill="#161d2f"
+            stroke="#2dd4bf"
+            stroke-width="1.2"
+          />
+          <text
+            x="86"
+            y="140"
+            fill="#e2e8f0"
+            font-size="11"
+            text-anchor="middle"
+            font-family="Segoe UI,sans-serif"
+          >
+            juegos
+          </text>
+          <rect
+            x="352"
+            y="16"
+            width="152"
+            height="36"
+            rx="6"
+            fill="#161d2f"
+            stroke="#38bdf8"
+            stroke-width="1.2"
+          />
+          <text
+            x="428"
+            y="38"
+            fill="#e2e8f0"
+            font-size="10"
+            text-anchor="middle"
+            font-family="Segoe UI,sans-serif"
+          >
+            usuario_seguimientos
+          </text>
+          <rect
+            x="352"
+            y="92"
+            width="152"
+            height="40"
+            rx="6"
+            fill="#161d2f"
+            stroke="#38bdf8"
+            stroke-width="1.2"
+          />
+          <text
+            x="428"
+            y="116"
+            fill="#e2e8f0"
+            font-size="10"
+            text-anchor="middle"
+            font-family="Segoe UI,sans-serif"
+          >
+            juego_recomendaciones
+          </text>
+          <rect
+            x="352"
+            y="176"
+            width="152"
+            height="36"
+            rx="6"
+            fill="#161d2f"
+            stroke="#38bdf8"
+            stroke-width="1.2"
+          />
+          <text
+            x="428"
+            y="198"
+            fill="#e2e8f0"
+            font-size="10"
+            text-anchor="middle"
+            font-family="Segoe UI,sans-serif"
+          >
+            lfg_publicaciones
+          </text>
+          <path
+            d="M 140 46 L 300 46 L 300 34 L 350 34"
+            fill="none"
+            stroke="#38bdf8"
+            stroke-width="1.5"
+            marker-end="url(#mk3)"
+          />
+          <path
+            d="M 140 50 L 260 50 L 260 112 L 350 112"
+            fill="none"
+            stroke="#38bdf8"
+            stroke-width="1.5"
+            marker-end="url(#mk3)"
+          />
+          <path
+            d="M 140 136 L 310 136 L 310 112"
+            fill="none"
+            stroke="#38bdf8"
+            stroke-width="1.5"
+            marker-end="url(#mk3)"
+          />
+          <path
+            d="M 140 52 L 215 52 L 215 182 L 350 182"
+            fill="none"
+            stroke="#38bdf8"
+            stroke-width="1.4"
+            marker-end="url(#mk3)"
+          />
+          <path
+            d="M 140 136 L 295 136 L 295 202 L 350 202"
+            fill="none"
+            stroke="#38bdf8"
+            stroke-width="1.4"
+            marker-end="url(#mk3)"
+          />
+        </svg>
+      </div>
+    </div>
+
+    <h2 class="section">Relaciones (clave foránea → tabla destino)</h2>
+    <table class="fk-matrix">
+      <thead>
+        <tr>
+          <th>Tabla</th>
+          <th>Columna FK</th>
+          <th>Apunta a</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>juegos</td>
+          <td><code>usuario_id</code></td>
+          <td><code>usuarios(id)</code></td>
+        </tr>
+        <tr>
+          <td>juegos</td>
+          <td><code>catalogo_id</code></td>
+          <td><code>catalogo_juegos(id)</code></td>
+        </tr>
+        <tr>
+          <td>juego_comentarios</td>
+          <td><code>juego_id</code></td>
+          <td><code>juegos(id)</code></td>
+        </tr>
+        <tr>
+          <td>juego_comentarios</td>
+          <td><code>usuario_id</code></td>
+          <td><code>usuarios(id)</code></td>
+        </tr>
+        <tr>
+          <td>juego_comentarios</td>
+          <td><code>parent_id</code></td>
+          <td><code>juego_comentarios(id)</code> (respuesta en hilo)</td>
+        </tr>
+        <tr>
+          <td>juego_comentario_votos</td>
+          <td><code>comentario_id</code></td>
+          <td><code>juego_comentarios(id)</code></td>
+        </tr>
+        <tr>
+          <td>juego_comentario_votos</td>
+          <td><code>usuario_id</code></td>
+          <td><code>usuarios(id)</code></td>
+        </tr>
+        <tr>
+          <td>usuario_seguimientos</td>
+          <td><code>seguidor_id</code>, <code>seguido_id</code></td>
+          <td><code>usuarios(id)</code> (dos veces)</td>
+        </tr>
+        <tr>
+          <td>juego_recomendaciones</td>
+          <td><code>remitente_id</code>, <code>destinatario_id</code></td>
+          <td><code>usuarios(id)</code></td>
+        </tr>
+        <tr>
+          <td>juego_recomendaciones</td>
+          <td><code>juego_id</code></td>
+          <td><code>juegos(id)</code> (ficha del remitente)</td>
+        </tr>
+        <tr>
+          <td>lfg_publicaciones</td>
+          <td><code>usuario_id</code></td>
+          <td><code>usuarios(id)</code></td>
+        </tr>
+        <tr>
+          <td>lfg_publicaciones</td>
+          <td><code>juego_id</code></td>
+          <td><code>juegos(id)</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="section">Detalle de columnas por tabla</h2>
+    <div class="grid">
+      <table>
+        <caption>
+          usuarios
+        </caption>
+        <tbody>
+          <tr>
+            <th class="pk">id</th>
+            <td>SERIAL PK</td>
+          </tr>
+          <tr>
+            <th>nombre_usuario</th>
+            <td>VARCHAR(255) NOT NULL</td>
+          </tr>
+          <tr>
+            <th>email</th>
+            <td>VARCHAR(255) UNIQUE NOT NULL</td>
+          </tr>
+          <tr>
+            <th>password_hash</th>
+            <td>VARCHAR(255) NOT NULL</td>
+          </tr>
+          <tr>
+            <th>rol</th>
+            <td>VARCHAR(50) DEFAULT 'user'</td>
+          </tr>
+          <tr>
+            <th>avatar_id</th>
+            <td>VARCHAR(32) NOT NULL DEFAULT 'robot-0'</td>
+          </tr>
+          <tr>
+            <th>fecha_registro</th>
+            <td>TIMESTAMP DEFAULT NOW()</td>
+          </tr>
+          <tr>
+            <th>notificaciones_sonido</th>
+            <td>BOOLEAN NOT NULL DEFAULT TRUE</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table>
+        <caption>
+          catalogo_juegos
+        </caption>
+        <tbody>
+          <tr>
+            <th class="pk">id</th>
+            <td>SERIAL PK</td>
+          </tr>
+          <tr>
+            <th>titulo</th>
+            <td>VARCHAR(512) NOT NULL</td>
+          </tr>
+          <tr>
+            <th>url_imagen</th>
+            <td>TEXT</td>
+          </tr>
+          <tr>
+            <th>rawg_id</th>
+            <td>INTEGER UNIQUE</td>
+          </tr>
+          <tr>
+            <th>steam_app_id</th>
+            <td>BIGINT UNIQUE</td>
+          </tr>
+          <tr>
+            <th>created_at</th>
+            <td>TIMESTAMPTZ</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table>
+        <caption>
+          juegos
+        </caption>
+        <tbody>
+          <tr>
+            <th class="pk">id</th>
+            <td>SERIAL PK</td>
+          </tr>
+          <tr>
+            <th class="fk">usuario_id</th>
+            <td>FK → usuarios(id) CASCADE</td>
+          </tr>
+          <tr>
+            <th>titulo</th>
+            <td>VARCHAR(255) NOT NULL</td>
+          </tr>
+          <tr>
+            <th>estado</th>
+            <td>VARCHAR(50) NOT NULL</td>
+          </tr>
+          <tr>
+            <th>plataforma</th>
+            <td>VARCHAR(100)</td>
+          </tr>
+          <tr>
+            <th>puntuacion</th>
+            <td>INTEGER</td>
+          </tr>
+          <tr>
+            <th>horas_jugadas</th>
+            <td>INTEGER DEFAULT 0</td>
+          </tr>
+          <tr>
+            <th>comentario</th>
+            <td>VARCHAR(1000)</td>
+          </tr>
+          <tr>
+            <th>url_imagen</th>
+            <td>TEXT</td>
+          </tr>
+          <tr>
+            <th class="fk">catalogo_id</th>
+            <td>FK → catalogo_juegos(id) SET NULL</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table>
+        <caption>
+          juego_comentarios
+        </caption>
+        <tbody>
+          <tr>
+            <th class="pk">id</th>
+            <td>SERIAL PK</td>
+          </tr>
+          <tr>
+            <th class="fk">juego_id</th>
+            <td>FK → juegos(id) CASCADE</td>
+          </tr>
+          <tr>
+            <th class="fk">usuario_id</th>
+            <td>FK → usuarios(id) CASCADE</td>
+          </tr>
+          <tr>
+            <th class="fk">parent_id</th>
+            <td>FK → juego_comentarios(id) CASCADE</td>
+          </tr>
+          <tr>
+            <th>cuerpo</th>
+            <td>TEXT NOT NULL</td>
+          </tr>
+          <tr>
+            <th>fecha_creacion</th>
+            <td>TIMESTAMPTZ DEFAULT NOW()</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table>
+        <caption>
+          juego_comentario_votos
+        </caption>
+        <tbody>
+          <tr>
+            <th class="fk">comentario_id</th>
+            <td>FK → juego_comentarios(id) CASCADE (PK compuesta)</td>
+          </tr>
+          <tr>
+            <th class="fk">usuario_id</th>
+            <td>FK → usuarios(id) CASCADE (PK compuesta)</td>
+          </tr>
+          <tr>
+            <th>valor</th>
+            <td>SMALLINT −1 o 1</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table>
+        <caption>
+          usuario_seguimientos
+        </caption>
+        <tbody>
+          <tr>
+            <th class="pk">id</th>
+            <td>SERIAL PK</td>
+          </tr>
+          <tr>
+            <th class="fk">seguidor_id</th>
+            <td>FK → usuarios(id) CASCADE</td>
+          </tr>
+          <tr>
+            <th class="fk">seguido_id</th>
+            <td>FK → usuarios(id) CASCADE</td>
+          </tr>
+          <tr>
+            <th>created_at</th>
+            <td>TIMESTAMPTZ DEFAULT NOW()</td>
+          </tr>
+          <tr>
+            <th>—</th>
+            <td>UNIQUE(seguidor_id, seguido_id); CHECK distintos</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table>
+        <caption>
+          juego_recomendaciones
+        </caption>
+        <tbody>
+          <tr>
+            <th class="pk">id</th>
+            <td>SERIAL PK</td>
+          </tr>
+          <tr>
+            <th class="fk">remitente_id</th>
+            <td>FK → usuarios(id) CASCADE</td>
+          </tr>
+          <tr>
+            <th class="fk">destinatario_id</th>
+            <td>FK → usuarios(id) CASCADE</td>
+          </tr>
+          <tr>
+            <th class="fk">juego_id</th>
+            <td>FK → juegos(id) CASCADE (ficha del remitente)</td>
+          </tr>
+          <tr>
+            <th>mensaje</th>
+            <td>TEXT opcional (≤500)</td>
+          </tr>
+          <tr>
+            <th>leida</th>
+            <td>BOOLEAN DEFAULT FALSE</td>
+          </tr>
+          <tr>
+            <th>created_at</th>
+            <td>TIMESTAMPTZ DEFAULT NOW()</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table>
+        <caption>
+          lfg_publicaciones
+        </caption>
+        <tbody>
+          <tr>
+            <th class="pk">id</th>
+            <td>SERIAL PK</td>
+          </tr>
+          <tr>
+            <th class="fk">usuario_id</th>
+            <td>FK → usuarios(id) CASCADE</td>
+          </tr>
+          <tr>
+            <th class="fk">juego_id</th>
+            <td>FK → juegos(id) CASCADE</td>
+          </tr>
+          <tr>
+            <th>modo</th>
+            <td>online | coop_local | otro</td>
+          </tr>
+          <tr>
+            <th>mensaje</th>
+            <td>TEXT NOT NULL (≤500)</td>
+          </tr>
+          <tr>
+            <th>activo</th>
+            <td>BOOLEAN DEFAULT TRUE</td>
+          </tr>
+          <tr>
+            <th>created_at</th>
+            <td>TIMESTAMPTZ DEFAULT NOW()</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <script>
+      (function () {
+        var btn = document.getElementById("btn-download-html");
+        if (!btn) return;
+        btn.addEventListener("click", function () {
+          try {
+            var doctype = "<!DOCTYPE html>\n";
+            var html = doctype + document.documentElement.outerHTML;
+            var blob = new Blob([html], { type: "text/html;charset=utf-8" });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement("a");
+            a.href = url;
+            a.download = "diagrama_bd.html";
+            a.rel = "noopener";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(function () {
+              URL.revokeObjectURL(url);
+            }, 1500);
+          } catch (e) {
+            alert("Descarga automática no disponible en este entorno.");
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

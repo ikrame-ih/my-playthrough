@@ -11,10 +11,11 @@ export function requestWelcomeTour() {
 }
 
 /**
- * Tour guiado inicial (react-joyride): resalta menú, búsqueda, campana y perfil.
- * Solo se lanza la primera vez; se puede repetir desde Ajustes de perfil.
+ * Tour guiado (react-joyride): menú, búsqueda, campana y perfil.
+ * Primera ejecución por navegador: si no existe la clave en `localStorage`, se muestra al iniciar sesión.
+ * No identifica “usuario nuevo” en servidor; `requestWelcomeTour()` en Perfil fuerza repetición.
  *
- * @param {{ isAdmin: boolean }} props - Si es false, se omite el paso del enlace Administración (no existe en el DOM).
+ * @param {{ isAdmin: boolean }} props — Si es false, se omite el paso del enlace Administración.
  */
 export default function WelcomeTour({ isAdmin }) {
   const [run, setRun] = useState(false);

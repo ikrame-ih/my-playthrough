@@ -29,7 +29,10 @@ function labelLfgModo(m) {
 }
 
 /**
- * Comunidad: miembros, estadísticas, actividad de seguidos y buscar grupo (LFG).
+ * Página Comunidad con pestañas internas (estado React `tab`): Miembros (lista de
+ * usuarios con seguir/dejar de seguir), Estadísticas (medias SQL globales), Actividad
+ * (comentarios y LFG de gente a la que sigues) y Buscar grupo (publicar y listar LFG).
+ * Los datos vienen de `/api/users`, `/api/community/stats`, `/api/social/activity` y `/api/social/lfg`.
  */
 export default function Community() {
   const [users, setUsers] = useState([]);
@@ -146,10 +149,7 @@ export default function Community() {
                 ? {
                     ...x,
                     siguiendo: false,
-                    num_seguidores: Math.max(
-                      0,
-                      (x.num_seguidores ?? 0) - 1,
-                    ),
+                    num_seguidores: Math.max(0, (x.num_seguidores ?? 0) - 1),
                   }
                 : x,
             ),
@@ -393,7 +393,9 @@ export default function Community() {
                       <td className="p-3 font-medium text-slate-200">
                         {row.titulo}
                       </td>
-                      <td className="p-3 text-brand-accent">{row.nota_media}</td>
+                      <td className="p-3 text-brand-accent">
+                        {row.nota_media}
+                      </td>
                       <td className="p-3 text-slate-400">{row.num_votos}</td>
                     </tr>
                   ))}
@@ -502,16 +504,16 @@ export default function Community() {
                 </select>
               </label>
               <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-slate-400">
-                  Modo
-                </span>
+                <span className="text-sm font-medium text-slate-400">Modo</span>
                 <select
                   className="figma-input py-3 text-sm"
                   value={lfgModo}
                   onChange={(e) => setLfgModo(e.target.value)}
                 >
                   <option value="online">Online / multijugador</option>
-                  <option value="coop_local">Co-op local o pantalla compartida</option>
+                  <option value="coop_local">
+                    Co-op local o pantalla compartida
+                  </option>
                   <option value="otro">Otro</option>
                 </select>
               </label>
@@ -547,9 +549,7 @@ export default function Community() {
             <h2 className="mb-4 text-lg font-bold text-white">
               Publicaciones activas
             </h2>
-            {lfgLoading && (
-              <p className="text-sm text-slate-500">Cargando…</p>
-            )}
+            {lfgLoading && <p className="text-sm text-slate-500">Cargando…</p>}
             {!lfgLoading && lfgList.length === 0 && (
               <p className="figma-panel px-6 py-10 text-center text-sm text-slate-400">
                 Nadie ha publicado una búsqueda aún.

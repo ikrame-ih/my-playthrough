@@ -9,7 +9,7 @@
  *
  * REQUISITO: La BD debe tener las tablas `catalogo_juegos` y las columnas
  * `url_imagen` y `catalogo_id` en `juegos`. Si no las tienes, ejecuta
- * primero los scripts de `docs/`.
+ * primero los scripts de `docs/sql/`.
  */
 
 const pool = require("../config/db");

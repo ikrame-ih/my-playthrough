@@ -186,7 +186,11 @@ function CommentBlock({
 }
 
 /**
- * Reseñas y discusión de una ficha (vista pública). Votación en reseñas raíz.
+ * Hilo de comentarios anidados de una ficha (ruta `/juego/:id/discussion`).
+ * Carga cabecera pública vía `/api/community/games/:id` y mensajes vía `/api/games/:id/comments`
+ * (siempre autenticado: la ficha puede ser de otro usuario). Las reseñas de primer nivel
+ * admiten voto útil / no útil (`PUT .../vote`). Quién puede borrar un mensaje lo decide
+ * el backend (autor, dueño de la ficha o admin); aquí solo se muestra el botón si `me.rol` o ids coinciden.
  */
 export default function GameDiscussion() {
   const { gameId } = useParams();

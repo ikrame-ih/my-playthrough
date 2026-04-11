@@ -3,7 +3,7 @@
 Referencia del sistema de diseño de la aplicación web MyPlaythrough.  
 Úsalo para mantener coherencia visual en todas las pantallas y componentes.
 
-*(Versión en español de [DESIGN.md](DESIGN.md). El contenido técnico es equivalente.)*
+_(Versión en español de [DESIGN.md](DESIGN.md). El contenido técnico es equivalente.)_
 
 ---
 
@@ -22,22 +22,22 @@ MyPlaythrough usa una estética de **biblioteca digital oscura**. La interfaz es
 
 Todos los colores están definidos como tokens Tailwind personalizados en `tailwind.config.js`.
 
-| Token | Hex | Función |
-|---|---|---|
-| `brand-bg` | `#0B1120` | Fondo de página — azul marino mate profundo |
-| `brand-panel` | `#161D2F` | Superficie de tarjetas y paneles |
-| `brand-input` | `#0F172A` | Fondo de campos y botón secundario |
-| `brand-surface` | `#1E293B` | Estados hover, separadores sutiles |
-| `brand-surface2` | `#334155` | Bordes en elementos interactivos |
-| `brand-accent` | `#2DD4BF` | Acento principal — teal vibrante |
-| `brand-tealBtn` | `#36D7B7` | Relleno del botón CTA (variante ligeramente más clara) |
-| `brand-blue` | `#007BFF` | Acento secundario — azul eléctrico |
-| `white` | `#FFFFFF` | Texto principal |
-| `slate-200` | `#E2E8F0` | Texto de cuerpo por defecto |
-| `slate-400` | `#94A3B8` | Etiquetas / texto secundario |
-| `slate-500` | `#64748B` | Placeholder y texto desactivado |
-| `amber-400` | `#FBBF24` | Estrella de puntuación — dorado cálido |
-| `red-400` | `#F87171` | Hover en acciones destructivas |
+| Token            | Hex       | Función                                                |
+| ---------------- | --------- | ------------------------------------------------------ |
+| `brand-bg`       | `#0B1120` | Fondo de página — azul marino mate profundo            |
+| `brand-panel`    | `#161D2F` | Superficie de tarjetas y paneles                       |
+| `brand-input`    | `#0F172A` | Fondo de campos y botón secundario                     |
+| `brand-surface`  | `#1E293B` | Estados hover, separadores sutiles                     |
+| `brand-surface2` | `#334155` | Bordes en elementos interactivos                       |
+| `brand-accent`   | `#2DD4BF` | Acento principal — teal vibrante                       |
+| `brand-tealBtn`  | `#36D7B7` | Relleno del botón CTA (variante ligeramente más clara) |
+| `brand-blue`     | `#007BFF` | Acento secundario — azul eléctrico                     |
+| `white`          | `#FFFFFF` | Texto principal                                        |
+| `slate-200`      | `#E2E8F0` | Texto de cuerpo por defecto                            |
+| `slate-400`      | `#94A3B8` | Etiquetas / texto secundario                           |
+| `slate-500`      | `#64748B` | Placeholder y texto desactivado                        |
+| `amber-400`      | `#FBBF24` | Estrella de puntuación — dorado cálido                 |
+| `red-400`        | `#F87171` | Hover en acciones destructivas                         |
 
 ### Uso semántico
 
@@ -68,15 +68,15 @@ background-image: radial-gradient(
 
 Se prefiere Inter. El fallback `system-ui` mantiene la interfaz limpia aunque no carguen las fuentes web.
 
-| Elemento | Clases | Uso |
-|---|---|---|
-| Título de página (H1) | `text-3xl font-bold tracking-tight text-white sm:text-4xl` | Cabecera del dashboard |
-| Título de sección (H2) | `text-xl font-bold tracking-tight text-white` | Cabeceras de panel |
-| Título de tarjeta (H3) | `text-base font-bold leading-snug tracking-tight text-white` | Título en tarjeta de juego |
-| Texto de cuerpo | `text-sm text-slate-200` | Descripciones, párrafos |
-| Etiqueta / pie | `text-sm font-medium text-slate-400` | Labels de formulario, info secundaria |
-| Badge / etiqueta | `text-[0.65rem] font-bold uppercase tracking-wide` | Estados, chip de plataforma |
-| Ítem de navegación | `text-sm font-medium` | Enlaces del sidebar |
+| Elemento               | Clases                                                       | Uso                                   |
+| ---------------------- | ------------------------------------------------------------ | ------------------------------------- |
+| Título de página (H1)  | `text-3xl font-bold tracking-tight text-white sm:text-4xl`   | Cabecera del dashboard                |
+| Título de sección (H2) | `text-xl font-bold tracking-tight text-white`                | Cabeceras de panel                    |
+| Título de tarjeta (H3) | `text-base font-bold leading-snug tracking-tight text-white` | Título en tarjeta de juego            |
+| Texto de cuerpo        | `text-sm text-slate-200`                                     | Descripciones, párrafos               |
+| Etiqueta / pie         | `text-sm font-medium text-slate-400`                         | Labels de formulario, info secundaria |
+| Badge / etiqueta       | `text-[0.65rem] font-bold uppercase tracking-wide`           | Estados, chip de plataforma           |
+| Ítem de navegación     | `text-sm font-medium`                                        | Enlaces del sidebar                   |
 
 **Reglas:**
 
@@ -145,11 +145,11 @@ Chip de plataforma: `bg-black/55 backdrop-blur-sm` — posición `top-3 left-3` 
 
 ### Badge de estado
 
-| Estado (BD) | Texto mostrado | Clases |
-|---|---|---|
-| `Jugando` | JUGANDO | `bg-brand-tealBtn text-black border-transparent` |
-| `Completado` | COMPLETADO | `bg-brand-tealBtn text-black border-transparent` |
-| `Pendiente` | BACKLOG | `bg-slate-700/80 text-slate-200 border-white/10` |
+| Estado (BD)  | Texto mostrado | Clases                                           |
+| ------------ | -------------- | ------------------------------------------------ |
+| `Jugando`    | JUGANDO        | `bg-brand-tealBtn text-black border-transparent` |
+| `Completado` | COMPLETADO     | `bg-brand-tealBtn text-black border-transparent` |
+| `Pendiente`  | BACKLOG        | `bg-slate-700/80 text-slate-200 border-white/10` |
 
 Nota: la UI muestra «BACKLOG» para `Pendiente` (`gameLabels.js`). Badges teal = estados activos/positivos. Badge gris = en cola/inactivo.
 
@@ -228,10 +228,10 @@ Etiquetas siempre encima del campo, nunca solo placeholder como etiqueta.
 
 ## 6. Profundidad y elevación
 
-| Nivel | Token de sombra | Uso |
-|---|---|---|
-| Tarjeta base | `shadow-figma` | Elevación por defecto |
-| Tarjeta elevada | `shadow-figma-lg` | Hover, modales |
+| Nivel           | Token de sombra   | Uso                   |
+| --------------- | ----------------- | --------------------- |
+| Tarjeta base    | `shadow-figma`    | Elevación por defecto |
+| Tarjeta elevada | `shadow-figma-lg` | Hover, modales        |
 
 Definiciones:
 
@@ -246,28 +246,28 @@ La segunda capa (`0 0 0 1px rgba(255,255,255,...)`) crea el borde claro que hace
 
 ## 7. Qué hacer y qué evitar
 
-| ✅ Hacer | ❌ Evitar |
-|---|---|
-| `rounded-2xl` en paneles y tarjetas | Mezclar `rounded-lg` y `rounded-2xl` en el mismo contexto |
-| `text-white` solo en títulos | `text-white` en cuerpo (usar `text-slate-200`) |
-| Texto negro sobre botones teal | Texto blanco sobre teal |
-| `tracking-tight` en todos los títulos | Interletrado por defecto en H1–H3 |
-| `tabular-nums` en puntuaciones y horas | Números de ancho variable en columnas alineadas |
-| `border-white/[0.06]` en bordes de tarjeta | Bordes blancos a opacidad plena |
-| Un CTA principal por pantalla | Dos botones teal lado a lado |
-| `transition` en cada elemento interactivo | Estados hover estáticos |
-| `active:scale-[0.98]` en botones | Sin feedback al pulsar |
+| ✅ Hacer                                   | ❌ Evitar                                                 |
+| ------------------------------------------ | --------------------------------------------------------- |
+| `rounded-2xl` en paneles y tarjetas        | Mezclar `rounded-lg` y `rounded-2xl` en el mismo contexto |
+| `text-white` solo en títulos               | `text-white` en cuerpo (usar `text-slate-200`)            |
+| Texto negro sobre botones teal             | Texto blanco sobre teal                                   |
+| `tracking-tight` en todos los títulos      | Interletrado por defecto en H1–H3                         |
+| `tabular-nums` en puntuaciones y horas     | Números de ancho variable en columnas alineadas           |
+| `border-white/[0.06]` en bordes de tarjeta | Bordes blancos a opacidad plena                           |
+| Un CTA principal por pantalla              | Dos botones teal lado a lado                              |
+| `transition` en cada elemento interactivo  | Estados hover estáticos                                   |
+| `active:scale-[0.98]` en botones           | Sin feedback al pulsar                                    |
 
 ---
 
 ## 8. Comportamiento responsive
 
-| Breakpoint | Comportamiento |
-|---|---|
-| `sm` (640px+) | Sidebar fijo; más padding en contenido (`sm:px-8`) |
-| `md` (768px+) | Grid de juegos a 2 columnas |
-| `lg` (1024px+) | Grid a 3 columnas |
-| `xl` (1280px+) | Grid a 4 columnas |
+| Breakpoint     | Comportamiento                                     |
+| -------------- | -------------------------------------------------- |
+| `sm` (640px+)  | Sidebar fijo; más padding en contenido (`sm:px-8`) |
+| `md` (768px+)  | Grid de juegos a 2 columnas                        |
+| `lg` (1024px+) | Grid a 3 columnas                                  |
+| `xl` (1280px+) | Grid a 4 columnas                                  |
 
 El sidebar **no** se colapsa en móvil en la implementación actual (limitación conocida, mejora futura).
 

@@ -1,10 +1,9 @@
 /**
- * URL base del backend. Se puede sobreescribir en producción
- * con la variable de entorno `VITE_API_URL` en el fichero `.env` del cliente.
+ * URL base del backend (desarrollo: suele ser `http://localhost:3000`).
+ * En producción se define en `client/.env` como `VITE_API_URL` para apuntar al dominio real.
  * @constant {string}
  */
-export const API_BASE =
-  import.meta.env.VITE_API_URL || "http://localhost:3000";
+export const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 /**
  * Genera las cabeceras HTTP necesarias para las peticiones autenticadas.
@@ -22,14 +21,11 @@ export function authHeaders() {
 }
 
 /**
- * Envoltorio de `fetch` que añade automáticamente las cabeceras de autenticación
- * y gestiona de forma centralizada la expiración del token (HTTP 401).
+ * `fetch` con cabeceras JSON + `Authorization: Bearer` si hay token guardado.
  *
- * Si el servidor responde 401, significa que el token ha caducado o es inválido.
- * En ese caso se limpia el localStorage y se recarga la página para que el
- * usuario vuelva a la pantalla de login, en lugar de quedarse en un estado roto.
- *
- * Con esta función no hace falta repetir la comprobación del 401 en cada componente.
+ * 401: el JWT caducó o el servidor lo rechazó → se borra token/usuario del almacenamiento
+ * local y se recarga la página para volver al login (evita pantallas a medias).
+ * Así no hay que repetir el mismo `if (res.status === 401)` en cada componente.
  *
  * @param {string} url     - URL de la petición (relativa o absoluta).
  * @param {object} [opts]  - Opciones adicionales de `fetch` (method, body, etc.).

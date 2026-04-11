@@ -1,5 +1,5 @@
 /**
- * Ejecuta docs/add-avatar-id-usuarios.sql usando las credenciales de server/.env
+ * Ejecuta docs/sql/add-avatar-id-usuarios.sql usando las credenciales de server/.env
  * Uso: desde la carpeta server → node scripts/run-add-avatar-column.js
  */
 const path = require("path");
@@ -8,7 +8,14 @@ require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 const fs = require("fs");
 const { Pool } = require("pg");
 
-const sqlPath = path.join(__dirname, "..", "..", "docs", "add-avatar-id-usuarios.sql");
+const sqlPath = path.join(
+  __dirname,
+  "..",
+  "..",
+  "docs",
+  "sql",
+  "add-avatar-id-usuarios.sql",
+);
 const sql = fs.readFileSync(sqlPath, "utf8");
 
 const pool = new Pool({

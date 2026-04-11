@@ -417,7 +417,7 @@ async function main() {
   try {
     await client.query("BEGIN");
 
-    // Un solo usuario con nombre público "Rufleto" (el del seed); borra duplicados (p. ej. otra cuenta con el mismo nick).
+    // Un solo usuario de demostración con nombre público «Rufleto» (email canónico del seed).
     await client.query(
       `DELETE FROM usuarios
        WHERE LOWER(TRIM(nombre_usuario)) = 'rufleto'
@@ -599,17 +599,10 @@ async function main() {
       [hash],
     );
 
-    await client.query(
-      `UPDATE usuarios SET rol = 'user' WHERE LOWER(TRIM(email)) = LOWER($1)`,
-      ["ikihga2223@gmail.com"],
-    );
-
     await client.query("COMMIT");
     console.log("OK: datos de presentación cargados.");
     console.log("Contraseña de todas las cuentas:", PASS);
-    console.log(
-      "Admins: Tizza, Rufleto, Demo Jurado — ikihga2223@gmail.com queda como usuario si existe.",
-    );
+    console.log("Administradores: Tizza, Rufleto, Demo Jurado.");
   } catch (e) {
     await client.query("ROLLBACK");
     throw e;

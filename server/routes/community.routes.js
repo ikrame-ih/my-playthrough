@@ -1,6 +1,8 @@
 /**
  * @module community.routes
- * @description Rutas de estadísticas globales y detalle público de juegos.
+ * @description Agregados sobre toda la comunidad: búsqueda por texto (miembros + fichas),
+ * medias de nota por título (`GROUP BY` en SQL) y detalle público de una ficha ajena
+ * (p. ej. enlace desde una búsqueda).
  *
  * Rutas definidas:
  *   GET /api/community/search     → usuarios y fichas de juego por texto

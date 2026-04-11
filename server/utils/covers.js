@@ -3,8 +3,8 @@
  * @description Lógica para buscar carátulas de videojuegos y mantener el catálogo compartido.
  *
  * Combina dos fuentes externas:
- * - **RAWG** (rawg.io): base de datos de más de 500.000 juegos. Requiere API key gratuita.
- * - **Steam** (store.steampowered.com): no necesita key, pero solo cubre títulos de PC en Steam.
+ * - RAWG (rawg.io): base de datos de más de 500.000 juegos. Requiere API key gratuita.
+ * - Steam (store.steampowered.com): no necesita key, pero solo cubre títulos de PC en Steam.
  *
  * También guarda los resultados en la tabla `catalogo_juegos` para no repetir la
  * misma búsqueda externa cada vez que alguien añade el mismo juego.

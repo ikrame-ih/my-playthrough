@@ -1,14 +1,18 @@
-# Dependencias y build
+# Dependencies and build
 node_modules/
-package-lock.json
 dist/
 build/
+coverage/
 
-# Entorno
+# Environment (never commit real secrets)
 .env
 .env.local
+.env.*.local
 
-# Sistema y logs
+# Local delivery / annexes (not part of source)
+material_entrega/
+
+# System and logs
 *.log
 .DS_Store
 Thumbs.db
@@ -17,7 +21,11 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Herramientas locales (Cursor)
+# Local tooling (Cursor)
 .cursor/
 .agents/
 skills-lock.json
+
+# Keys and certs (if ever added locally)
+*.pem
+*.key

@@ -15,10 +15,10 @@ import ProfileSettings from "./components/ProfileSettings";
 import RecommendationsPage from "./components/RecommendationsPage";
 
 /**
- * @file Raíz de la SPA: autenticación, enrutado y envoltorio de layout.
- * - Sin token válido → `AuthPage`.
- * - Con sesión → `SearchProvider` + `BrowserRouter` + `AppShell` y rutas hijas
- *   (colección, comunidad, discusión, admin, recomendaciones, etc.).
+ * @file Raíz de la aplicación React: decide si mostrar el login o la app con menú.
+ * Si `localStorage` tiene `token`, se asume sesión iniciada y se renderiza el router
+ * (rutas como `/`, `/community`, `/admin`, etc.) dentro de `AppShell` (barra lateral + cabecera).
+ * `SearchProvider` comparte el texto de búsqueda entre cabecera y páginas que filtran listas.
  */
 
 /**

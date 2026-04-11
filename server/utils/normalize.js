@@ -1,10 +1,8 @@
 /**
  * @module normalize
- * @description Funciones puras de normalización para limpiar y estandarizar
- * los datos de entrada antes de guardarlos en la BD o compararlos.
- *
- * Al centralizar aquí estas funciones, cada ruta no necesita repetir la misma
- * lógica de limpieza, lo que reduce errores y mejora la consistencia.
+ * @description Entrada del usuario en forma canónica antes de validar o guardar (emails en
+ * minúsculas, títulos sin espacios dobles, estados de juego en español unificado, etc.).
+ * Son funciones puras (sin tocar BD ni `req`), reutilizadas en rutas y en tests Vitest.
  */
 
 /**
