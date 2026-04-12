@@ -11,6 +11,7 @@ coverage/
 
 # Local delivery / annexes (not part of source)
 material_entrega/
+_tmp_entrega_review/
 
 # System and logs
 *.log

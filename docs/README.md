@@ -27,6 +27,8 @@ La **fuente en texto** del plan de pruebas es [`pruebas.md`](pruebas.md); su con
 | Esquema completo de la base de datos | [`sql/schema.sql`](sql/schema.sql) |
 | Migraciones y ajustes puntuales | `sql/add-*.sql`, `sql/fix-*.sql`, `sql/promover-admin.sql`, etc. |
 
+En `schema.sql` figuran **nueve tablas** del modelo actual: núcleo (`usuarios`, `catalogo_juegos`, `juegos`), comentarios y votos (`juego_comentarios`, `juego_comentario_votos`) y bloque social (`usuario_seguimientos`, `juego_recomendaciones`, `lfg_publicaciones`).
+
 **Relación entre documentos:** el esquema definido en `sql/schema.sql` es el referenciado por el diagrama en `abrir-en-navegador/diagrama_bd.html`. El plan de pruebas en [`pruebas.md`](pruebas.md) y la versión en `abrir-en-navegador/plan_pruebas.html` describen el mismo contenido.
 
 Las migraciones ejecutables desde `server/` mediante `npm run migrate:*` aplican los scripts SQL correspondientes bajo `docs/sql/`.

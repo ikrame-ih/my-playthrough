@@ -3,17 +3,23 @@
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 const pool = require("../config/db");
+const { passwordPolicyMessage } = require("../utils/normalize");
 
 const email = String(process.argv[2] ?? "")
   .trim()
   .toLowerCase();
 const newPassword = process.argv[3];
 
-if (!email || !newPassword || newPassword.length < 6) {
+if (!email || !newPassword) {
   console.error(
     "Uso: node scripts/reset-password.js email@ejemplo.com nuevaContraseña",
   );
-  console.error("La contraseña debe tener al menos 6 caracteres.");
+  process.exit(1);
+}
+
+const policyError = passwordPolicyMessage(newPassword);
+if (policyError) {
+  console.error(policyError);
   process.exit(1);
 }
 
