@@ -11,7 +11,8 @@
         --bg: #0b1120;
         --panel: #161d2f;
         --accent: #2dd4bf;
-        --toc-code: #7dd3fc;
+        --toc-temario: #fcd34d;
+        --toc-code: #e879f9;
         --text: #e2e8f0;
         --muted: #94a3b8;
         --border: rgba(255, 255, 255, 0.08);
@@ -195,7 +196,7 @@
         font-size: 0.98rem;
         border: none;
         padding: 0;
-        color: var(--accent);
+        color: #cbd5e1;
       }
       .toc ul {
         margin: 0;
@@ -205,10 +206,24 @@
         margin: 0.3rem 0;
       }
       .toc a.toc-temario {
-        color: var(--accent);
+        color: var(--toc-temario);
+        font-weight: 600;
+        text-decoration: underline;
+        text-decoration-color: rgba(252, 211, 77, 0.45);
+        text-underline-offset: 0.2em;
+      }
+      .toc a.toc-temario:hover {
+        color: #fde68a;
       }
       .toc a.toc-code {
         color: var(--toc-code);
+        font-weight: 600;
+        text-decoration: underline;
+        text-decoration-color: rgba(232, 121, 249, 0.45);
+        text-underline-offset: 0.2em;
+      }
+      .toc a.toc-code:hover {
+        color: #f0abfc;
       }
       @media print {
         body {
@@ -245,12 +260,13 @@
     <p class="byline">Ikrame Ibn Hayoun · DAW · CESUR Málaga Este</p>
     <p class="lead">
       Primero van unos <strong>conceptos de apoyo</strong> (HTTP, JWT,
-      middleware…) que en el ciclo se dan por vistos, pero aquí los dejo en corto
-      para que el resto del documento tenga sentido. Después viene el
-      <strong>código de verdad</strong>: funciones concretas con rutas de
-      fichero.       Si lo que te interesa es ir directo a eso, usa el índice: las entradas en
-      <strong style="color: var(--toc-code); font-weight: 600">azul claro</strong>
-      son las secciones numeradas (1–7).
+      middleware…) que <strong>ya se han visto durante el ciclo</strong>; aquí
+      los resumo en corto para que encaje con lo que viene después. Luego está
+      el <strong>detalle del proyecto por ficheros</strong> (funciones concretas
+      y su ruta en el repositorio). Para ir directo a eso, usa el índice: la
+      entrada en <strong style="color: var(--toc-temario)">tono dorado</strong>
+      es el temario; las numeradas (1–7) van en
+      <strong style="color: var(--toc-code)">violeta / magenta</strong>.
     </p>
 
     <nav class="toc" aria-label="Índice del documento">
@@ -299,16 +315,14 @@
       </ul>
     </nav>
 
-    <h2 id="temario">
-      Temario de apoyo: lo que cruza el login y la API
-    </h2>
+    <h2 id="temario">Temario de apoyo: lo que cruza el login y la API</h2>
 
     <div class="gloss">
       <h3>Petición HTTP y códigos de respuesta</h3>
       <p>
-        Cada vez que el navegador (o Thunder Client) llama a la API, el
-        servidor contesta con un <strong>número de estado</strong>. Los que más
-        uso en este proyecto son:
+        Cada vez que el navegador (o Thunder Client) llama a la API, el servidor
+        contesta con un <strong>número de estado</strong>. Los que más uso en
+        este proyecto son:
       </p>
       <ul>
         <li>
@@ -417,9 +431,9 @@
       <h3>Por qué trato el 401 en el cliente con <code>apiFetch</code></h3>
       <p>
         Si el token caducó, cualquier ruta protegida puede devolver
-        <strong>401</strong>. Si no hago nada en el cliente, la interfaz seguiría
-        mostrando al usuario como registrado aunque el servidor ya no lo
-        acepte. Por eso lo centralicé: si la respuesta es 401,
+        <strong>401</strong>. Si no hago nada en el cliente, la interfaz
+        seguiría mostrando al usuario como registrado aunque el servidor ya no
+        lo acepte. Por eso lo centralicé: si la respuesta es 401,
         <strong>borro token y usuario del <code>localStorage</code></strong> y
         <strong>recargo la página</strong> para volver al login con estado
         limpio.
@@ -745,8 +759,8 @@
     <h2 id="esfuerzo">7. Partes del proyecto que más tiempo llevaron</h2>
     <ul>
       <li>
-        <strong>Discusión y votos</strong> (cliente + servidor): montar el
-        árbol de comentarios, el orden, el enlace con <code>?c=</code> y que las
+        <strong>Discusión y votos</strong> (cliente + servidor): montar el árbol
+        de comentarios, el orden, el enlace con <code>?c=</code> y que las
         reglas de voto cuadren en todas partes.
       </li>
       <li>
