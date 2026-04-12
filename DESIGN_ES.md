@@ -275,11 +275,11 @@ El sidebar **no** se colapsa en móvil en la implementación actual (limitación
 
 ---
 
-## 9. Guía para IA / agentes
+## 9. Referencia rápida para nuevos componentes UI
 
-Al generar o editar componentes UI, mantener:
+Al añadir pantallas o componentes, conviene alinear colores y utilidades con lo ya definido.
 
-**Referencia rápida de color:**
+**Color:**
 
 - Fondo: `bg-brand-bg` (`#0B1120`)
 - Panel/tarjeta: `bg-brand-panel` (`#161D2F`)
@@ -294,7 +294,3 @@ Al generar o editar componentes UI, mantener:
 - `.figma-btn-primary` — botón CTA teal (texto negro)
 - `.figma-btn-outline` — botón secundario
 - `.figma-table-wrap` — contenedor de tabla admin
-
-**Plantilla de prompt:**
-
-> «Crea un componente React para MyPlaythrough siguiendo el tema oscuro de DESIGN_ES.md. Usa `bg-brand-bg` como fondo de página, `figma-panel` para paneles, `figma-input` para campos y `figma-btn-primary` para la acción principal. Jerarquía: `text-white` en títulos, `text-slate-200` en cuerpo, `text-slate-400` en etiquetas.»

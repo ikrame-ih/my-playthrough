@@ -226,7 +226,7 @@ export default function AppShell({ user, onLogout, children }) {
           {children}
         </main>
       </div>
-      <WelcomeTour isAdmin={user?.rol === "admin"} />
+      <WelcomeTour isAdmin={user?.rol === "admin"} userId={user?.id} />
     </div>
   );
 }

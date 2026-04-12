@@ -272,16 +272,22 @@
     </div>
     <p class="doc-nav">
       <a href="../README.md">Índice docs (README)</a>
+      <a href="flujo_pern_tres_capas.html">Arquitectura PERN (flujo)</a>
       <a href="funciones_principales.html">Funciones en código</a>
       <a href="plan_pruebas.html">Plan de pruebas (HTML)</a>
       <a href="../pruebas.md">Plan de pruebas (Markdown)</a>
     </p>
     <h1>Modelo lógico — base de datos</h1>
     <p class="sub">
-      Lo mismo que <code>docs/sql/schema.sql</code>, en página. Tres dibujos
-      para que las flechas no se amontonen; abajo, la tabla de relaciones y el
-      listado de columnas cuentan el detalle (incluida la cardinalidad en
-      palabras, sin números encima del SVG).
+      Lo mismo que <code>docs/sql/schema.sql</code>, en página: el modelo actual
+      son <strong>ocho tablas</strong> (<code>usuarios</code>,
+      <code>catalogo_juegos</code>, <code>juegos</code>,
+      <code>juego_comentarios</code>, <code>juego_comentario_votos</code>,
+      <code>usuario_seguimientos</code>, <code>juego_recomendaciones</code>,
+      <code>lfg_publicaciones</code>). Tres dibujos para que las flechas no se
+      amontonen; abajo, la tabla de relaciones y el listado de columnas cuentan
+      el detalle (incluida la cardinalidad en palabras, sin números encima del
+      SVG).
     </p>
 
     <div class="legend" aria-label="Leyenda">
@@ -815,7 +821,7 @@
           </tr>
           <tr>
             <th>rol</th>
-            <td>VARCHAR(50) DEFAULT 'user'</td>
+            <td>VARCHAR(50) NOT NULL DEFAULT 'user' (CHECK: 'user' o 'admin')</td>
           </tr>
           <tr>
             <th>avatar_id</th>
@@ -859,7 +865,7 @@
           </tr>
           <tr>
             <th>created_at</th>
-            <td>TIMESTAMPTZ</td>
+            <td>TIMESTAMPTZ DEFAULT NOW()</td>
           </tr>
         </tbody>
       </table>
@@ -931,7 +937,7 @@
           </tr>
           <tr>
             <th class="fk">parent_id</th>
-            <td>FK → juego_comentarios(id) CASCADE</td>
+            <td>FK → juego_comentarios(id) CASCADE (NULL si es raíz del hilo)</td>
           </tr>
           <tr>
             <th>cuerpo</th>
@@ -939,7 +945,7 @@
           </tr>
           <tr>
             <th>fecha_creacion</th>
-            <td>TIMESTAMPTZ DEFAULT NOW()</td>
+            <td>TIMESTAMPTZ NOT NULL DEFAULT NOW()</td>
           </tr>
         </tbody>
       </table>
@@ -983,7 +989,7 @@
           </tr>
           <tr>
             <th>created_at</th>
-            <td>TIMESTAMPTZ DEFAULT NOW()</td>
+            <td>TIMESTAMPTZ NOT NULL DEFAULT NOW()</td>
           </tr>
           <tr>
             <th>—</th>
@@ -1019,11 +1025,11 @@
           </tr>
           <tr>
             <th>leida</th>
-            <td>BOOLEAN DEFAULT FALSE</td>
+            <td>BOOLEAN NOT NULL DEFAULT FALSE</td>
           </tr>
           <tr>
             <th>created_at</th>
-            <td>TIMESTAMPTZ DEFAULT NOW()</td>
+            <td>TIMESTAMPTZ NOT NULL DEFAULT NOW()</td>
           </tr>
         </tbody>
       </table>
@@ -1055,11 +1061,11 @@
           </tr>
           <tr>
             <th>activo</th>
-            <td>BOOLEAN DEFAULT TRUE</td>
+            <td>BOOLEAN NOT NULL DEFAULT TRUE</td>
           </tr>
           <tr>
             <th>created_at</th>
-            <td>TIMESTAMPTZ DEFAULT NOW()</td>
+            <td>TIMESTAMPTZ NOT NULL DEFAULT NOW()</td>
           </tr>
         </tbody>
       </table>

@@ -83,7 +83,7 @@ Se ejecutan en terminal, desde la carpeta de cada paquete, **sin** levantar obli
 | P-13 | Editar estado       | Detalle → cambiar estado → guardar          | Estado actualizado         | Correcto                 | OK     |
 | P-14 | Editar nota y horas | Cambiar puntuación y horas                  | Valores persistidos        | Correcto                 | OK     |
 | P-15 | Eliminar            | Eliminar y confirmar                        | Desaparece de la colección | Eliminado                | OK     |
-| P-16 | Filtro por estado   | Filtro "Completados" en sidebar             | Solo completados           | Filtro correcto          | OK     |
+| P-16 | Ordenar por estado  | Colección → «Ordenar por» → «Estado (backlog → completado)» | Orden coherente por estado | Listado ordenado correctamente | OK     |
 
 ### 5.3. RF-03 — Edición de detalles
 
@@ -178,20 +178,20 @@ Se ejecutan en terminal, desde la carpeta de cada paquete, **sin** levantar obli
 
 ## 8. Resumen numérico
 
-**Comprobación del recuento (por ID):**
+**Comprobación del recuento (por filas en tablas de este documento):**
 
-- **P-01 … P-44** → **44** casos (incluye RF-06 ampliado con listado LFG en admin, RF-07 social, RF-08 presentación).
+- **P-** → **46** casos (P-01 … P-43 y **P-44**, más las variantes **P-08b** y **P-08c** en RF-01).
 - **S-01 … S-08** → **8** casos (seguridad API / configuración).
 - **V-01 … V-04** → **4** casos (validación de datos coherente con el backend).
 
-**Total pruebas manuales: 44 + 8 + 4 = 56.**
+**Total pruebas manuales: 46 + 8 + 4 = 58.**
 
 | Categoría                                   | Total  | Pasadas | Fallidas |
 | ------------------------------------------- | ------ | ------- | -------- |
-| Flujo de aplicación (P-01 … P-44)           | 44     | 44      | 0        |
+| Flujo de aplicación (prefijo **P-**)        | 46     | 46      | 0        |
 | Seguridad API / configuración (S-01 … S-08) | 8      | 8       | 0        |
 | Validación de datos (V-01 … V-04)           | 4      | 4       | 0        |
-| **Total pruebas manuales**                  | **56** | **56**  | **0**    |
+| **Total pruebas manuales**                  | **58** | **58**  | **0**    |
 | Unitarias automáticas (Vitest)              | 27     | 27      | 0        |
 
 _Las 27 pruebas unitarias corresponden a 17 tests en `server` y 10 en `client` (`npm test` en cada carpeta)._

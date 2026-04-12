@@ -151,7 +151,7 @@ export default function ProfileSettings({ user, onUserUpdate }) {
         </p>
         <button
           type="button"
-          onClick={() => requestWelcomeTour()}
+          onClick={() => requestWelcomeTour(user?.id)}
           className="rounded-lg border border-white/15 bg-brand-input px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-brand-accent/35 hover:text-white"
         >
           Iniciar tour guiado

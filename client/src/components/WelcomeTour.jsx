@@ -1,23 +1,30 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Joyride, { STATUS } from "react-joyride";
 
-/** Clave en localStorage: no volver a mostrar el tour hasta que el usuario lo reinicie desde Perfil. */
+/** Prefijo en localStorage; el estado del tour se guarda por usuario (`…_u{id}`). */
 export const TOUR_STORAGE_KEY = "myplaythrough_tour_v1";
 
-/** Dispara el tour desde cualquier sitio (p. ej. botón en Perfil). */
-export function requestWelcomeTour() {
+function tourStorageKeyForUser(userId) {
+  return `${TOUR_STORAGE_KEY}_u${userId}`;
+}
+
+/** Dispara el tour desde cualquier sitio (p. ej. botón en Perfil). Pasa el id de usuario actual. */
+export function requestWelcomeTour(userId) {
+  if (userId != null) {
+    localStorage.removeItem(tourStorageKeyForUser(userId));
+  }
   localStorage.removeItem(TOUR_STORAGE_KEY);
   window.dispatchEvent(new CustomEvent("myplaythrough-start-tour"));
 }
 
 /**
  * Tour guiado (react-joyride): menú, búsqueda, campana y perfil.
- * Primera ejecución por navegador: si no existe la clave en `localStorage`, se muestra al iniciar sesión.
- * No identifica “usuario nuevo” en servidor; `requestWelcomeTour()` en Perfil fuerza repetición.
+ * Primera vez **por cuenta** en este navegador: si no hay marca para ese `userId`, se muestra al iniciar sesión.
+ * La clave global antigua (`myplaythrough_tour_v1`) ya no bloquea cuentas nuevas en el mismo dispositivo.
  *
- * @param {{ isAdmin: boolean }} props — Si es false, se omite el paso del enlace Administración.
+ * @param {{ isAdmin: boolean; userId?: number }} props — Si es false, se omite el paso del enlace Administración.
  */
-export default function WelcomeTour({ isAdmin }) {
+export default function WelcomeTour({ isAdmin, userId }) {
   const [run, setRun] = useState(false);
 
   const steps = useMemo(
@@ -80,10 +87,12 @@ export default function WelcomeTour({ isAdmin }) {
   }, [isAdmin, steps]);
 
   useEffect(() => {
-    if (localStorage.getItem(TOUR_STORAGE_KEY)) return undefined;
+    if (userId == null) return undefined;
+    const key = tourStorageKeyForUser(userId);
+    if (localStorage.getItem(key)) return undefined;
     const t = window.setTimeout(() => setRun(true), 700);
     return () => window.clearTimeout(t);
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     const onStart = () => setRun(true);
@@ -91,12 +100,17 @@ export default function WelcomeTour({ isAdmin }) {
     return () => window.removeEventListener("myplaythrough-start-tour", onStart);
   }, []);
 
-  const onCallback = useCallback((data) => {
-    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(data.status)) {
-      localStorage.setItem(TOUR_STORAGE_KEY, "1");
-      setRun(false);
-    }
-  }, []);
+  const onCallback = useCallback(
+    (data) => {
+      if ([STATUS.FINISHED, STATUS.SKIPPED].includes(data.status)) {
+        if (userId != null) {
+          localStorage.setItem(tourStorageKeyForUser(userId), "1");
+        }
+        setRun(false);
+      }
+    },
+    [userId],
+  );
 
   return (
     <Joyride

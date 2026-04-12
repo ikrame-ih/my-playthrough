@@ -247,6 +247,7 @@
     <p class="doc-nav no-print">
       <a href="../README.md">Índice docs</a>
       <a href="diagrama_bd.html">Diagrama BD</a>
+      <a href="flujo_pern_tres_capas.html">Arquitectura PERN (flujo)</a>
       <a href="funciones_principales.html">Funciones en código</a>
       <a href="../pruebas.md">Plan (Markdown)</a>
     </p>
@@ -575,10 +576,10 @@
         </tr>
         <tr>
           <td>P-16</td>
-          <td>Filtro por estado</td>
-          <td>Filtro "Completados" en sidebar</td>
-          <td>Solo completados</td>
-          <td>Filtro correcto</td>
+          <td>Ordenar por estado</td>
+          <td>Colección → «Ordenar por» → «Estado (backlog → completado)»</td>
+          <td>Orden coherente por estado</td>
+          <td>Listado ordenado correctamente</td>
           <td>OK</td>
         </tr>
       </tbody>
@@ -1076,9 +1077,10 @@
     <p><strong>Comprobación del recuento (por ID):</strong></p>
     <ul>
       <li>
-        <strong>P-01 … P-44</strong> → <strong>44</strong> casos (incluye RF-06
-        con listado LFG en admin, RF-07 social y RF-08 presentación).
-        <em>P-08b y P-08c siguen en autenticación / perfil.</em>
+        <strong>Prefijo P-</strong> → <strong>46</strong> casos en tablas (P-01 …
+        P-43 y P-44, más <strong>P-08b</strong> y <strong>P-08c</strong> en
+        autenticación / perfil; RF-06 con LFG admin, RF-07 social, RF-08
+        presentación).
       </li>
       <li>
         <strong>S-01 … S-08</strong> → <strong>8</strong> casos (seguridad API /
@@ -1089,7 +1091,7 @@
         datos coherente con el backend).
       </li>
     </ul>
-    <p><strong>Total pruebas manuales: 44 + 8 + 4 = 56.</strong></p>
+    <p><strong>Total pruebas manuales: 46 + 8 + 4 = 58.</strong></p>
     <table>
       <thead>
         <tr>
@@ -1101,9 +1103,9 @@
       </thead>
       <tbody>
         <tr>
-          <td>Flujo de aplicación (P-01 … P-44)</td>
-          <td>44</td>
-          <td>44</td>
+          <td>Flujo de aplicación (prefijo P-)</td>
+          <td>46</td>
+          <td>46</td>
           <td>0</td>
         </tr>
         <tr>
@@ -1120,8 +1122,8 @@
         </tr>
         <tr>
           <td><strong>Total pruebas manuales</strong></td>
-          <td><strong>56</strong></td>
-          <td><strong>56</strong></td>
+          <td><strong>58</strong></td>
+          <td><strong>58</strong></td>
           <td><strong>0</strong></td>
         </tr>
         <tr>

@@ -185,12 +185,6 @@ export default function AuthPage({ onAuthSuccess }) {
               autoComplete={mode === "login" ? "username" : "email"}
               className="figma-input"
             />
-            {mode === "login" && (
-              <p className="mt-1.5 text-xs text-slate-500">
-                Puedes entrar con el correo o con el nombre público (el mismo que
-                en comunidad).
-              </p>
-            )}
           </div>
 
           <div>
@@ -250,11 +244,6 @@ export default function AuthPage({ onAuthSuccess }) {
               >
                 Rellenar cuenta demo
               </button>
-              <span className="block mt-1 text-[0.65rem] text-slate-600">
-                Requiere haber ejecutado{" "}
-                <code className="text-slate-500">npm run seed:demo</code> en{" "}
-                <code className="text-slate-500">server/</code>
-              </span>
             </p>
           )}
 

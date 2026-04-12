@@ -31,6 +31,7 @@ Plataformas como HowLongToBeat o Backloggd son útiles, pero suelen saturarse. M
 - **Registro** — contraseña de **al menos 8 caracteres** con **mayúscula, minúscula, número y símbolo** (validación en servidor y aviso en el formulario). El **nombre de usuario** público es **único** (sin distinguir mayúsculas; índice en BD).
 - **Inicio de sesión** — **correo** o **nombre de usuario** (el que aparece en comunidad).
 - **Documentación en `docs/`** — índice en [`docs/README.md`](docs/README.md): scripts SQL en `docs/sql/`, documentación HTML en `docs/abrir-en-navegador/`, plan de pruebas en Markdown; redactado en **español** salvo nombres técnicos de ficheros.
+- **Modelo de datos** — el esquema canónico está en [`docs/sql/schema.sql`](docs/sql/schema.sql): **ocho tablas** (`usuarios`, `catalogo_juegos`, `juegos`, `juego_comentarios`, `juego_comentario_votos`, `usuario_seguimientos`, `juego_recomendaciones`, `lfg_publicaciones`). Diagrama interactivo: [`docs/abrir-en-navegador/diagrama_bd.html`](docs/abrir-en-navegador/diagrama_bd.html).
 
 ### Stack tecnológico
 
@@ -134,30 +135,28 @@ En el login, **«Rellenar cuenta demo»** usa **Demo Jurado** y esa contraseña 
 
 Permite entrar **sin registrarse** y ver la aplicación **con datos de ejemplo** (colección, estadísticas, vistas lista y cuadrícula). Sirve para demostración rápida; conviene probar también con un usuario registrado a mano.
 
-**Capturas u otras imágenes** del proyecto pueden guardarse en `docs/` (por ejemplo `docs/screenshots/`) y citarse en la **memoria o informe** del trabajo, o adjuntarse en el **paquete** que subas a la plataforma de entrega (Aula Virtual, ZIP, etc.).
-
 ### Referencia rápida de la API
 
-| Método              | Ruta                                                   | Descripción                             | Auth |
-| ------------------- | ------------------------------------------------------ | --------------------------------------- | ---- |
-| GET                 | `/api/auth/me`                                         | Usuario actual                          | ✓    |
-| PATCH               | `/api/auth/me`                                         | `avatar_id` y/o `notificaciones_sonido` | ✓    |
-| GET/POST/PUT/DELETE | `/api/games`…                                          | CRUD de colección                       | ✓    |
-| GET                 | `/api/users`, `/api/users/:id/games`                   | Comunidad (lista incluye `siguiendo`)   | ✓    |
-| GET                 | `/api/community/stats`                                 | Medias globales                         | ✓    |
-| GET/POST/DELETE     | `/api/social/follow/…`, `following`, `follow-status/…` | Seguimientos                            | ✓    |
-| GET/POST/PATCH      | `/api/social/recommendations…`                         | Recomendaciones y no leídas             | ✓    |
-| GET/POST/DELETE     | `/api/social/lfg…`                                     | Buscar grupo (LFG)                      | ✓    |
-| GET                 | `/api/social/activity`                                 | Actividad de seguidos                   | ✓    |
+| Método              | Ruta                                                   | Descripción                             | Auth  |
+| ------------------- | ------------------------------------------------------ | --------------------------------------- | ----- |
+| GET                 | `/api/auth/me`                                         | Usuario actual                          | ✓     |
+| PATCH               | `/api/auth/me`                                         | `avatar_id` y/o `notificaciones_sonido` | ✓     |
+| GET/POST/PUT/DELETE | `/api/games`…                                          | CRUD de colección                       | ✓     |
+| GET                 | `/api/users`, `/api/users/:id/games`                   | Comunidad (lista incluye `siguiendo`)   | ✓     |
+| GET                 | `/api/community/stats`                                 | Medias globales                         | ✓     |
+| GET/POST/DELETE     | `/api/social/follow/…`, `following`, `follow-status/…` | Seguimientos                            | ✓     |
+| GET/POST/PATCH      | `/api/social/recommendations…`                         | Recomendaciones y no leídas             | ✓     |
+| GET/POST/DELETE     | `/api/social/lfg…`                                     | Buscar grupo (LFG)                      | ✓     |
+| GET                 | `/api/social/activity`                                 | Actividad de seguidos                   | ✓     |
 | GET                 | `/api/admin/lfg`                                       | Listado LFG (moderación)                | admin |
-| …                   | …                                                      | Comentarios, más rutas admin, proxy     | …    |
+| …                   | …                                                      | Comentarios, más rutas admin, proxy     | …     |
 
 (Listado completo en el código fuente de `server/routes/`.)
 
 ### Seguridad (resumen)
 
 - **SQL** — Consultas **parametrizadas** (`pg`): los valores del usuario no se interpolan en el texto SQL, lo que evita **inyección SQL**.
-- **Contraseñas** — Se almacenan con **bcrypt** (hash irreversible), nunca en claro.
+- **Contraseñas** — Hash con algoritmo **bcrypt** (coste 10) mediante la biblioteca **`bcryptjs`** en Node.js; nunca en claro.
 - **API** — **JWT** firmado con un secreto del servidor; rutas privadas exigen token válido.
 - **Permisos** — En administración, el **rol** se comprueba en **base de datos** en cada petición, no solo en el cliente.
 - **CORS** — Solo el origen configurado en `CORS_ORIGIN` puede usar la API desde el navegador.
@@ -194,6 +193,8 @@ Platforms like HowLongToBeat or Backloggd are useful, but they tend to get clutt
 > Final intermodular project — Higher Degree in Web Application Development (DAW) · CESUR Málaga Este · 2025/2026.
 
 **Language & layout:** [`DESIGN_ES.md`](DESIGN_ES.md) (Spanish) and [`DESIGN.md`](DESIGN.md) (English) describe the UI. The **app strings** are **Spanish**. This README is **Spanish first**, then **English**. **Code identifiers** use English naming (typical for PERN). Main server JSDoc blocks are in Spanish. Documentation index: [`docs/README.md`](docs/README.md).
+
+**Database schema:** [`docs/sql/schema.sql`](docs/sql/schema.sql) defines **eight tables** (`usuarios`, `catalogo_juegos`, `juegos`, `juego_comentarios`, `juego_comentario_votos`, `usuario_seguimientos`, `juego_recomendaciones`, `lfg_publicaciones`). Interactive diagram: [`docs/abrir-en-navegador/diagrama_bd.html`](docs/abrir-en-navegador/diagrama_bd.html).
 
 **Registration:** passwords must be **at least 8 characters** with **uppercase, lowercase, a digit, and a symbol** (server-side + form hint). **Display names** (`nombre_usuario`) are **unique** (case-insensitive; DB index).
 
@@ -282,14 +283,14 @@ API on port **3000**, PostgreSQL on **5432**. Empty volume → schema from `docs
 
 ### API reference (summary)
 
-| Method              | Route                                | Description                                | Auth |
-| ------------------- | ------------------------------------ | ------------------------------------------ | ---- |
-| GET                 | `/api/auth/me`                       | Current user                               | ✓    |
-| PATCH               | `/api/auth/me`                       | `avatar_id` and/or `notificaciones_sonido` | ✓    |
-| GET/POST/PUT/DELETE | `/api/games`…                        | Collection CRUD                            | ✓    |
-| GET                 | `/api/users`, `/api/users/:id/games` | Community (list includes `siguiendo`)      | ✓    |
-| GET                 | `/api/community/stats`               | Global averages                            | ✓    |
-| various             | `/api/social/…`                      | Follows, recommendations, LFG, activity    | ✓    |
+| Method              | Route                                | Description                                | Auth  |
+| ------------------- | ------------------------------------ | ------------------------------------------ | ----- |
+| GET                 | `/api/auth/me`                       | Current user                               | ✓     |
+| PATCH               | `/api/auth/me`                       | `avatar_id` and/or `notificaciones_sonido` | ✓     |
+| GET/POST/PUT/DELETE | `/api/games`…                        | Collection CRUD                            | ✓     |
+| GET                 | `/api/users`, `/api/users/:id/games` | Community (list includes `siguiendo`)      | ✓     |
+| GET                 | `/api/community/stats`               | Global averages                            | ✓     |
+| various             | `/api/social/…`                      | Follows, recommendations, LFG, activity    | ✓     |
 | GET                 | `/api/admin/lfg`                     | LFG list (moderation)                      | admin |
 
 (Full list in `server/routes/` source files.)
@@ -297,7 +298,7 @@ API on port **3000**, PostgreSQL on **5432**. Empty volume → schema from `docs
 ### Security overview
 
 - **SQL injection** — **Parameterized queries** everywhere: user input is never concatenated into SQL strings.
-- **Passwords** — **bcrypt** hashes (cost 10); plaintext is never stored.
+- **Passwords** — **bcrypt**-compatible hashes (cost 10) via the **`bcryptjs`** package; plaintext is never stored.
 - **Auth** — **JWT** signed with `JWT_SECRET`; private routes use `authMiddleware`.
 - **Authorization** — **Admin role** is read from the **database** on each admin request.
 - **CORS** — Allowed browser origin comes from **`CORS_ORIGIN`**.
