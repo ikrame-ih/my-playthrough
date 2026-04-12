@@ -32,8 +32,16 @@
       p.sub {
         color: var(--muted);
         font-size: 0.9rem;
-        margin: 0 0 2rem;
-        max-width: 42rem;
+        margin: 0 0 1.25rem;
+        max-width: 46rem;
+        line-height: 1.55;
+      }
+      .diagram-caption {
+        margin: 0.65rem 0 0;
+        font-size: 0.78rem;
+        color: #94a3b8;
+        line-height: 1.45;
+        max-width: 52rem;
       }
       .grid {
         display: grid;
@@ -226,7 +234,8 @@
       </button>
       <span class="hint">
         Descarga: copia del HTML de esta página. En GitHub, la vista
-        <strong>Raw</strong> muestra el mismo contenido como página independiente.
+        <strong>Raw</strong> muestra el mismo contenido como página
+        independiente.
       </span>
     </div>
     <p class="doc-nav">
@@ -237,25 +246,20 @@
     </p>
     <h1>Modelo lógico — base de datos</h1>
     <p class="sub">
-      Contenido alineado con <code>docs/sql/schema.sql</code>. El diagrama está
-      partido en tres bloques para que las líneas no se crucen. Las
-      <strong>FK</strong> están en las tablas hijas (p. ej. <code>juegos</code>
-      referencia a <code>usuarios</code>); en el SVG, <strong>1</strong> y
-      <strong>N</strong> indican <strong>1:N</strong> (una fila del lado
-      <strong>1</strong>, muchas filas posibles del lado <strong>N</strong>). La
-      tabla de abajo lista cada FK con la misma cardinalidad en texto.
+      Lo mismo que <code>docs/sql/schema.sql</code>, en página. Tres dibujos
+      para que las flechas no se amontonen; abajo, la tabla de relaciones y el
+      listado de columnas cuentan el detalle (incluida la cardinalidad en
+      palabras, sin números encima del SVG).
     </p>
 
     <div class="legend" aria-label="Leyenda">
       <span><span class="dot-pk" aria-hidden></span> Clave primaria (PK)</span>
       <span
-        ><span class="dot-fk" aria-hidden></span> Clave foránea (FK): apunta a
+        ><span class="dot-fk" aria-hidden></span> Clave foránea (FK): enlaza con
         otra tabla</span
       >
-      <span
-        ><strong>1 — N</strong> en el SVG: cardinalidad <strong>uno a muchos</strong>
-        (el <strong>1</strong> corresponde a la tabla referenciada por la FK; el
-        <strong>N</strong>, a la tabla que contiene la FK)</span
+      <span>Las flechas marcan dependencias; <strong>1:N</strong> y casos raros
+        están en la tabla de relaciones.</span
       >
     </div>
 
@@ -351,24 +355,6 @@
             stroke-width="1.6"
             marker-end="url(#mk1)"
           />
-          <text
-            x="282"
-            y="80"
-            fill="#94a3b8"
-            font-size="10"
-            font-family="Segoe UI,sans-serif"
-          >
-            N
-          </text>
-          <text
-            x="282"
-            y="70"
-            fill="#94a3b8"
-            font-size="10"
-            font-family="Segoe UI,sans-serif"
-          >
-            1
-          </text>
           <path
             d="M 150 92 L 205 92 L 205 112 L 210 112"
             fill="none"
@@ -376,25 +362,12 @@
             stroke-width="1.6"
             marker-end="url(#mk1)"
           />
-          <text
-            x="128"
-            y="86"
-            fill="#94a3b8"
-            font-size="10"
-            font-family="Segoe UI,sans-serif"
-          >
-            N
-          </text>
-          <text
-            x="95"
-            y="86"
-            fill="#94a3b8"
-            font-size="10"
-            font-family="Segoe UI,sans-serif"
-          >
-            1
-          </text>
         </svg>
+        <p class="diagram-caption">
+          Un usuario puede tener muchas fichas en <code>juegos</code>; una fila
+          de <code>catalogo_juegos</code> puede enlazar muchas fichas cuando
+          llevan <code>catalogo_id</code>.
+        </p>
       </div>
       <div class="diagram-fig">
         <h3>
@@ -519,68 +492,14 @@
             stroke-width="1.5"
             marker-end="url(#mk2)"
           />
-          <text
-            x="348"
-            y="125"
-            fill="#94a3b8"
-            font-size="10"
-            font-family="Segoe UI,sans-serif"
-          >
-            N
-          </text>
-          <text
-            x="348"
-            y="88"
-            fill="#94a3b8"
-            font-size="10"
-            font-family="Segoe UI,sans-serif"
-          >
-            1
-          </text>
-          <text
-            x="248"
-            y="52"
-            fill="#94a3b8"
-            font-size="10"
-            font-family="Segoe UI,sans-serif"
-          >
-            N
-          </text>
-          <text
-            x="118"
-            y="40"
-            fill="#94a3b8"
-            font-size="10"
-            font-family="Segoe UI,sans-serif"
-          >
-            1
-          </text>
-          <text
-            x="248"
-            y="130"
-            fill="#94a3b8"
-            font-size="10"
-            font-family="Segoe UI,sans-serif"
-          >
-            N
-          </text>
-          <text
-            x="118"
-            y="128"
-            fill="#94a3b8"
-            font-size="10"
-            font-family="Segoe UI,sans-serif"
-          >
-            1
-          </text>
         </svg>
+        <p class="diagram-caption">
+          Cada comentario pertenece a un juego y a un autor; cada voto une un
+          comentario con quien vota.
+        </p>
       </div>
       <div class="diagram-fig">
-        <h3>
-          3. Red social (seguidos, recomendaciones, LFG: cada fila enlaza un
-          usuario y, salvo seguidos, un juego; respecto a
-          <code>usuarios</code>/<code>juegos</code> la cardinalidad es 1:N)
-        </h3>
+        <h3>3. Red social (seguidos, recomendaciones, buscar grupo / LFG)</h3>
         <svg
           viewBox="0 0 560 248"
           xmlns="http://www.w3.org/2000/svg"
@@ -734,6 +653,11 @@
             marker-end="url(#mk3)"
           />
         </svg>
+        <p class="diagram-caption">
+          Cada tabla de la derecha guarda filas que enlazan
+          <code>usuarios</code> y, cuando aplica, un <code>juego</code> (por
+          ejemplo una recomendación o un LFG asociado a una ficha).
+        </p>
       </div>
     </div>
 
@@ -741,11 +665,10 @@
       Relaciones (clave foránea → tabla destino) y cardinalidad
     </h2>
     <p class="sub" style="margin-bottom: 1rem">
-      En cada fila, la columna <strong>Cardinalidad</strong> expresa la relación
-      desde la tabla <em>referenciada</em> (padre) hacia la tabla que contiene
-      la FK (hijo): <strong>1:N</strong> = una fila padre, muchas filas hijas
-      posibles. Las tablas de enlace con dos FKs a <code>usuarios</code> modelan
-      un <strong>M:N</strong> entre usuarios mediante filas intermedias.
+      La columna <strong>Cardinalidad</strong> lo dice en una frase (un usuario,
+      muchas fichas…). Donde pone <strong>M:N</strong>, la relación entre
+      usuarios pasa por una tabla intermedia (cada fila es un par
+      seguidor→seguido).
     </p>
     <table class="fk-matrix">
       <thead>
@@ -815,7 +738,9 @@
           <td>juego_recomendaciones</td>
           <td><code>juego_id</code></td>
           <td><code>juegos(id)</code> (ficha del remitente)</td>
-          <td>1 juego (ficha remitente) : N envíos a distintos destinatarios</td>
+          <td>
+            1 juego (ficha remitente) : N envíos a distintos destinatarios
+          </td>
         </tr>
         <tr>
           <td>lfg_publicaciones</td>

@@ -3,7 +3,7 @@
 **Proyecto:** MyPlaythrough  
 **Alumna:** Ikrame Ibn Hayoun  
 **Ciclo:** Desarrollo de Aplicaciones Web — CESUR Málaga Este  
-**Curso:** 2025/2026 · Entrega final (cuarta entrega)
+**Curso:** 2025/2026
 
 **Consulta recomendada para la evaluación:** el plan completo se visualiza con más claridad en **`docs/abrir-en-navegador/plan_pruebas.html`** (navegador): tablas maquetadas, secciones diferenciadas e impresión o exportación a **PDF** desde el menú de imprimir del propio navegador. Este fichero **`docs/pruebas.md`** es la fuente en texto del mismo contenido.
 
@@ -17,12 +17,12 @@ Este documento describe **qué se ha probado**, **cómo** y **con qué resultado
 
 ## 2. Tipos de prueba realizadas
 
-| Tipo                  | Descripción breve                                                                                        |
-| --------------------- | -------------------------------------------------------------------------------------------------------- |
-| Manuales funcionales  | Comprobación de flujos de usuario (registro, colección, comunidad, social ampliado, admin, comentarios). |
+| Tipo                  | Descripción breve                                                                                                                                |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Manuales funcionales  | Comprobación de flujos de usuario (registro, colección, comunidad, social ampliado, admin, comentarios).                                         |
 | Seguridad básica      | Acceso a rutas protegidas sin token, permisos, límites de cuerpo, límite de frecuencia en login/registro, endpoint de diagnóstico en producción. |
-| Validación de datos   | Normalización de entradas (email, título, estado, plataforma) coherente con el backend.                  |
-| Unitarias automáticas | Tests repetibles sobre lógica pura (sin navegador ni base de datos), ejecutados con Vitest 3.            |
+| Validación de datos   | Normalización de entradas (email, título, estado, plataforma) coherente con el backend.                                                          |
+| Unitarias automáticas | Tests repetibles sobre lógica pura (sin navegador ni base de datos), ejecutados con Vitest 3.                                                    |
 
 ---
 
@@ -152,15 +152,15 @@ Se ejecutan en terminal, desde la carpeta de cada paquete, **sin** levantar obli
 
 ## 6. Pruebas de seguridad (API / configuración)
 
-| ID   | Caso                  | Herramienta / condición                             | Esperado | Obtenido                | Estado |
-| ---- | --------------------- | --------------------------------------------------- | -------- | ----------------------- | ------ |
-| S-01 | Sin token             | `GET /api/games` sin `Authorization`                | 401      | JSON de error coherente | OK     |
-| S-02 | JWT alterado          | Token modificado a mano                             | 401      | Rechazado               | OK     |
-| S-03 | Juego de otro usuario | `GET /api/games/:id` con juego de otro `usuario_id` | 404      | Sin datos ajenos        | OK     |
-| S-04 | Admin sin rol         | `GET /api/admin/users` con JWT de usuario           | 403      | Mensaje de permisos     | OK     |
-| S-05 | test-db en producción | `NODE_ENV=production` y `GET /api/test-db`          | 404      | Endpoint oculto         | OK     |
-| S-06 | Body > 50 KB          | Registro con payload grande                         | 413      | Rechazado               | OK     |
-| S-07 | Social sin token      | `GET /api/social/lfg` sin `Authorization`           | 401      | Rechazado               | OK     |
+| ID   | Caso                  | Herramienta / condición                                                                                                                   | Esperado | Obtenido                | Estado |
+| ---- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------- | ------ |
+| S-01 | Sin token             | `GET /api/games` sin `Authorization`                                                                                                      | 401      | JSON de error coherente | OK     |
+| S-02 | JWT alterado          | Token modificado a mano                                                                                                                   | 401      | Rechazado               | OK     |
+| S-03 | Juego de otro usuario | `GET /api/games/:id` con juego de otro `usuario_id`                                                                                       | 404      | Sin datos ajenos        | OK     |
+| S-04 | Admin sin rol         | `GET /api/admin/users` con JWT de usuario                                                                                                 | 403      | Mensaje de permisos     | OK     |
+| S-05 | test-db en producción | `NODE_ENV=production` y `GET /api/test-db`                                                                                                | 404      | Endpoint oculto         | OK     |
+| S-06 | Body > 50 KB          | Registro con payload grande                                                                                                               | 413      | Rechazado               | OK     |
+| S-07 | Social sin token      | `GET /api/social/lfg` sin `Authorization`                                                                                                 | 401      | Rechazado               | OK     |
 | S-08 | Límite login/registro | Más de **40** peticiones `POST` a `/api/auth/login` o `/api/auth/register` desde la **misma IP** en **15 minutos** (`express-rate-limit`) | 429      | JSON de error coherente | OK     |
 
 ---
@@ -198,9 +198,9 @@ _Las 27 pruebas unitarias corresponden a 17 tests en `server` y 10 en `client` (
 
 ---
 
-## 9. Líneas de mejora de mayor alcance (no implementadas)
+## 9. Cosas que dejaría para más adelante (no están hechas)
 
-1. **Errores de API unificados:** centralizar todas las respuestas de error en un único formato y capa (middleware o helper común), y en producción ocultar stack traces y códigos internos al cliente.
-2. **Notificaciones en tiempo real:** sustituir o complementar el polling de la campana por **WebSockets** o **SSE**, con reconexión y estados de conexión visibles.
-3. **Fusión o deduplicación de fichas:** herramienta para unir dos entradas de colección que representen el mismo título (p. ej. cuando comparten `catalogo_id` o tras revisión manual), migrando comentarios y votos.
-4. **Pruebas de integración automatizadas:** suite contra API levantada en entorno de prueba (p. ej. Supertest + BD efímera) además de las unitarias actuales.
+1. **Mensajes de error más uniformes:** según la ruta el JSON de error puede cambiar un poco de forma; lo suyo sería centralizarlo (p. ej. middleware) y que en producción no se envíen al cliente detalles técnicos largos.
+2. **Campana sin ir preguntando cada X segundos:** hoy la campana usa *polling*; en un producto grande habría que valorar **WebSockets** o **SSE** para avisos al momento (más trabajo de despliegue y reconexión).
+3. **Juntar dos fichas del mismo juego:** si hubiera dos entradas duplicadas, haría falta un flujo que las una y mueva comentarios y votos (sobre todo si ya comparten `catalogo_id`).
+4. **Tests que peguen contra la API de verdad:** además de las unitarias, una suite tipo **Supertest** con API y base de prueba levantadas para pillar fallos entre capas.

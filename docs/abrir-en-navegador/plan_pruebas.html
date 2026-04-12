@@ -259,7 +259,7 @@
         <strong>Ciclo:</strong> Desarrollo de Aplicaciones Web — CESUR Málaga
         Este
       </p>
-      <p><strong>Curso:</strong> 2025/2026 · Entrega final (cuarta entrega)</p>
+      <p><strong>Curso:</strong> 2025/2026</p>
     </div>
 
     <div class="note">
@@ -1016,8 +1016,8 @@
           <td>Límite login/registro</td>
           <td>
             Más de <strong>40</strong> <code>POST</code> a
-            <code>/api/auth/login</code> o
-            <code>/api/auth/register</code> desde la <strong>misma IP</strong> en
+            <code>/api/auth/login</code> o <code>/api/auth/register</code> desde
+            la <strong>misma IP</strong> en
             <strong>15 minutos</strong> (<code>express-rate-limit</code>)
           </td>
           <td>429</td>
@@ -1140,29 +1140,35 @@
       >
     </p>
 
-    <h2>9. Líneas de mejora de mayor alcance (no implementadas)</h2>
+    <h2>9. Cosas que dejaría para más adelante (no están hechas)</h2>
     <ol>
       <li>
-        <strong>Errores de API unificados:</strong> centralizar todas las
-        respuestas de error en un único formato y capa (middleware o helper
-        común), y en producción ocultar stack traces y códigos internos al
-        cliente.
+        <strong>Mensajes de error más uniformes:</strong> ahora mismo según la
+        ruta el JSON de error puede cambiar un poco de forma. Lo suyo sería
+        pasar todo por el mismo sitio (por ejemplo un middleware) y que en
+        producción el usuario no reciba detalles técnicos largos (stack, cosas
+        internas).
       </li>
       <li>
-        <strong>Notificaciones en tiempo real:</strong> sustituir o complementar
-        el polling de la campana por <strong>WebSockets</strong> o
-        <strong>SSE</strong>, con reconexión y estados de conexión visibles.
+        <strong>Campana sin ir preguntando cada X segundos:</strong> hoy la
+        campana hace <em>polling</em> (cada poco pregunta al servidor si hay
+        novedades). Para un producto grande habría que valorar
+        <strong>WebSockets</strong> o <strong>SSE</strong> para que el servidor
+        avise al momento; es más trabajo de despliegue y de reconexión si se
+        cae la red.
       </li>
       <li>
-        <strong>Fusión o deduplicación de fichas:</strong> herramienta para unir
-        dos entradas de colección que representen el mismo título (p. ej. cuando
-        comparten <code>catalogo_id</code> o tras revisión manual), migrando
-        comentarios y votos.
+        <strong>Juntar dos fichas del mismo juego:</strong> si alguien tiene dos
+        entradas que en realidad son el mismo título, haría falta una pantalla o
+        proceso de administración que las una y mueva comentarios y votos a la
+        ficha buena (sobre todo si ya comparten <code>catalogo_id</code>).
       </li>
       <li>
-        <strong>Pruebas de integración automatizadas:</strong> suite contra API
-        levantada en entorno de prueba (p. ej. Supertest + BD efímera) además de
-        las unitarias actuales.
+        <strong>Tests que peguen contra la API de verdad:</strong> las
+        unitarias prueban funciones sueltas; faltaría una batería que levante la
+        API (y una base de prueba) y compruebe rutas enteras, tipo
+        <strong>Supertest</strong>, para pillar fallos de integración entre
+        capas.
       </li>
     </ol>
 
