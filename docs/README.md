@@ -2,6 +2,8 @@
 
 Índice de la carpeta `docs/` para la evaluación del trabajo y para quien consulte el repositorio. La guía de instalación, variables de entorno y descripción general de la API figuran en el [`README.md`](../README.md) de la raíz del proyecto.
 
+**Para revisar el plan de pruebas completo**, lo más cómodo es abrir en el navegador [`abrir-en-navegador/plan_pruebas.html`](abrir-en-navegador/plan_pruebas.html) (mejor lectura que el Markdown e impresión a PDF). El texto fuente es [`pruebas.md`](pruebas.md).
+
 ---
 
 ## Documentación en HTML (`abrir-en-navegador/`)
@@ -11,7 +13,7 @@ Los ficheros maquetados para **visualización en navegador** (estilos propios; e
 | Ruta | Contenido |
 |------|-----------|
 | [`abrir-en-navegador/diagrama_bd.html`](abrir-en-navegador/diagrama_bd.html) | Modelo de datos: diagramas por bloques, tabla de claves foráneas y detalle de columnas. |
-| [`abrir-en-navegador/funciones_principales.html`](abrir-en-navegador/funciones_principales.html) | Funciones relevantes del código con repaso de conceptos (JWT, middleware, códigos HTTP, etc.) y referencias a ficheros. |
+| [`abrir-en-navegador/funciones_principales.html`](abrir-en-navegador/funciones_principales.html) | Funciones relevantes del código, temario de apoyo del ciclo (JWT, middleware, HTTP, etc.) y referencias a ficheros. |
 | [`abrir-en-navegador/plan_pruebas.html`](abrir-en-navegador/plan_pruebas.html) | Plan de pruebas en formato página. |
 
 La **fuente en texto** del plan de pruebas es [`pruebas.md`](pruebas.md); su contenido es el mismo que el HTML anterior.

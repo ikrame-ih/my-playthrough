@@ -8,9 +8,13 @@
  *   POST /api/auth/register → crear nueva cuenta
  *   POST /api/auth/login    → iniciar sesión (devuelve JWT)
  *   GET  /api/auth/me       → verificar que el token sigue siendo válido
+ *
+ * POST de registro e inicio de sesión comparten un límite por IP (`express-rate-limit`)
+ * para dificultar pruebas masivas de contraseñas desde la misma dirección.
  */
 
 const express = require("express");
+const rateLimit = require("express-rate-limit");
 const bcrypt = require("bcryptjs");
 const pool = require("../config/db");
 const {
@@ -29,6 +33,17 @@ const {
 
 const router = express.Router();
 
+const authLoginRegisterLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 40,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error:
+      "Demasiados intentos de registro o inicio de sesión. Espera unos minutos e inténtalo de nuevo.",
+  },
+});
+
 /**
  * Registra una nueva cuenta de usuario en el sistema.
  * Valida que el email y el nombre de usuario no estén ya en uso antes de insertar.
@@ -42,7 +57,7 @@ const router = express.Router();
  * @param  {string} req.body.password       - Contraseña (mín. 8 caracteres, mayúscula, minúscula, número y símbolo).
  * @returns {object} 201 – `{ success, token, user }` | 400 – `{ error }` | 500 – `{ error }`
  */
-router.post("/register", async (req, res) => {
+router.post("/register", authLoginRegisterLimiter, async (req, res) => {
   try {
     const nombre_usuario = String(req.body.nombre_usuario ?? "").trim();
     const email = normalizeEmail(req.body.email);
@@ -127,7 +142,7 @@ router.post("/register", async (req, res) => {
  * @param  {string} req.body.password - Contraseña en texto plano.
  * @returns {object} 200 – `{ success, token, user }` | 401 – `{ error }` | 500 – `{ error }`
  */
-router.post("/login", async (req, res) => {
+router.post("/login", authLoginRegisterLimiter, async (req, res) => {
   try {
     const raw = String(req.body.login ?? req.body.email ?? "").trim();
     const password = req.body.password;

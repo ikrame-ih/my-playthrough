@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Funciones de código — MyPlaythrough (guía con repaso de conceptos)</title>
+  <title>Funciones de código — MyPlaythrough (temario de apoyo y referencias)</title>
   <style>
     :root {
       --bg: #0b1120;
@@ -84,6 +84,24 @@
     .gloss h3 { margin-top: 0; color: #cbd5e1; font-size: 1rem; }
     .gloss p, .gloss li { color: #e2e8f0; }
     .gloss strong { color: var(--accent); font-weight: 600; }
+    .toc {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.15rem;
+      margin: 1rem 0 1.5rem;
+      font-size: 0.9rem;
+    }
+    .toc h2 {
+      margin: 0 0 0.65rem;
+      font-size: 0.98rem;
+      border: none;
+      padding: 0;
+      color: var(--accent);
+    }
+    .toc ul { margin: 0; padding-left: 1.2rem; }
+    .toc li { margin: 0.3rem 0; }
+    .toc a { color: var(--accent); }
     @media print {
       body { background: #fff; color: #111; max-width: 100%; }
       .toolbar { display: none; }
@@ -101,12 +119,26 @@
     <a href="plan_pruebas.html">Plan de pruebas</a>
   </p>
 
-  <h1>Funciones de código y repaso de conceptos</h1>
+  <h1>Funciones de código y temario de apoyo</h1>
   <p class="lead">
-    Este documento acompaña al código del proyecto: no es una lista de pantallas, sino <strong>funciones concretas</strong> que implementé (JavaScript en servidor y cliente) y, antes, un <strong>repaso en lenguaje claro</strong> de términos que en clase y en tutoriales aparecen una y otra vez. Lo escribo como quien <strong>vuelve sobre apuntes</strong>: si algo suena obvio para quien ya trabaja en backend, aquí lo dejo fijado para mí y para quien revise el repositorio.
+    Este documento enlaza el código del proyecto con la <strong>formación del ciclo de Grado Superior DAW</strong>: primero un bloque de <strong>conceptos del temario</strong> y de la <strong>bibliografía habitual</strong> (HTTP, JWT, middleware, etc.) alineados con lo que exigen los módulos de desarrollo web; después, <strong>funciones concretas</strong> en servidor y cliente con rutas de fichero. Quien evalúe el repositorio puede ir directo al índice de funciones si el bloque conceptual ya es familiar.
   </p>
 
-  <h2>Repaso: conceptos que uso en casi todo el flujo de login y API</h2>
+  <nav class="toc" aria-label="Índice del documento">
+    <h2>Índice</h2>
+    <ul>
+      <li><a href="#temario">Temario de apoyo (conceptos transversales)</a></li>
+      <li><a href="#auth">1. Autenticación: token y comprobación por petición</a></li>
+      <li><a href="#cliente">2. Cliente: cabeceras y tratamiento del 401</a></li>
+      <li><a href="#normalize">3. Normalización de datos antes de guardar</a></li>
+      <li><a href="#coleccion">4. Colección, SQL reutilizable y carátulas (CORS)</a></li>
+      <li><a href="#discusion">5. Discusión: agrupar comentarios y votar</a></li>
+      <li><a href="#campana">6. Campana de recomendaciones (sin WebSockets)</a></li>
+      <li><a href="#esfuerzo">7. Partes del proyecto que más tiempo llevaron</a></li>
+    </ul>
+  </nav>
+
+  <h2 id="temario">Temario de apoyo: conceptos que atraviesan el login y la API</h2>
 
   <div class="gloss">
     <h3>Petición HTTP y códigos de respuesta</h3>
@@ -122,7 +154,7 @@
       <li><strong>500</strong>: error interno del servidor (bug o fallo de base de datos).</li>
     </ul>
     <p>
-      <strong>Recuerdo:</strong> 401 = identidad; 403 = identidad clara pero acción prohibida.
+      <strong>Criterio útil:</strong> 401 = identidad no válida o ausente; 403 = identidad reconocida, acción no permitida.
     </p>
   </div>
 
@@ -135,21 +167,21 @@
       La parte central (el <strong>payload</strong>) lleva datos en JSON codificados (por ejemplo <code>id</code>, <code>email</code>, <code>rol</code>). Cualquiera puede <em>leer</em> esa parte si decodifica el Base64 (no es cifrado total), pero <strong>no puede falsificarla</strong> sin conocer el secreto del servidor, porque la tercera parte es la <strong>firma</strong>.
     </p>
     <p>
-      <strong>JWT_SECRET</strong> (en el <code>.env</code>) es la “clave maestra” solo del servidor: con ella se <strong>firma</strong> el token al crearlo y se <strong>verifica</strong> al recibirlo. Por eso en los apuntes se llama <strong>secreto</strong>: si alguien lo roba, podría fabricar tokens falsos. No se sube a Git ni se envía al navegador.
+      <strong>JWT_SECRET</strong> (en el <code>.env</code>) es la “clave maestra” solo del servidor: con ella se <strong>firma</strong> el token al crearlo y se <strong>verifica</strong> al recibirlo. Por eso en la documentación se denomina <strong>secreto</strong>: si alguien lo obtiene, podría fabricar tokens falsos. No se sube a Git ni se envía al navegador.
     </p>
   </div>
 
   <div class="gloss">
     <h3>Sesión “sin guardar sesiones” en el servidor</h3>
     <p>
-      Otra forma clásica de login es que el servidor guarde en memoria o en base de datos una tabla de sesiones (“usuario 7 conectado con id de sesión S”). Aquí no hace falta esa tabla para el día a día: confiamos en el <strong>JWT</strong> que el cliente guarda (en <code>localStorage</code>) y envía en cada petición. El servidor solo tiene que <strong>verificar la firma</strong> y la caducidad. Eso es lo que suelo resumir como: <strong>identificar al usuario en cada petición sin almacenar yo misma la lista de sesiones</strong>.
+      Otra forma habitual de login es que el servidor guarde en memoria o en base de datos una tabla de sesiones (“usuario 7 conectado con id de sesión S”). En este proyecto no hace falta esa tabla para el día a día: se usa el <strong>JWT</strong> que el cliente guarda (en <code>localStorage</code>) y envía en cada petición. El servidor solo tiene que <strong>verificar la firma</strong> y la caducidad: <strong>identidad en cada petición sin almacenar en servidor la lista de sesiones activas</strong>.
     </p>
   </div>
 
   <div class="gloss">
     <h3>Cabecera <code>Authorization: Bearer …</code></h3>
     <p>
-      Es el <strong>formato estándar</strong> acordado en la web para mandar un token junto a la petición. La cabecera se llama <code>Authorization</code>; el valor empieza por la palabra <strong>Bearer</strong>, un espacio, y después el JWT completo. Ejemplo mental: <code>Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…</code>. Mi función <code>authHeaders()</code> en el cliente monta exactamente eso cuando hay token guardado.
+      Es el <strong>formato estándar</strong> acordado en la web para mandar un token junto a la petición. La cabecera se llama <code>Authorization</code>; el valor empieza por la palabra <strong>Bearer</strong>, un espacio, y después el JWT completo. Ejemplo: <code>Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…</code>. La función <code>authHeaders()</code> en el cliente monta ese formato cuando hay token guardado.
     </p>
   </div>
 
@@ -163,17 +195,17 @@
   <div class="gloss">
     <h3>Por qué trato el 401 en el cliente con <code>apiFetch</code></h3>
     <p>
-      Si el token caducó, cualquier ruta protegida puede devolver <strong>401</strong>. Si no reacciono, la interfaz seguiría mostrando al usuario como logueado aunque el servidor ya no lo acepte. Por eso centralicé: si la respuesta es 401, <strong>borro token y usuario del <code>localStorage</code></strong> y <strong>recargo la página</strong> para volver a la pantalla de login con un estado limpio.
+      Si el token caducó, cualquier ruta protegida puede devolver <strong>401</strong>. Sin reaccionar en cliente, la interfaz seguiría mostrando al usuario como registrado aunque el servidor ya no lo acepte. Por eso se centraliza: si la respuesta es 401, se <strong>borran token y usuario del <code>localStorage</code></strong> y se <strong>recarga la página</strong> para volver al login con estado limpio.
     </p>
   </div>
 
-  <h2>1. Autenticación: crear el token y comprobarlo en cada petición</h2>
+  <h2 id="auth">1. Autenticación: crear el token y comprobarlo en cada petición</h2>
 
   <div class="card">
     <span class="path">server/middleware/auth.middleware.js → <code>createToken(user)</code></span>
     <p class="prob">Qué problema resolvía</p>
     <p>
-      Después de un login o registro correcto, el backend tiene que entregar al cliente una forma <strong>portátil</strong> de demostrar quién es en las siguientes peticiones, sin que yo tenga que consultar primero una tabla de “sesiones abiertas” en cada caso (el enfoque con JWT ya lo expliqué arriba).
+      Tras un login o registro correcto, el backend entrega al cliente una forma <strong>portátil</strong> de demostrar la identidad en las siguientes peticiones, sin mantener una tabla de sesiones en servidor para cada conexión (el modelo JWT está descrito en el bloque de temario anterior).
     </p>
     <p><strong>Qué hace la función:</strong> usa <code>jwt.sign</code> para generar un JWT cuyo <strong>payload</strong> incluye <code>id</code>, <code>email</code> y <code>rol</code>, firmado con <code>JWT_SECRET</code> y con caducidad de 7 días. Ese string es el que el navegador guarda y reenvía en <code>Authorization: Bearer …</code>.</p>
     <pre><code>jwt.sign(
@@ -182,7 +214,7 @@
   { expiresIn: "7d" },
 );</code></pre>
     <p>
-      <strong>Recuerdo:</strong> el payload del JWT ayuda al front a mostrar menús, pero para acciones sensibles (como admin) el servidor vuelve a mirar el rol en base de datos cuando hace falta, porque el token podría estar desactualizado.
+      <strong>Nota:</strong> el payload del JWT sirve al cliente para menús y UI, pero para acciones sensibles (p. ej. administración) el servidor vuelve a leer el rol en base de datos cuando procede, porque el token puede quedar desactualizado.
     </p>
     <p><span class="dif dif-media">Media</span> Configurar bien variables de entorno y no confundir “datos en el token” con “permisos definitivos”.</p>
   </div>
@@ -191,7 +223,7 @@
     <span class="path">server/middleware/auth.middleware.js → <code>authMiddleware</code></span>
     <p class="prob">Qué problema resolvía</p>
     <p>
-      Sin esto, en cada ruta tendría que copiar el mismo código: leer la cabecera <code>Authorization</code>, comprobar que empiece por <code>Bearer</code>, extraer el token, llamar a <code>jwt.verify</code> y devolver JSON de error si algo falla.
+      Sin este middleware, cada ruta repetiría el mismo código: leer <code>Authorization</code>, comprobar el prefijo <code>Bearer</code>, extraer el token, <code>jwt.verify</code> y responder con JSON de error si falla algo.
     </p>
     <p><strong>Qué hace:</strong> es el <strong>middleware</strong> que encapsula todo eso: si el token es válido, rellena <code>req.user</code> con lo que venía en el payload; si no, responde <strong>401</strong> con un mensaje claro.</p>
     <p><span class="dif dif-baja">Baja</span> Patrón muy documentado en Express; lo importante es encadenarlo bien en el router.</p>
@@ -201,21 +233,21 @@
     <span class="path">server/middleware/auth.middleware.js → <code>usuarioEsAdmin(usuarioId)</code> y <code>adminMiddleware</code></span>
     <p class="prob">Qué problema resolvía</p>
     <p>
-      El JWT podría haberse emitido <strong>antes</strong> de que en base de datos cambiara el rol. No basta con leer <code>rol</code> solo del payload si quiero estar segura de quién es administradora ahora mismo.
+      El JWT puede haberse emitido <strong>antes</strong> de un cambio de rol en base de datos. No basta con leer <code>rol</code> solo del payload si se exige certeza sobre quién es administrador en el momento de la petición.
     </p>
     <p><strong>Qué hace:</strong> <code>usuarioEsAdmin</code> ejecuta <code>SELECT rol FROM usuarios WHERE id = $1</code>. <code>adminMiddleware</code> va <strong>después</strong> de <code>authMiddleware</code> y, si el rol en BD no es admin, responde <strong>403</strong> (aquí sí: identidad conocida, acción no permitida).</p>
     <p><span class="dif dif-media">Media</span> Mantener claros los mensajes y no mezclar 401 con 403.</p>
   </div>
 
-  <h2>2. Cliente: cabeceras y un solo sitio para el 401</h2>
+  <h2 id="cliente">2. Cliente: cabeceras y un solo sitio para el 401</h2>
 
   <div class="card">
     <span class="path">client/src/api.js → <code>authHeaders()</code> y <code>apiFetch(url, opts)</code></span>
     <p class="prob">Qué problema resolvía</p>
     <p>
-      Sin capa común, cada componente repetiría cómo montar JSON y el <code>Bearer</code>, y tendría que copiar el mismo <code>if (res.status === 401)</code> una y otra vez.
+      Sin capa común, cada componente repetiría cómo montar JSON y el <code>Bearer</code>, y el mismo <code>if (res.status === 401)</code> en múltiples sitios.
     </p>
-    <p><strong>Qué hace:</strong> <code>authHeaders</code> devuelve <code>Content-Type: application/json</code> y, si existe token en <code>localStorage</code>, la cabecera <code>Authorization: Bearer …</code>. <code>apiFetch</code> envuelve a <code>fetch</code> y, si la respuesta es 401, limpia almacenamiento y recarga (como expliqué en el recuadro del 401).</p>
+    <p><strong>Qué hace:</strong> <code>authHeaders</code> devuelve <code>Content-Type: application/json</code> y, si existe token en <code>localStorage</code>, la cabecera <code>Authorization: Bearer …</code>. <code>apiFetch</code> envuelve a <code>fetch</code> y, si la respuesta es 401, limpia almacenamiento y recarga (comportamiento descrito en el apartado de temario sobre el 401).</p>
     <pre><code>if (res.status === 401) {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
@@ -225,29 +257,29 @@
     <p><span class="dif dif-media">Media</span> Un solo lugar donde mantener el comportamiento ante sesión caducada.</p>
   </div>
 
-  <h2>3. Normalización de datos antes de guardar</h2>
+  <h2 id="normalize">3. Normalización de datos antes de guardar</h2>
 
   <div class="card">
     <span class="path">server/utils/normalize.js</span>
     <p class="prob">Qué problema resolvía</p>
     <p>
-      Misma persona escribiendo <code>Usuario@Gmail.com</code> y <code>usuario@gmail.com</code>: sin normalizar, la base de datos los trataría como dos emails distintos.
+      La misma dirección escrita como <code>Usuario@Gmail.com</code> y como <code>usuario@gmail.com</code>, sin normalizar, la base de datos la trataría como dos correos distintos.
     </p>
-    <p><strong>Qué hace:</strong> funciones <strong>puras</strong> (sin tocar base de datos) que dejan emails, títulos y estados en una forma única; las uso en rutas y las cubro con tests en <code>normalize.test.js</code>.</p>
+    <p><strong>Qué hace:</strong> funciones <strong>puras</strong> (sin tocar base de datos) que unifican emails, títulos y estados; se usan en rutas y están cubiertas por tests en <code>normalize.test.js</code>.</p>
     <p><span class="dif dif-baja">Baja</span>–<span class="dif dif-media">Media</span> La dificultad está en no duplicar reglas entre cliente y servidor.</p>
   </div>
 
-  <h2>4. Colección, SQL reutilizable y carátulas (CORS)</h2>
+  <h2 id="coleccion">4. Colección, SQL reutilizable y carátulas (CORS)</h2>
 
   <div class="card">
     <span class="path">server/utils/queries.js → <code>queryGamesListForUser(usuarioId)</code></span>
     <p class="prob">Qué problema resolvía</p>
     <p>
-      Quería un solo sitio con el <code>LEFT JOIN</code> al catálogo para mostrar título e imagen oficiales cuando la ficha está enlazada, en lugar de repetir la consulta en cada ruta.
+      Un único lugar con el <code>LEFT JOIN</code> al catálogo evita repetir la consulta en cada ruta y centraliza título e imagen oficiales cuando la ficha está enlazada.
     </p>
     <p><strong>Qué hace:</strong> un <code>SELECT</code> con <code>COALESCE</code>: en castellano, “si el catálogo tiene título, úsalo; si no, el de la ficha del usuario”. Igual para la URL de imagen.</p>
     <p>
-      <strong>Recuerdo rápido de <code>COALESCE(a,b)</code>:</strong> devuelve el primer valor que no sea nulo. Así priorizo datos del catálogo sin perder lo manual.
+      <strong><code>COALESCE(a,b)</code></strong> devuelve el primer valor que no sea nulo; aquí prioriza datos del catálogo sin descartar lo introducido a mano.
     </p>
     <p><span class="dif dif-media">Media</span> Sintaxis SQL y cuidar <code>NULL</code> y espacios en URLs.</p>
   </div>
@@ -259,30 +291,30 @@
       La vista de discusión muestra juegos de <strong>cualquier</strong> usuario; el endpoint “solo mis juegos” no sirve para eso.
     </p>
     <p><strong>Qué hace:</strong> trae la ficha pública con datos del propietario (nombre, etc.) para enlaces y cabecera.</p>
-    <p><span class="dif dif-media">Media</span> Separar bien “leer ficha ajena en comunidad” frente a “editar mi colección”.</p>
+    <p><span class="dif dif-media">Media</span> Separar bien “leer ficha ajena en comunidad” frente a “editar la colección del usuario autenticado”.</p>
   </div>
 
   <div class="card">
     <span class="path">client/src/coverUrl.js → <code>displayCoverUrl(url)</code></span>
     <p class="prob">Qué problema resolvía</p>
     <p>
-      <strong>CORS</strong> (Cross-Origin Resource Sharing) es el mecanismo por el que el navegador decide si una página en un origen (mi React) puede cargar recursos de otro (CDN de Steam/RAWG). A veces la imagen no se muestra si el navegador la pide directamente al dominio externo.
+      <strong>CORS</strong> (Cross-Origin Resource Sharing) es el mecanismo por el que el navegador decide si una página en un origen (p. ej. el frontend en Vite) puede cargar recursos de otro (CDN de Steam/RAWG). A veces la imagen no se muestra si el navegador la pide directamente al dominio externo.
     </p>
     <p><strong>Qué hace:</strong> sustituye la URL por una petición a nuestro backend <code>/api/covers/proxy?u=…</code>, que descarga la imagen y la sirve desde el mismo origen que la API, evitando ese bloqueo en la práctica.</p>
     <p><span class="dif dif-baja">Baja</span> Pocas líneas, pero imprescindible para ver carátulas.</p>
   </div>
 
-  <h2>5. Discusión: agrupar comentarios y votar</h2>
+  <h2 id="discusion">5. Discusión: agrupar comentarios y votar</h2>
 
   <div class="card">
     <span class="path">client/src/components/GameDiscussion.jsx → <code>Map</code> por <code>parent_id</code></span>
     <p class="prob">Qué problema resolvía</p>
     <p>
-      El servidor devuelve una <strong>lista plana</strong> de filas; en pantalla necesito <strong>árbol</strong> (respuestas bajo su padre) y un orden razonable para las reseñas raíz.
+      El servidor devuelve una <strong>lista plana</strong> de filas; la interfaz necesita un <strong>árbol</strong> (respuestas bajo su padre) y un orden razonable para las reseñas raíz.
     </p>
-    <p><strong>Qué hace:</strong> construyo un <code>Map</code> de JavaScript donde cada clave es un <code>parent_id</code> (o 0 para raíz) y el valor es un array de hijos. Luego ordeno las raíces por saldo de votos y fecha. Eso alimenta el componente recursivo <code>CommentBlock</code>.</p>
+    <p><strong>Qué hace:</strong> un <code>Map</code> donde cada clave es un <code>parent_id</code> (o 0 para raíz) y el valor es un array de hijos; luego se ordenan las raíces por saldo de votos y fecha. Eso alimenta el componente recursivo <code>CommentBlock</code>.</p>
     <p>
-      <strong>Recuerdo:</strong> un <code>Map</code> aquí es solo una estructura clave → lista, cómoda para agrupar sin anidar a mano cientos de <code>if</code>.
+      <strong>Nota:</strong> el <code>Map</code> actúa como índice clave → lista para agrupar hijos sin encadenar muchos <code>if</code> a mano.
     </p>
     <p><span class="dif dif-alta">Alta</span> Visualizar el árbol y no romper el renderizado fue lo más delicado.</p>
   </div>
@@ -307,7 +339,7 @@
     <p><span class="dif dif-alta">Alta</span> Probar bien con herramientas tipo Thunder Client.</p>
   </div>
 
-  <h2>6. Campana de recomendaciones (sin WebSockets)</h2>
+  <h2 id="campana">6. Campana de recomendaciones (sin WebSockets)</h2>
 
   <div class="card">
     <span class="path">client/src/components/NotificationBell.jsx</span>
@@ -319,7 +351,7 @@
     <p><span class="dif dif-media">Media</span> Las reglas de autoplay del audio dan más guerra de lo que parece.</p>
   </div>
 
-  <h2>7. Partes del proyecto que más tiempo me llevaron</h2>
+  <h2 id="esfuerzo">7. Partes del proyecto que más tiempo llevaron</h2>
   <ul>
     <li><strong>Discusión y votos</strong> (cliente + servidor): árbol de comentarios, orden, deep link <code>?c=</code> y reglas de voto coherentes.</li>
     <li><strong>Red social en SQL</strong> (<code>social.routes.js</code>): recomendaciones condicionadas al seguimiento, actividad mezclando comentarios y LFG, muchas consultas encadenadas.</li>

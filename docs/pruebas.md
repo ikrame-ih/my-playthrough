@@ -5,7 +5,7 @@
 **Ciclo:** Desarrollo de Aplicaciones Web — CESUR Málaga Este  
 **Curso:** 2025/2026 · Entrega final (cuarta entrega)
 
-**Sobre este fichero:** constituye la **fuente en texto** del plan de pruebas. Existe una versión equivalente maquetada para navegador en **`docs/abrir-en-navegador/plan_pruebas.html`** (mismo contenido; formato adecuado para impresión o exportación a PDF desde el navegador).
+**Consulta recomendada para la evaluación:** el plan completo se visualiza con más claridad en **`docs/abrir-en-navegador/plan_pruebas.html`** (navegador): tablas maquetadas, secciones diferenciadas e impresión o exportación a **PDF** desde el menú de imprimir del propio navegador. Este fichero **`docs/pruebas.md`** es la fuente en texto del mismo contenido.
 
 ---
 
@@ -20,7 +20,7 @@ Este documento describe **qué se ha probado**, **cómo** y **con qué resultado
 | Tipo                  | Descripción breve                                                                                        |
 | --------------------- | -------------------------------------------------------------------------------------------------------- |
 | Manuales funcionales  | Comprobación de flujos de usuario (registro, colección, comunidad, social ampliado, admin, comentarios). |
-| Seguridad básica      | Acceso a rutas protegidas sin token, permisos, límites de cuerpo, endpoint de diagnóstico en producción. |
+| Seguridad básica      | Acceso a rutas protegidas sin token, permisos, límites de cuerpo, límite de frecuencia en login/registro, endpoint de diagnóstico en producción. |
 | Validación de datos   | Normalización de entradas (email, título, estado, plataforma) coherente con el backend.                  |
 | Unitarias automáticas | Tests repetibles sobre lógica pura (sin navegador ni base de datos), ejecutados con Vitest 3.            |
 
@@ -161,6 +161,7 @@ Se ejecutan en terminal, desde la carpeta de cada paquete, **sin** levantar obli
 | S-05 | test-db en producción | `NODE_ENV=production` y `GET /api/test-db`          | 404      | Endpoint oculto         | OK     |
 | S-06 | Body > 50 KB          | Registro con payload grande                         | 413      | Rechazado               | OK     |
 | S-07 | Social sin token      | `GET /api/social/lfg` sin `Authorization`           | 401      | Rechazado               | OK     |
+| S-08 | Límite login/registro | Más de **40** peticiones `POST` a `/api/auth/login` o `/api/auth/register` desde la **misma IP** en **15 minutos** (`express-rate-limit`) | 429      | JSON de error coherente | OK     |
 
 ---
 
@@ -180,26 +181,26 @@ Se ejecutan en terminal, desde la carpeta de cada paquete, **sin** levantar obli
 **Comprobación del recuento (por ID):**
 
 - **P-01 … P-44** → **44** casos (incluye RF-06 ampliado con listado LFG en admin, RF-07 social, RF-08 presentación).
-- **S-01 … S-07** → **7** casos (seguridad API / configuración).
+- **S-01 … S-08** → **8** casos (seguridad API / configuración).
 - **V-01 … V-04** → **4** casos (validación de datos coherente con el backend).
 
-**Suma manual: 44 + 7 + 4 = 55.**  
-_Nota rápida: antes a veces salía **37** “de cabeza” si alguien sumaba solo los bloques RF viejos y se dejaba fuera los tres casos de comentarios (P-28…P-30); aquí el total sale de contar **todos** los IDs P, S y V sin saltos._
+**Total pruebas manuales: 44 + 8 + 4 = 56.**
 
 | Categoría                                   | Total  | Pasadas | Fallidas |
 | ------------------------------------------- | ------ | ------- | -------- |
 | Flujo de aplicación (P-01 … P-44)           | 44     | 44      | 0        |
-| Seguridad API / configuración (S-01 … S-07) | 7      | 7       | 0        |
+| Seguridad API / configuración (S-01 … S-08) | 8      | 8       | 0        |
 | Validación de datos (V-01 … V-04)           | 4      | 4       | 0        |
-| **Total pruebas manuales**                  | **55** | **55**  | **0**    |
+| **Total pruebas manuales**                  | **56** | **56**  | **0**    |
 | Unitarias automáticas (Vitest)              | 27     | 27      | 0        |
 
 _Las 27 pruebas unitarias corresponden a 17 tests en `server` y 10 en `client` (`npm test` en cada carpeta)._
 
 ---
 
-## 9. Mejoras detectadas durante las pruebas (líneas futuras)
+## 9. Líneas de mejora de mayor alcance (no implementadas)
 
-1. **Intentos de login:** ahora mismo puedes probar contraseñas una y otra vez sin límites; en un despliegue real convendría **frenar** eso (por ejemplo con `express-rate-limit`), para que no sea tan fácil ir a lo bruto.
-2. **Errores en producción:** en algunas rutas el error se “escupe” al cliente de forma distinta; lo ideal sería que **todo** pasara por el mismo sitio central y en producción no se enseñaran detalles internos técnicos.
-3. **Duplicados de ficha:** si en el futuro hubiera que **juntar** dos fichas del mismo juego, sería más sencillo cuando ambas ya comparten el mismo `catalogo_id`.
+1. **Errores de API unificados:** centralizar todas las respuestas de error en un único formato y capa (middleware o helper común), y en producción ocultar stack traces y códigos internos al cliente.
+2. **Notificaciones en tiempo real:** sustituir o complementar el polling de la campana por **WebSockets** o **SSE**, con reconexión y estados de conexión visibles.
+3. **Fusión o deduplicación de fichas:** herramienta para unir dos entradas de colección que representen el mismo título (p. ej. cuando comparten `catalogo_id` o tras revisión manual), migrando comentarios y votos.
+4. **Pruebas de integración automatizadas:** suite contra API levantada en entorno de prueba (p. ej. Supertest + BD efímera) además de las unitarias actuales.

@@ -164,10 +164,22 @@ Permite entrar **sin registrarse** y ver la aplicación **con datos de ejemplo**
 - **Peticiones** — Tamaño máximo del cuerpo JSON: **50 kb**.
 - **Proxy de carátulas** — Solo se reenvían URLs de dominios permitidos (Steam, RAWG, etc.).
 - **Producción** — Con `NODE_ENV=production`, el endpoint de prueba `/api/test-db` responde **404** (no se expone al público).
+- **Login y registro** — Límite de frecuencia por IP (`express-rate-limit`): demasiados `POST` a `/api/auth/login` o `/api/auth/register` en una ventana de tiempo → **429 Too Many Requests** con JSON de error coherente.
+
+### Bibliografía (consulta y temario DAW)
+
+Referencias generales alineadas con el ciclo y con el stack del proyecto (lectura complementaria, no lista cerrada):
+
+- [MDN Web Docs](https://developer.mozilla.org/es/) — HTML, CSS, JavaScript, HTTP y APIs del navegador.
+- [Express](https://expressjs.com/) — guía de rutas, middleware y aplicaciones HTTP en Node.js.
+- [Documentación de PostgreSQL](https://www.postgresql.org/docs/) — SQL, tipos, integridad referencial.
+- [React](https://react.dev/) — interfaz declarativa, hooks y referencia de la API.
+- [RFC 7519 — JSON Web Token (JWT)](https://www.rfc-editor.org/rfc/rfc7519) — estructura y claims del token.
+- [Node.js — documentación](https://nodejs.org/docs/) — runtime, módulos `http`/`fs` y buenas prácticas.
 
 ### Estado
 
-Funcionalidades principales implementadas y probadas. Plan de pruebas: `docs/pruebas.md` y versión maquetada `docs/abrir-en-navegador/plan_pruebas.html`.
+Funcionalidades principales implementadas y probadas. Plan de pruebas: `docs/pruebas.md`; para revisión con tablas e impresión/PDF, conviene abrir `docs/abrir-en-navegador/plan_pruebas.html` en el navegador.
 
 ---
 
@@ -292,7 +304,19 @@ API on port **3000**, PostgreSQL on **5432**. Empty volume → schema from `docs
 - **Request size** — JSON body limited to **50 kb**.
 - **Image proxy** — Only approved CDN hostnames are fetched.
 - **Production** — `/api/test-db` returns **404** when `NODE_ENV=production`.
+- **Login / register** — Per-IP rate limiting (`express-rate-limit`): too many `POST` requests to `/api/auth/login` or `/api/auth/register` within the window → **429 Too Many Requests** with a consistent JSON error body.
+
+### Bibliography (DAW curriculum & stack)
+
+General references aligned with the degree syllabus and this project’s stack (illustrative, not exhaustive):
+
+- [MDN Web Docs](https://developer.mozilla.org/en-US/) — HTML, CSS, JavaScript, HTTP, and Web APIs.
+- [Express](https://expressjs.com/) — routing, middleware, and HTTP apps on Node.js.
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/) — SQL, types, and referential integrity.
+- [React](https://react.dev/) — declarative UI, hooks, and API reference.
+- [RFC 7519 — JSON Web Token (JWT)](https://www.rfc-editor.org/rfc/rfc7519) — token structure and claims.
+- [Node.js documentation](https://nodejs.org/docs/) — runtime, modules, and APIs.
 
 ### Status
 
-Core features implemented and tested. Test plan: `docs/pruebas.md` and formatted `docs/abrir-en-navegador/plan_pruebas.html`.
+Core features implemented and tested. Test plan: `docs/pruebas.md`; for tables and print/PDF export, open `docs/abrir-en-navegador/plan_pruebas.html` in a browser.

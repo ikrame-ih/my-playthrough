@@ -263,9 +263,12 @@
     </div>
 
     <div class="note">
-      <strong>Fuente:</strong> mismo contenido que
-      <code>docs/pruebas.md</code> en el repositorio. La barra superior incluye
-      impresión (exportación a PDF según el navegador) y descarga del HTML.
+      <strong>Consulta para evaluación:</strong> el plan completo se visualiza
+      con más claridad en esta página HTML que en el Markdown; el menú
+      <strong>Imprimir</strong> del navegador permite exportar a
+      <strong>PDF</strong>. <strong>Fuente en texto:</strong>
+      <code>docs/pruebas.md</code> (mismo contenido). La barra superior incluye
+      impresión y descarga del HTML.
     </div>
 
     <h2>1. Finalidad y alcance</h2>
@@ -298,7 +301,8 @@
           <td>Seguridad básica</td>
           <td>
             Acceso a rutas protegidas sin token, permisos, límites de cuerpo,
-            endpoint de diagnóstico en producción.
+            límite de frecuencia en login/registro, endpoint de diagnóstico en
+            producción.
           </td>
         </tr>
         <tr>
@@ -1007,6 +1011,19 @@
           <td>Rechazado</td>
           <td>OK</td>
         </tr>
+        <tr>
+          <td>S-08</td>
+          <td>Límite login/registro</td>
+          <td>
+            Más de <strong>40</strong> <code>POST</code> a
+            <code>/api/auth/login</code> o
+            <code>/api/auth/register</code> desde la <strong>misma IP</strong> en
+            <strong>15 minutos</strong> (<code>express-rate-limit</code>)
+          </td>
+          <td>429</td>
+          <td>JSON de error coherente</td>
+          <td>OK</td>
+        </tr>
       </tbody>
     </table>
 
@@ -1064,7 +1081,7 @@
         <em>P-08b y P-08c siguen en autenticación / perfil.</em>
       </li>
       <li>
-        <strong>S-01 … S-07</strong> → <strong>7</strong> casos (seguridad API /
+        <strong>S-01 … S-08</strong> → <strong>8</strong> casos (seguridad API /
         configuración).
       </li>
       <li>
@@ -1072,15 +1089,7 @@
         datos coherente con el backend).
       </li>
     </ul>
-    <p><strong>Suma manual: 44 + 7 + 4 = 55.</strong></p>
-    <p>
-      <em
-        >Nota rápida: antes a veces salía <strong>37</strong> «de cabeza» si
-        alguien sumaba solo los bloques RF viejos y se dejaba fuera los tres
-        casos de comentarios (P-28…P-30); aquí el total sale de contar
-        <strong>todos</strong> los IDs P, S y V sin saltos.</em
-      >
-    </p>
+    <p><strong>Total pruebas manuales: 44 + 8 + 4 = 56.</strong></p>
     <table>
       <thead>
         <tr>
@@ -1098,9 +1107,9 @@
           <td>0</td>
         </tr>
         <tr>
-          <td>Seguridad API / configuración (S-01 … S-07)</td>
-          <td>7</td>
-          <td>7</td>
+          <td>Seguridad API / configuración (S-01 … S-08)</td>
+          <td>8</td>
+          <td>8</td>
           <td>0</td>
         </tr>
         <tr>
@@ -1111,8 +1120,8 @@
         </tr>
         <tr>
           <td><strong>Total pruebas manuales</strong></td>
-          <td><strong>55</strong></td>
-          <td><strong>55</strong></td>
+          <td><strong>56</strong></td>
+          <td><strong>56</strong></td>
           <td><strong>0</strong></td>
         </tr>
         <tr>
@@ -1131,25 +1140,29 @@
       >
     </p>
 
-    <h2>9. Mejoras detectadas durante las pruebas (líneas futuras)</h2>
+    <h2>9. Líneas de mejora de mayor alcance (no implementadas)</h2>
     <ol>
       <li>
-        <strong>Intentos de login:</strong> ahora mismo puedes probar
-        contraseñas una y otra vez sin límites; en un despliegue real convendría
-        <strong>frenar</strong> eso (por ejemplo con
-        <code>express-rate-limit</code>), para que no sea tan fácil ir a lo
-        bruto.
+        <strong>Errores de API unificados:</strong> centralizar todas las
+        respuestas de error en un único formato y capa (middleware o helper
+        común), y en producción ocultar stack traces y códigos internos al
+        cliente.
       </li>
       <li>
-        <strong>Errores en producción:</strong> en algunas rutas el error se
-        «escupe» al cliente de forma distinta; lo ideal sería que
-        <strong>todo</strong> pasara por el mismo sitio central y en producción
-        no se enseñaran detalles internos técnicos.
+        <strong>Notificaciones en tiempo real:</strong> sustituir o complementar
+        el polling de la campana por <strong>WebSockets</strong> o
+        <strong>SSE</strong>, con reconexión y estados de conexión visibles.
       </li>
       <li>
-        <strong>Duplicados de ficha:</strong> si en el futuro hubiera que
-        <strong>juntar</strong> dos fichas del mismo juego, sería más sencillo
-        cuando ambas ya comparten el mismo <code>catalogo_id</code>.
+        <strong>Fusión o deduplicación de fichas:</strong> herramienta para unir
+        dos entradas de colección que representen el mismo título (p. ej. cuando
+        comparten <code>catalogo_id</code> o tras revisión manual), migrando
+        comentarios y votos.
+      </li>
+      <li>
+        <strong>Pruebas de integración automatizadas:</strong> suite contra API
+        levantada en entorno de prueba (p. ej. Supertest + BD efímera) además de
+        las unitarias actuales.
       </li>
     </ol>
 
