@@ -1,0 +1,91 @@
+# docker-compose.yml — MyPlaythrough
+#
+# Con este archivo levanto toda la infraestructura del backend con un solo comando:
+#   docker compose up --build
+#
+# Eso arranca dos cosas: la base de datos PostgreSQL y el servidor Express.
+# El frontend (React) lo sigo ejecutando aparte con "npm run dev" en /client,
+# porque así tengo el hot-reload de Vite y es más cómodo para desarrollar.
+#
+# Para que el corrector pueda probar la app solo necesita:
+#   1. docker compose up --build
+#   2. npm run dev  (dentro de /client)
+#
+# Las tablas se crean solas la primera vez, porque monto el archivo
+# docs/sql/schema.sql en una carpeta especial de Postgres que ejecuta los
+# scripts .sql automáticamente cuando la base de datos está vacía.
+
+services:
+  # ------------------------------------------------------------------
+  # Base de datos
+  # ------------------------------------------------------------------
+  db:
+    # Uso la versión "alpine" de la imagen porque es más ligera.
+    image: postgres:16-alpine
+    container_name: myplaythrough_db
+    restart: unless-stopped
+    environment:
+      # Estas tres variables son las que la imagen de Postgres necesita
+      # para crear la base de datos y el usuario la primera vez.
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      # Expongo el puerto para poder conectarme también desde pgAdmin si quiero.
+      - "5432:5432"
+    volumes:
+      # Los datos de la BD se guardan en un volumen separado del contenedor,
+      # así no se pierden si hago "docker compose down" (sin el -v).
+      - postgres_data:/var/lib/postgresql/data
+      # Este archivo SQL se ejecuta automáticamente la primera vez que el
+      # volumen está vacío, y crea todas las tablas sin que yo tenga que
+      # hacer nada a mano en pgAdmin. Incluye usuarios.avatar_id (avatares robot).
+      # Volumen antiguo (BD ya creada antes): los .sql de initdb solo corren la 1ª vez.
+      # Tras un pull con cambios de esquema: desde la raíz del repo, con contenedores arriba:
+      #   Get-Content docs/sql/add-social-features.sql -Raw | docker compose exec -T db psql -U postgres -d myplaythrough
+      # O en local con server/.env apuntando al puerto 5432: cd server && npm run migrate:social
+      - ./docs/sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      # Antes de arrancar el servidor, compruebo que Postgres ya está listo
+      # para aceptar conexiones. Si no hiciera esto, Express intentaría
+      # conectarse antes de que la BD estuviera disponible y fallaría.
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ------------------------------------------------------------------
+  # Servidor Express
+  # ------------------------------------------------------------------
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: myplaythrough_server
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Aquí le digo al servidor que la base de datos está en el servicio
+      # llamado "db" (Docker lo resuelve como hostname internamente).
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: admin1234
+      DB_NAME: myplaythrough
+      PORT: 3000
+      JWT_SECRET: myplaythrough_docker_secret_2026
+      CORS_ORIGIN: http://localhost:5173
+      NODE_ENV: production
+      RAWG_API_KEY: 8ea97647a110478f953dcb6e58be0523
+    depends_on:
+      db:
+        # Con "service_healthy" me aseguro de que el servidor no arranca
+        # hasta que el healthcheck de Postgres pase. Así evito errores de
+        # conexión al inicio.
+        condition: service_healthy
+
+volumes:
+  # Volumen gestionado por Docker. Los datos sobreviven a "docker compose down".
+  # Si quiero borrarlos del todo, uso: docker compose down -v
+  postgres_data:
