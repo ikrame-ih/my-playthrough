@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { API_BASE, apiFetch } from "../api";
-import { useSearch } from "../SearchContext";
 import GameCard from "./GameCard";
 import GameListRow from "./GameListRow";
 import EmptyCollection from "./EmptyCollection";
 import CollectionStats from "./CollectionStats";
 import { GameCardSkeleton } from "./Skeletons";
 import RecommendGameModal from "./RecommendGameModal";
+import ErrorRetryPanel from "./ErrorRetryPanel";
 
 const LS_SORT = "myplaythrough_sort";
 const LS_VIEW = "myplaythrough_view";
@@ -25,8 +25,10 @@ function estadoRank(estado) {
 export default function GameList() {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [recoGame, setRecoGame] = useState(null);
-  const { query } = useSearch();
+  /** Filtro solo de esta pantalla; la barra superior es búsqueda global (Intro). */
+  const [collectionFilter, setCollectionFilter] = useState("");
 
   const [sort, setSort] = useState(
     () => localStorage.getItem(LS_SORT) || "reciente",
@@ -44,14 +46,14 @@ export default function GameList() {
   }, [view]);
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = collectionFilter.trim().toLowerCase();
     if (!q) return games;
     return games.filter(
       (g) =>
         (g.titulo || "").toLowerCase().includes(q) ||
         (g.plataforma || "").toLowerCase().includes(q),
     );
-  }, [games, query]);
+  }, [games, collectionFilter]);
 
   const sorted = useMemo(() => {
     const list = [...filtered];
@@ -88,13 +90,18 @@ export default function GameList() {
   }, [filtered, sort]);
 
   const fetchGames = async () => {
+    setLoadError(false);
+    setLoading(true);
     try {
       const response = await apiFetch(`${API_BASE}/api/games`);
       if (response.ok) {
         setGames(await response.json());
+      } else {
+        setLoadError(true);
       }
     } catch (error) {
       console.error("Error cargando juegos:", error);
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -133,6 +140,16 @@ export default function GameList() {
     );
   }
 
+  if (loadError) {
+    return (
+      <ErrorRetryPanel
+        title="No hemos podido cargar tu colección."
+        hint="Comprueba que el servidor está en marcha (puerto 3000) o que la conexión es estable."
+        onRetry={() => void fetchGames()}
+      />
+    );
+  }
+
   if (games.length === 0) {
     return <EmptyCollection />;
   }
@@ -144,7 +161,7 @@ export default function GameList() {
           Ningún juego coincide con tu búsqueda.
         </p>
         <p className="mt-2 text-sm text-slate-500">
-          Prueba con otro título o plataforma.
+          Ajusta el filtro de abajo (título o plataforma) o bórralo para ver toda la colección.
         </p>
       </div>
     );
@@ -162,21 +179,37 @@ export default function GameList() {
       <CollectionStats games={games} />
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-3">
-          <label htmlFor="collection-sort" className="sr-only">
-            Ordenar por
-          </label>
-          <select
-            id="collection-sort"
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            className="figma-input max-w-[220px] py-2.5 text-sm"
-          >
-            <option value="reciente">Más recientes primero</option>
-            <option value="titulo">Título (A–Z)</option>
-            <option value="estado">Estado (backlog → completado)</option>
-            <option value="nota">Nota (mayor primero)</option>
-          </select>
+        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="flex flex-wrap items-center gap-3">
+            <label htmlFor="collection-sort" className="sr-only">
+              Ordenar por
+            </label>
+            <select
+              id="collection-sort"
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="figma-select"
+            >
+              <option value="reciente">Más recientes primero</option>
+              <option value="titulo">Título (A–Z)</option>
+              <option value="estado">Estado (backlog → completado)</option>
+              <option value="nota">Nota (mayor primero)</option>
+            </select>
+          </div>
+          <div className="min-w-0 w-full sm:w-auto sm:max-w-[240px]">
+            <label htmlFor="collection-filter" className="sr-only">
+              Filtrar mi colección por título o plataforma
+            </label>
+            <input
+              id="collection-filter"
+              type="search"
+              value={collectionFilter}
+              onChange={(e) => setCollectionFilter(e.target.value)}
+              placeholder="Filtrar mi colección…"
+              autoComplete="off"
+              className="figma-input w-full py-2.5 text-sm"
+            />
+          </div>
         </div>
         <div
           className="inline-flex rounded-xl bg-slate-900/80 p-1 ring-1 ring-white/10"

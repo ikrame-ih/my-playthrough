@@ -5,6 +5,7 @@ import GameCard from "./GameCard";
 import { GameCardSkeleton, ProfileHeaderSkeleton } from "./Skeletons";
 import UserAvatar from "./UserAvatar";
 import RecommendGameModal from "./RecommendGameModal";
+import ErrorRetryPanel from "./ErrorRetryPanel";
 
 function getStoredUserId() {
   try {
@@ -26,6 +27,7 @@ export default function UserPublicProfile() {
   const [recoOpen, setRecoOpen] = useState(false);
   /** Ajuste local tras Seguir / Dejar de seguir para no esperar otro GET. */
   const [followDelta, setFollowDelta] = useState(0);
+  const [profileRetry, setProfileRetry] = useState(0);
 
   const profileId = parseInt(userId, 10);
   const myId = getStoredUserId();
@@ -35,6 +37,8 @@ export default function UserPublicProfile() {
     let cancelled = false;
 
     async function load() {
+      setLoading(true);
+      setData(null);
       try {
         const res = await apiFetch(`${API_BASE}/api/users/${userId}/games`);
 
@@ -47,10 +51,11 @@ export default function UserPublicProfile() {
           const json = await res.json();
           if (!cancelled) setData(json);
         } else if (!cancelled) {
-          setData(null);
+          setData({ loadFailed: true });
         }
       } catch (e) {
         console.error(e);
+        if (!cancelled) setData({ loadFailed: true });
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -60,7 +65,7 @@ export default function UserPublicProfile() {
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [userId, profileRetry]);
 
   useEffect(() => {
     setFollowDelta(0);
@@ -139,10 +144,18 @@ export default function UserPublicProfile() {
     );
   }
 
-  if (!loading && !data) {
+  if (!loading && data?.loadFailed) {
     return (
-      <div className="figma-panel mx-auto mt-6 max-w-md px-6 py-10 text-center text-red-300">
-        No se pudo cargar el perfil.
+      <div className="mx-auto max-w-md space-y-4">
+        <ErrorRetryPanel
+          title="No hemos podido cargar el perfil."
+          onRetry={() => setProfileRetry((n) => n + 1)}
+        />
+        <p className="text-center text-sm text-slate-500">
+          <Link to="/community" className="text-brand-accent hover:text-teal-300">
+            ← Volver a comunidad
+          </Link>
+        </p>
       </div>
     );
   }

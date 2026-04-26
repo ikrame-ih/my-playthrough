@@ -4,6 +4,7 @@ import { API_BASE, apiFetch } from "../api";
 import { displayCoverUrl } from "../coverUrl";
 import { IconThumbDown, IconThumbUp } from "./icons";
 import UserAvatar from "./UserAvatar";
+import ErrorRetryPanel from "./ErrorRetryPanel";
 
 /**
  * Lee y parsea el usuario actual del localStorage.
@@ -205,6 +206,7 @@ export default function GameDiscussion() {
   const [replyTo, setReplyTo] = useState(null);
   const [posting, setPosting] = useState(false);
   const [voteBusyId, setVoteBusyId] = useState(null);
+  const [retryTick, setRetryTick] = useState(0);
 
   const load = async () => {
     setErr("");
@@ -244,8 +246,8 @@ export default function GameDiscussion() {
   useEffect(() => {
     setLoading(true);
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- recargar solo al cambiar ficha
-  }, [gameId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- recargar al cambiar ficha o reintentar
+  }, [gameId, retryTick]);
 
   useEffect(() => {
     if (loading || !highlightId) return;
@@ -324,21 +326,39 @@ export default function GameDiscussion() {
 
   if (loading) {
     return (
-      <div className="figma-panel py-20 text-center text-lg font-medium text-brand-accent animate-pulse">
-        Cargando…
+      <div
+        className="figma-panel space-y-4 p-8 sm:p-10"
+        aria-busy="true"
+        aria-label="Cargando discusión"
+      >
+        <div className="h-6 w-2/3 max-w-sm animate-pulse rounded-lg bg-slate-800" />
+        <div className="h-4 w-1/2 animate-pulse rounded bg-slate-800/80" />
+        <div className="h-32 animate-pulse rounded-xl bg-slate-900/60" />
       </div>
     );
   }
 
   if (!game) {
     return (
-      <div className="figma-panel px-6 py-12 text-center text-slate-400">
-        {err || "Juego no encontrado."}
-        <div className="mt-6">
-          <Link to="/community" className="figma-btn-primary inline-flex">
+      <div className="space-y-4">
+        <ErrorRetryPanel
+          title={err || "Juego no encontrado."}
+          hint={
+            err && err !== "No se encontró el juego."
+              ? "Puede ser un fallo de red o de servidor."
+              : "Puede que la ficha se haya eliminado o el enlace no sea válido."
+          }
+          onRetry={
+            err && err !== "No se encontró el juego."
+              ? () => setRetryTick((n) => n + 1)
+              : undefined
+          }
+        />
+        <p className="text-center text-sm text-slate-500">
+          <Link to="/community" className="figma-btn-primary inline-flex text-base">
             Volver a comunidad
           </Link>
-        </div>
+        </p>
       </div>
     );
   }

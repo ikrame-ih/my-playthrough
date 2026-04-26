@@ -71,6 +71,23 @@ export default function AppShell({ user, onLogout, children }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [navOpen]);
 
+  /** Título de la pestaña según la ruta (mejor orientación con varias ventanas o historial). */
+  useEffect(() => {
+    const p = location.pathname;
+    const base = "MyPlaythrough";
+    let page = "Mi colección";
+    if (p === "/game/new") page = "Añadir juego";
+    else if (p.startsWith("/edit/")) page = "Editar juego";
+    else if (p === "/community") page = "Comunidad";
+    else if (p === "/search") page = "Búsqueda";
+    else if (p === "/recommendations") page = "Recomendaciones";
+    else if (p.startsWith("/user/")) page = "Perfil";
+    else if (p === "/settings") page = "Ajustes de cuenta";
+    else if (p === "/admin") page = "Administración";
+    else if (p.includes("/discussion")) page = "Discusión del juego";
+    document.title = `${page} · ${base}`;
+  }, [location.pathname]);
+
   const closeNav = () => setNavOpen(false);
 
   return (
@@ -90,7 +107,7 @@ export default function AppShell({ user, onLogout, children }) {
         onClick={closeNav}
       />
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-screen w-[260px] flex-col border-r border-brand-accent/[0.12] bg-gradient-to-b from-[#0c131f] via-[#0a0f1a] to-[#070b12] transition-transform duration-200 ease-out md:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 flex h-screen w-[260px] flex-col border-r border-brand-accent/[0.14] bg-gradient-to-b from-[#0d1522] via-[#0a101a] to-[#060a11] shadow-[inset_-1px_0_0_rgba(45,212,191,0.1)] transition-transform duration-200 ease-out md:translate-x-0 ${
           navOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -170,7 +187,7 @@ export default function AppShell({ user, onLogout, children }) {
       </aside>
 
       <div className="flex min-h-screen min-w-0 flex-1 flex-col pl-0 md:pl-[260px]">
-        <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-white/[0.08] bg-brand-bg/85 px-3 py-3 shadow-[0_8px_32px_-12px_rgba(0,0,0,0.45),0_1px_0_0_rgba(45,212,191,0.1)] backdrop-blur-lg sm:gap-4 sm:px-6 sm:py-4">
+        <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-white/[0.09] bg-brand-bg/88 px-3 py-3 shadow-[0_8px_36px_-14px_rgba(0,0,0,0.5),inset_0_-1px_0_0_rgba(45,212,191,0.07)] backdrop-blur-xl backdrop-saturate-150 sm:gap-4 sm:px-6 sm:py-4">
           <button
             type="button"
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-300 transition hover:bg-white/[0.06] hover:text-white md:hidden"
@@ -223,7 +240,9 @@ export default function AppShell({ user, onLogout, children }) {
           tabIndex={-1}
           className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 outline-none sm:px-8 sm:py-10"
         >
-          {children}
+          <div key={location.pathname} className="app-page-enter">
+            {children}
+          </div>
         </main>
       </div>
       <WelcomeTour isAdmin={user?.rol === "admin"} userId={user?.id} />

@@ -3,30 +3,227 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    @apply scroll-smooth;
+  }
   body {
     @apply min-h-screen bg-brand-bg bg-app-radial antialiased text-slate-200;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    @apply bg-brand-accent/25 text-white;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    .app-page-enter {
+      animation: none !important;
+    }
+    .auth-aurora::before,
+    .auth-aurora::after,
+    .auth-logo-float,
+    .auth-avatar-bounce__item {
+      animation: none !important;
+    }
+  }
+
+  * {
+    scrollbar-color: rgba(45, 212, 191, 0.25) rgba(15, 23, 42, 0.6);
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    @apply bg-slate-950/40;
+  }
+  *::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-slate-600/50;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    @apply bg-brand-accent/30;
   }
 }
 
 @layer components {
-  /* Paneles / inputs alineados con capturas Figma */
+  /* Paneles: relieve suave y borde superior fino (lectura en oscuro) */
   .figma-panel {
-    @apply rounded-2xl border border-white/[0.08] bg-brand-panel bg-card-shine shadow-figma ring-1 ring-white/[0.04] transition-shadow duration-300 ease-out;
+    @apply rounded-2xl border border-white/[0.09] bg-brand-panel bg-card-shine ring-1 ring-white/[0.05] transition-shadow duration-300 ease-out;
+    box-shadow:
+      0 4px 24px -4px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.04),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
   }
   .figma-panel-interactive {
-    @apply figma-panel hover:border-brand-accent/20 hover:shadow-[0_12px_40px_-10px_rgba(45,212,191,0.12)];
+    @apply figma-panel;
+  }
+  /* @apply no admite hover: + sombras extendidas; se declara a mano */
+  .figma-panel-interactive:hover {
+    border-color: rgba(45, 212, 191, 0.25);
+    box-shadow:
+      0 0 24px -8px rgba(45, 212, 191, 0.22),
+      0 0 0 1px rgba(45, 212, 191, 0.08);
   }
   .figma-input {
-    @apply w-full rounded-lg border border-white/10 bg-brand-input px-4 py-3 text-white placeholder:text-slate-500 transition focus:border-brand-accent focus:outline-none focus:ring-2 focus:ring-brand-accent/25;
+    @apply w-full rounded-lg border border-white/10 bg-brand-input/95 px-4 py-3 text-white placeholder:text-slate-500 transition duration-200 focus:border-brand-accent/80 focus:outline-none focus:ring-2 focus:ring-brand-accent/30;
+  }
+  /* <select>: flecha nativa suele ir descentrada; chevron propia y altura fija alinean texto e icono */
+  .figma-select {
+    @apply w-full max-w-[220px] cursor-pointer rounded-lg border border-white/10 bg-brand-input/95 pl-3 text-sm text-white transition duration-200 focus:border-brand-accent/80 focus:outline-none focus:ring-2 focus:ring-brand-accent/30;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    min-height: 2.5rem;
+    line-height: 2.5rem;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 0.75rem;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.6rem center;
+    background-size: 1.125rem 1.125rem;
   }
   /* Botón principal: teal sólido + texto negro (login / CTAs) */
   .figma-btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand-tealBtn px-5 py-2.5 text-sm font-bold text-black shadow-lg shadow-teal-900/30 transition-all duration-200 ease-out hover:brightness-105 hover:shadow-[0_8px_28px_-6px_rgba(45,212,191,0.45)] active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand-tealBtn px-5 py-2.5 text-sm font-bold text-black shadow-lg shadow-black/20 transition-all duration-200 ease-out hover:brightness-110 hover:shadow-[0_10px_32px_-8px_rgba(45,212,191,0.55)] active:scale-[0.98] motion-reduce:transition-none;
   }
   .figma-btn-outline {
-    @apply inline-flex w-full items-center justify-center rounded-lg border border-white/10 bg-brand-input py-3 text-sm font-semibold text-white transition hover:bg-white/[0.04];
+    @apply inline-flex w-full items-center justify-center rounded-lg border border-white/10 bg-brand-input py-3 text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.06];
   }
   .figma-table-wrap {
-    @apply overflow-x-auto rounded-2xl border border-white/[0.08] bg-brand-panel shadow-figma ring-1 ring-white/[0.04];
+    @apply overflow-x-auto rounded-2xl border border-white/[0.08] bg-brand-panel shadow-figma ring-1 ring-white/[0.05];
+  }
+  /* Contenido al cambiar de ruta: solo si el usuario no pide menos movimiento */
+  .app-page-enter {
+    @apply motion-safe:animate-page-in;
+  }
+
+  /* Login: fondo con aurora suave (sin JS) */
+  .auth-aurora {
+    @apply pointer-events-none absolute inset-0 z-0 overflow-hidden;
+  }
+  .auth-aurora::before,
+  .auth-aurora::after {
+    content: "";
+    position: absolute;
+    width: min(85vmin, 520px);
+    height: min(85vmin, 520px);
+    border-radius: 50%;
+    filter: blur(68px);
+    will-change: transform;
+  }
+  .auth-aurora::before {
+    left: -18%;
+    top: 8%;
+    background: radial-gradient(
+      circle,
+      rgba(45, 212, 191, 0.22) 0%,
+      rgba(45, 212, 191, 0.05) 42%,
+      transparent 68%
+    );
+    animation: auth-aurora-drift-a 22s ease-in-out infinite;
+  }
+  .auth-aurora::after {
+    right: -22%;
+    bottom: -5%;
+    background: radial-gradient(
+      circle,
+      rgba(34, 211, 238, 0.16) 0%,
+      rgba(6, 182, 212, 0.05) 45%,
+      transparent 70%
+    );
+    animation: auth-aurora-drift-b 28s ease-in-out infinite;
+  }
+  .auth-logo-float {
+    animation: auth-logo-float 5.5s ease-in-out infinite;
+  }
+
+  /* Robots de perfil: saltitos en oleada (login) */
+  .auth-avatar-bounce {
+    @apply flex items-end justify-center gap-1.5 sm:gap-2.5;
+  }
+  .auth-avatar-bounce__item {
+    display: flex;
+    animation: auth-avatar-hop 1.2s ease-in-out infinite;
+    will-change: transform;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+  }
+  .auth-avatar-bounce__item:nth-child(1) {
+    animation-delay: 0s;
+  }
+  .auth-avatar-bounce__item:nth-child(2) {
+    animation-delay: 0.16s;
+  }
+  .auth-avatar-bounce__item:nth-child(3) {
+    animation-delay: 0.32s;
+  }
+  .auth-avatar-bounce__item:nth-child(4) {
+    animation-delay: 0.48s;
+  }
+  .auth-avatar-bounce__item:nth-child(5) {
+    animation-delay: 0.64s;
+  }
+}
+
+@layer utilities {
+  @keyframes auth-aurora-drift-a {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    33% {
+      transform: translate(6%, 4%) scale(1.06);
+    }
+    66% {
+      transform: translate(-4%, 6%) scale(0.98);
+    }
+  }
+  @keyframes auth-aurora-drift-b {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    40% {
+      transform: translate(-7%, -5%) scale(1.05);
+    }
+    75% {
+      transform: translate(5%, -3%) scale(0.97);
+    }
+  }
+  @keyframes auth-logo-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-3px);
+    }
+  }
+  /* Rebote: más pausa abajo, salto un poco más lento */
+  @keyframes auth-avatar-hop {
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+    }
+    12%,
+    18% {
+      transform: translateY(0) scale(1);
+    }
+    32% {
+      transform: translateY(-14px) scale(1.05);
+    }
+    48% {
+      transform: translateY(0) scale(0.99, 1.03);
+    }
+    58% {
+      transform: translateY(-4px) scale(1.02);
+    }
+    72% {
+      transform: translateY(0) scale(1);
+    }
   }
 }

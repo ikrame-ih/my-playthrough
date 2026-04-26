@@ -5,6 +5,7 @@ import { useSearch } from "../SearchContext";
 import { IconUsers } from "./icons";
 import { CommunityMemberSkeleton } from "./Skeletons";
 import UserAvatar from "./UserAvatar";
+import ErrorRetryPanel from "./ErrorRetryPanel";
 
 function getCurrentUserRole() {
   try {
@@ -38,6 +39,8 @@ export default function Community() {
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [mainRetry, setMainRetry] = useState(0);
   const [tab, setTab] = useState("members");
   const { query } = useSearch();
 
@@ -60,20 +63,27 @@ export default function Community() {
     let cancelled = false;
 
     async function load() {
+      setLoadError(false);
+      setLoading(true);
       try {
         const [uRes, sRes] = await Promise.all([
           apiFetch(`${API_BASE}/api/users`),
           apiFetch(`${API_BASE}/api/community/stats`),
         ]);
-
-        if (uRes.ok && !cancelled) {
-          setUsers(await uRes.json());
+        if (cancelled) return;
+        if (!uRes.ok) {
+          setLoadError(true);
+          return;
         }
-        if (sRes.ok && !cancelled) {
+        setUsers(await uRes.json());
+        if (sRes.ok) {
           setStats(await sRes.json());
+        } else {
+          setStats([]);
         }
       } catch (e) {
         console.error(e);
+        if (!cancelled) setLoadError(true);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -83,7 +93,7 @@ export default function Community() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [mainRetry]);
 
   useEffect(() => {
     if (tab !== "activity") return;
@@ -268,6 +278,22 @@ export default function Community() {
             </li>
           ))}
         </ul>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="space-y-8">
+        <header>
+          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Comunidad
+          </h1>
+        </header>
+        <ErrorRetryPanel
+          title="No hemos podido cargar la comunidad."
+          onRetry={() => setMainRetry((n) => n + 1)}
+        />
       </div>
     );
   }

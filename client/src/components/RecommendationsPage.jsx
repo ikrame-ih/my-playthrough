@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { API_BASE, apiFetch } from "../api";
 import UserAvatar from "./UserAvatar";
 import { displayCoverUrl } from "../coverUrl";
+import ErrorRetryPanel from "./ErrorRetryPanel";
 
 /**
  * Bandeja de recomendaciones recibidas.
@@ -14,15 +15,18 @@ export default function RecommendationsPage() {
 
   const load = async () => {
     setErr("");
+    setLoading(true);
     try {
       const res = await apiFetch(`${API_BASE}/api/social/recommendations`);
       if (!res.ok) {
         setErr("No se pudo cargar la bandeja.");
+        setItems([]);
         return;
       }
       setItems(await res.json());
     } catch {
       setErr("Error de conexión.");
+      setItems([]);
     } finally {
       setLoading(false);
     }
@@ -66,14 +70,21 @@ export default function RecommendationsPage() {
       </header>
 
       {loading && (
-        <p className="text-sm text-slate-500" aria-busy="true">
-          Cargando…
-        </p>
+        <ul
+          className="space-y-4"
+          aria-busy="true"
+          aria-label="Cargando recomendaciones"
+        >
+          {Array.from({ length: 3 }).map((_, i) => (
+            <li
+              key={i}
+              className="figma-panel h-28 animate-pulse bg-slate-900/40 ring-0"
+            />
+          ))}
+        </ul>
       )}
-      {err && (
-        <p className="text-sm text-red-400" role="alert">
-          {err}
-        </p>
+      {err && !loading && (
+        <ErrorRetryPanel title={err} onRetry={() => void load()} />
       )}
 
       {!loading && !err && items.length === 0 && (
@@ -83,6 +94,7 @@ export default function RecommendationsPage() {
         </div>
       )}
 
+      {!loading && !err && items.length > 0 && (
       <ul className="space-y-4">
         {items.map((r) => {
           const cover = r.juego_url_imagen?.trim()
@@ -157,6 +169,7 @@ export default function RecommendationsPage() {
           );
         })}
       </ul>
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { API_BASE, apiFetch } from "../api";
+import ErrorRetryPanel from "./ErrorRetryPanel";
 
 /**
  * Lee el rol del usuario desde localStorage para personalizar
@@ -73,28 +74,55 @@ export default function GameForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
+  const [editLoading, setEditLoading] = useState(() => Boolean(id));
+  const [editError, setEditError] = useState(null);
+  const [editRetry, setEditRetry] = useState(0);
 
   useEffect(() => {
-    if (isEditing) {
-      apiFetch(`${API_BASE}/api/games/${id}`)
-        .then((res) => res.json())
-        .then((data) => {
-          tituloDirty.current = false;
-          setFormData({
-            titulo: data.titulo,
-            estado: data.estado,
-            plataforma: data.plataforma ?? "",
-            puntuacion: data.puntuacion,
-            horas_jugadas: data.horas_jugadas,
-            url_imagen: data.url_imagen ?? "",
-          });
-          if (data.url_imagen) {
-            setCoverHint("Imagen guardada en tu ficha.");
-          }
-        })
-        .catch((err) => console.error("Error al obtener el juego:", err));
+    if (!isEditing) {
+      setEditLoading(false);
+      setEditError(null);
+      return;
     }
-  }, [id, isEditing]);
+    let cancelled = false;
+    setEditLoading(true);
+    setEditError(null);
+    apiFetch(`${API_BASE}/api/games/${id}`)
+      .then(async (res) => {
+        if (cancelled) return;
+        if (res.status === 404) {
+          setEditError("notfound");
+          return;
+        }
+        if (!res.ok) {
+          setEditError("error");
+          return;
+        }
+        const data = await res.json();
+        tituloDirty.current = false;
+        setFormData({
+          titulo: data.titulo,
+          estado: data.estado,
+          plataforma: data.plataforma ?? "",
+          puntuacion: data.puntuacion,
+          horas_jugadas: data.horas_jugadas,
+          url_imagen: data.url_imagen ?? "",
+        });
+        if (data.url_imagen) {
+          setCoverHint("Imagen guardada en tu ficha.");
+        }
+      })
+      .catch((err) => {
+        console.error("Error al obtener el juego:", err);
+        if (!cancelled) setEditError("error");
+      })
+      .finally(() => {
+        if (!cancelled) setEditLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id, isEditing, editRetry]);
 
   useEffect(() => {
     if (!tituloDirty.current) return;
@@ -324,6 +352,54 @@ export default function GameForm() {
       setFormSubmitting(false);
     }
   };
+
+  if (isEditing && editLoading) {
+    return (
+      <div className="mx-auto max-w-3xl">
+        <div
+          className="figma-panel py-20 text-center"
+          aria-busy="true"
+          aria-label="Cargando ficha"
+        >
+          <p className="text-lg font-medium text-brand-accent animate-pulse">
+            Cargando ficha…
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isEditing && editError === "notfound") {
+    return (
+      <div className="mx-auto max-w-3xl space-y-4">
+        <ErrorRetryPanel
+          title="No hemos encontrado esa ficha."
+          hint="Puede que se haya eliminado o el enlace no sea válido."
+        />
+        <p className="text-center">
+          <Link to="/" className="figma-btn-primary inline-flex">
+            Volver a mi colección
+          </Link>
+        </p>
+      </div>
+    );
+  }
+
+  if (isEditing && editError === "error") {
+    return (
+      <div className="mx-auto max-w-3xl space-y-4">
+        <ErrorRetryPanel
+          title="No hemos podido cargar la ficha."
+          onRetry={() => setEditRetry((n) => n + 1)}
+        />
+        <p className="text-center text-sm text-slate-500">
+          <Link to="/" className="text-brand-accent hover:text-teal-300">
+            ← Volver a mi colección
+          </Link>
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-3xl">

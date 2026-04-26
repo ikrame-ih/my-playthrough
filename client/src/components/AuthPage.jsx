@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { API_BASE } from "../api";
 import { passwordPolicyMessage } from "../passwordPolicy";
 import { IconController } from "./icons";
+import RobotAvatar from "./RobotAvatar";
 
 /**
  * Pantalla de autenticación que combina login y registro en un único componente.
@@ -31,6 +32,12 @@ export default function AuthPage({ onAuthSuccess }) {
       setRemember(true);
     }
   }, []);
+
+  useEffect(() => {
+    const t =
+      mode === "login" ? "Iniciar sesión" : "Crear cuenta";
+    document.title = `${t} · MyPlaythrough`;
+  }, [mode]);
 
   const handleChange = (e) => {
     setFormError("");
@@ -116,19 +123,30 @@ export default function AuthPage({ onAuthSuccess }) {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-brand-bg bg-app-radial px-4 py-12">
-      <div className="mb-8 flex flex-col items-center text-center">
-        <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-900/90 text-brand-accent shadow-[0_0_28px_-8px_rgba(45,212,191,0.55)] ring-1 ring-brand-accent/30">
+    <div className="auth-screen relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-brand-bg bg-app-radial py-12">
+      <div className="auth-aurora" aria-hidden="true" />
+      <div className="relative z-10 flex w-full flex-col items-center px-4">
+        <div className="mb-8 flex flex-col items-center text-center">
+        <span className="auth-logo-float flex h-12 w-12 items-center justify-center rounded-xl bg-slate-900/90 text-brand-accent shadow-[0_0_32px_-6px_rgba(45,212,191,0.45)] ring-1 ring-brand-accent/35">
           <IconController className="h-7 w-7" />
         </span>
-        <h1 className="mt-5 max-w-sm text-2xl font-bold leading-tight text-white sm:text-[1.65rem]">
+        <h1 className="mt-5 max-w-sm text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-[1.65rem]">
           {mode === "login"
             ? "Inicia sesión en tu cuenta"
             : "Crea una cuenta nueva"}
         </h1>
-      </div>
+        <div className="auth-avatar-bounce mt-6" aria-hidden="true">
+          {["robot-0", "robot-2", "robot-4", "robot-5", "robot-7"].map(
+            (id) => (
+              <span key={id} className="auth-avatar-bounce__item">
+                <RobotAvatar robotId={id} className="h-12 w-12 sm:h-14 sm:w-14" />
+              </span>
+            ),
+          )}
+        </div>
+        </div>
 
-      <div className="figma-panel w-full max-w-md p-8 shadow-[0_0_48px_-16px_rgba(45,212,191,0.12)] ring-1 ring-brand-accent/10 sm:p-10">
+        <div className="figma-panel w-full max-w-md p-8 shadow-glow-sm ring-1 ring-brand-accent/16 sm:p-10 motion-safe:animate-page-in">
         {formError && (
           <div
             className="mb-5 rounded-lg border border-red-500/35 bg-red-950/35 px-4 py-3 text-sm text-red-100"
@@ -281,6 +299,7 @@ export default function AuthPage({ onAuthSuccess }) {
             ? "Crear una cuenta nueva"
             : "Iniciar sesión"}
         </button>
+        </div>
       </div>
     </div>
   );

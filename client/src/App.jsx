@@ -32,7 +32,7 @@ function HomePage() {
     <>
       <header className="mb-10 flex flex-col gap-6 sm:mb-12 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
             Mi colección
           </h1>
           <p className="mt-2 max-w-xl text-base leading-relaxed text-slate-400">
@@ -61,16 +61,34 @@ function HomePage() {
  *
  * @component
  */
+function safeReadStoredUser() {
+  const raw = localStorage.getItem("user");
+  if (!raw) return null;
+  try {
+    const u = JSON.parse(raw);
+    if (u && typeof u === "object" && u.id != null) {
+      return u;
+    }
+  } catch {
+    /* JSON corrupto o truncado: evita que React falle y deje #root en blanco */
+  }
+  localStorage.removeItem("user");
+  localStorage.removeItem("token");
+  return null;
+}
+
 function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
+    const saved = safeReadStoredUser();
 
     // Carga inmediata desde localStorage para evitar parpadeo
-    if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
+    if (token && saved) {
+      setUser(saved);
+    } else if (token && !saved) {
+      localStorage.removeItem("token");
     }
 
     if (!token) return;
@@ -97,40 +115,40 @@ function App() {
     setUser(null);
   };
 
-  if (!user) {
-    return <AuthPage onAuthSuccess={setUser} />;
-  }
-
   return (
     <SearchProvider>
-      <BrowserRouter>
-        <AppShell user={user} onLogout={handleLogout}>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/game/new" element={<GameForm />} />
-            <Route path="/edit/:id" element={<GameForm />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/search" element={<SearchResultsPage />} />
-            <Route
-              path="/recommendations"
-              element={<RecommendationsPage />}
-            />
-            <Route path="/user/:userId" element={<UserPublicProfile />} />
-            <Route
-              path="/settings"
-              element={
-                <ProfileSettings user={user} onUserUpdate={setUser} />
-              }
-            />
-            <Route path="/admin" element={<AdminUsers />} />
-            <Route
-              path="/juego/:gameId/discussion"
-              element={<GameDiscussion />}
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </AppShell>
-      </BrowserRouter>
+      {!user ? (
+        <AuthPage onAuthSuccess={setUser} />
+      ) : (
+        <BrowserRouter>
+          <AppShell user={user} onLogout={handleLogout}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/game/new" element={<GameForm />} />
+              <Route path="/edit/:id" element={<GameForm />} />
+              <Route path="/community" element={<Community />} />
+              <Route path="/search" element={<SearchResultsPage />} />
+              <Route
+                path="/recommendations"
+                element={<RecommendationsPage />}
+              />
+              <Route path="/user/:userId" element={<UserPublicProfile />} />
+              <Route
+                path="/settings"
+                element={
+                  <ProfileSettings user={user} onUserUpdate={setUser} />
+                }
+              />
+              <Route path="/admin" element={<AdminUsers />} />
+              <Route
+                path="/juego/:gameId/discussion"
+                element={<GameDiscussion />}
+              />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </AppShell>
+        </BrowserRouter>
+      )}
     </SearchProvider>
   );
 }

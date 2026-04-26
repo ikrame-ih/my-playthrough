@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { API_BASE, apiFetch } from "../api";
 import UserAvatar from "./UserAvatar";
+import ErrorRetryPanel from "./ErrorRetryPanel";
 
 /**
  * Resultados de la búsqueda global (usuarios y fichas de juego en toda la comunidad).
@@ -13,6 +14,7 @@ export default function SearchResultsPage() {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
+  const [retryTick, setRetryTick] = useState(0);
 
   useEffect(() => {
     if (!q) {
@@ -31,7 +33,11 @@ export default function SearchResultsPage() {
         );
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-          if (!cancelled) setErr(data.error || "No se pudo buscar.");
+          if (!cancelled) {
+            setErr(data.error || "No se pudo buscar.");
+            setUsers([]);
+            setGames([]);
+          }
           return;
         }
         if (!cancelled) {
@@ -39,7 +45,11 @@ export default function SearchResultsPage() {
           setGames(Array.isArray(data.games) ? data.games : []);
         }
       } catch {
-        if (!cancelled) setErr("Error de conexión.");
+        if (!cancelled) {
+          setErr("Error de conexión.");
+          setUsers([]);
+          setGames([]);
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -48,7 +58,7 @@ export default function SearchResultsPage() {
     return () => {
       cancelled = true;
     };
-  }, [q]);
+  }, [q, retryTick]);
 
   return (
     <div>
@@ -68,10 +78,13 @@ export default function SearchResultsPage() {
         )}
       </header>
 
-      {err && (
-        <div className="mb-6 rounded-lg border border-red-500/30 bg-red-950/30 px-4 py-3 text-sm text-red-100">
-          {err}
-        </div>
+      {err && !loading && q && (
+        <ErrorRetryPanel
+          className="mb-6"
+          title={err}
+          hint="Puedes probar otra búsqueda o reintentar con los mismos términos."
+          onRetry={() => setRetryTick((t) => t + 1)}
+        />
       )}
 
       {loading && (
@@ -84,7 +97,7 @@ export default function SearchResultsPage() {
         </div>
       )}
 
-      {!loading && (users.length > 0 || games.length > 0) && (
+      {!loading && !err && (users.length > 0 || games.length > 0) && (
         <div className="grid gap-10 lg:grid-cols-2">
           {users.length > 0 && (
             <section>

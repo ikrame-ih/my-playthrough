@@ -1,3 +1,4 @@
+
 # docker-compose.yml — MyPlaythrough
 #
 # Con este archivo levanto toda la infraestructura del backend con un solo comando:
@@ -66,13 +67,12 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # Aquí le digo al servidor que la base de datos está en el servicio
-      # llamado "db" (Docker lo resuelve como hostname internamente).
+      # Mismas credenciales que el servicio `db` (definidas en el .env de la raíz).
       DB_HOST: db
       DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: admin1234
-      DB_NAME: myplaythrough
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
       PORT: 3000
       JWT_SECRET: myplaythrough_docker_secret_2026
       CORS_ORIGIN: http://localhost:5173

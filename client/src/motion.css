@@ -63,3 +63,15 @@
 .motion-avatar-tile:hover:not(:disabled) {
   transform: translateY(-2px);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-stagger > * {
+    animation: none;
+  }
+  .motion-avatar-tile {
+    transition: none;
+  }
+  .motion-avatar-tile:hover:not(:disabled) {
+    transform: none;
+  }
+}
