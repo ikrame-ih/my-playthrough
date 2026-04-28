@@ -32,9 +32,12 @@ export default {
           "0 0 24px -8px rgba(45, 212, 191, 0.22), 0 0 0 1px rgba(45, 212, 191, 0.08)",
       },
       keyframes: {
+        /** Solo opacidad: si el último keyframe incluye transform, el relleno de la
+         * animación deja transform en el ancestro y `position:fixed` de los modales
+         * deja de ser respecto al viewport (hay que desplazar el scroll para verlos). */
         "page-in": {
-          "0%": { opacity: "0", transform: "translateY(8px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
         },
         "line-glow": {
           "0%, 100%": { opacity: "0.4" },

@@ -32,8 +32,9 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      # Expongo el puerto para poder conectarme también desde pgAdmin si quiero.
-      - "5432:5432"
+      # Host 5433 evita colisión con PostgreSQL nativo de Windows en :5432.
+      # Desde el PC: server/.env → DB_PORT=5433, DB_HOST=localhost
+      - "5433:5432"
     volumes:
       # Los datos de la BD se guardan en un volumen separado del contenedor,
       # así no se pierden si hago "docker compose down" (sin el -v).

@@ -154,15 +154,31 @@ router.post("/login", authLoginRegisterLimiter, async (req, res) => {
     }
 
     const looksLikeEmail = raw.includes("@");
-    const result = looksLikeEmail
-      ? await pool.query(
-          "SELECT id, nombre_usuario, email, password_hash, rol, avatar_id, notificaciones_sonido FROM usuarios WHERE LOWER(TRIM(email)) = $1",
-          [normalizeEmail(raw)],
-        )
-      : await pool.query(
-          "SELECT id, nombre_usuario, email, password_hash, rol, avatar_id, notificaciones_sonido FROM usuarios WHERE LOWER(TRIM(nombre_usuario)) = LOWER(TRIM($1))",
-          [raw],
-        );
+    const loginParam = looksLikeEmail ? normalizeEmail(raw) : raw;
+
+    const fullSelect = looksLikeEmail
+      ? `SELECT id, nombre_usuario, email, password_hash, rol, avatar_id, notificaciones_sonido
+         FROM usuarios WHERE LOWER(TRIM(email)) = $1`
+      : `SELECT id, nombre_usuario, email, password_hash, rol, avatar_id, notificaciones_sonido
+         FROM usuarios WHERE LOWER(TRIM(nombre_usuario)) = LOWER(TRIM($1))`;
+
+    const leanSelect = looksLikeEmail
+      ? `SELECT id, nombre_usuario, email, password_hash, rol
+         FROM usuarios WHERE LOWER(TRIM(email)) = $1`
+      : `SELECT id, nombre_usuario, email, password_hash, rol
+         FROM usuarios WHERE LOWER(TRIM(nombre_usuario)) = LOWER(TRIM($1))`;
+
+    let result;
+    try {
+      result = await pool.query(fullSelect, [loginParam]);
+    } catch (err) {
+      // BD creada antes de avatar_id / notificaciones_sonido (42703 = undefined_column)
+      if (err?.code === "42703") {
+        result = await pool.query(leanSelect, [loginParam]);
+      } else {
+        throw err;
+      }
+    }
 
     if (result.rows.length === 0) {
       return res.status(401).json({
@@ -172,6 +188,13 @@ router.post("/login", authLoginRegisterLimiter, async (req, res) => {
     }
 
     const user = result.rows[0];
+    if (!user.password_hash) {
+      return res.status(500).json({
+        error:
+          "Esta cuenta no tiene contraseña en la base de datos. Ejecuta de nuevo el seed o migraciones.",
+      });
+    }
+
     const isValidPassword = await bcrypt.compare(password, user.password_hash);
 
     if (!isValidPassword) {
@@ -194,7 +217,8 @@ router.post("/login", authLoginRegisterLimiter, async (req, res) => {
             : true,
       },
     });
-  } catch {
+  } catch (error) {
+    console.error("[POST /api/auth/login]", error);
     return res.status(500).json({ error: "Error al iniciar sesión." });
   }
 });

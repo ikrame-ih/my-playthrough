@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { API_BASE } from "../api";
 import { passwordPolicyMessage } from "../passwordPolicy";
-import { IconController } from "./icons";
+import { IconController, IconEye, IconEyeOff } from "./icons";
 import RobotAvatar from "./RobotAvatar";
 
 /**
@@ -24,6 +24,7 @@ export default function AuthPage({ onAuthSuccess }) {
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState("");
   const [remember, setRemember] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("rememberLogin");
@@ -212,20 +213,39 @@ export default function AuthPage({ onAuthSuccess }) {
             >
               Contraseña
             </label>
-            <input
-              id="password"
-              type="password"
-              name="password"
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              minLength={mode === "register" ? 8 : undefined}
-              autoComplete={
-                mode === "login" ? "current-password" : "new-password"
-              }
-              className="figma-input"
-            />
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                minLength={mode === "register" ? 8 : undefined}
+                autoComplete={
+                  mode === "login" ? "current-password" : "new-password"
+                }
+                className="figma-input pr-12"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={
+                  showPassword
+                    ? "Ocultar contraseña"
+                    : "Mostrar contraseña"
+                }
+                aria-pressed={showPassword}
+                className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 transition hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-accent/40"
+              >
+                {showPassword ? (
+                  <IconEyeOff className="h-5 w-5" />
+                ) : (
+                  <IconEye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
             {mode === "register" && (
               <p className="mt-2 text-xs leading-relaxed text-slate-500">
                 Mínimo 8 caracteres, con mayúscula, minúscula, número y un símbolo
@@ -291,6 +311,7 @@ export default function AuthPage({ onAuthSuccess }) {
           type="button"
           onClick={() => {
             setFormError("");
+            setShowPassword(false);
             setMode(mode === "login" ? "register" : "login");
           }}
           className="figma-btn-outline"

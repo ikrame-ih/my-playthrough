@@ -32,7 +32,7 @@ export default function WelcomeTour({ isAdmin, userId }) {
       {
         target: '[data-tour="tour-welcome"]',
         content:
-          "Bienvenida a MyPlaythrough. En unos pasos verás dónde está cada función principal: tu biblioteca, la comunidad, las recomendaciones y más.",
+          "Te damos la bienvenida a MyPlaythrough. En unos pasos verás dónde está cada función principal: tu biblioteca, la comunidad, las recomendaciones y más.",
         placement: "center",
         disableBeacon: true,
       },

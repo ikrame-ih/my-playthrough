@@ -27,6 +27,11 @@ export default function AdminUsers() {
   const [gameSearch, setGameSearch] = useState("");
   const [lfgPosts, setLfgPosts] = useState([]);
   const [lfgSearch, setLfgSearch] = useState("");
+  /** Modal grave: borrar cuenta de usuario (no usar window.confirm). */
+  const [userDeleteModal, setUserDeleteModal] = useState(null);
+  const [deleteConfirmInput, setDeleteConfirmInput] = useState("");
+  const [deleteModalError, setDeleteModalError] = useState("");
+  const [deleteInProgress, setDeleteInProgress] = useState(false);
 
   // --- Carga inicial: usuarios, juegos y LFG (solo admin pasa del 403) ---
   const loadUsers = async () => {
@@ -119,36 +124,56 @@ export default function AdminUsers() {
     );
   }, [lfgPosts, lfgSearch]);
 
-  // --- Acciones destructivas: DELETE y recarga del bloque afectado ---
-  const eliminarUsuario = async (id, nombre) => {
-    if (
-      !window.confirm(
-        `¿Eliminar la cuenta de "${nombre}"? Esta acción no se puede deshacer.`,
-      )
-    ) {
+  const openDeleteUserConfirm = (u) => {
+    setDeleteConfirmInput("");
+    setDeleteModalError("");
+    setUserDeleteModal({
+      id: u.id,
+      nombre_usuario: u.nombre_usuario,
+      email: u.email,
+      rol: u.rol,
+    });
+  };
+
+  const closeDeleteUserModal = (force = false) => {
+    if (deleteInProgress && !force) return;
+    setUserDeleteModal(null);
+    setDeleteConfirmInput("");
+    setDeleteModalError("");
+  };
+
+  const ejecutarEliminarUsuario = async () => {
+    const target = userDeleteModal;
+    if (!target) return;
+    if (deleteConfirmInput.trim() !== String(target.nombre_usuario).trim()) {
+      setDeleteModalError(
+        "Debes escribir el nombre público exactamente como se muestra arriba.",
+      );
       return;
     }
-
+    setDeleteInProgress(true);
+    setDeleteModalError("");
     try {
-      const res = await apiFetch(`${API_BASE}/api/admin/users/${id}`, {
+      const res = await apiFetch(`${API_BASE}/api/admin/users/${target.id}`, {
         method: "DELETE",
       });
-
       const data = await res.json().catch(() => ({}));
-
       if (!res.ok) {
-        alert(data.error || "No se pudo eliminar.");
+        setDeleteModalError(data.error || "No se pudo eliminar la cuenta.");
         return;
       }
-
+      closeDeleteUserModal(true);
       loadUsers();
       loadGames();
       loadLfg();
-    } catch (e) {
-      alert("Error de conexión.");
+    } catch {
+      setDeleteModalError("Error de conexión.");
+    } finally {
+      setDeleteInProgress(false);
     }
   };
 
+  // --- Acciones destructivas: DELETE y recarga del bloque afectado ---
   const eliminarJuego = async (id, titulo) => {
     if (
       !window.confirm(
@@ -222,6 +247,122 @@ export default function AdminUsers() {
 
   return (
     <div>
+      {userDeleteModal && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="admin-delete-user-title"
+          aria-describedby="admin-delete-user-desc"
+          onClick={closeDeleteUserModal}
+        >
+          <div
+            className="figma-panel max-h-[90vh] w-full max-w-lg overflow-y-auto border border-red-500/25 p-6 shadow-2xl shadow-red-950/40 ring-1 ring-red-500/15"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2
+              id="admin-delete-user-title"
+              className="text-xl font-bold tracking-tight text-red-100"
+            >
+              Eliminar cuenta de forma permanente
+            </h2>
+            <p
+              id="admin-delete-user-desc"
+              className="mt-3 text-sm leading-relaxed text-slate-300"
+            >
+              Vas a borrar la cuenta de un usuario real en la base de datos.
+              No es reversible: dejará de existir como miembro de la
+              plataforma y <strong className="text-white">no se puede deshacer</strong> desde esta
+              aplicación.
+            </p>
+
+            <div className="mt-5 rounded-xl border border-red-500/30 bg-red-950/35 px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-red-300/90">
+                Cuenta afectada
+              </p>
+              <p className="mt-2 text-base font-semibold text-white">
+                {userDeleteModal.nombre_usuario}
+              </p>
+              <p className="mt-1 text-sm text-slate-400">
+                {userDeleteModal.email} · ID {userDeleteModal.id}
+              </p>
+              {userDeleteModal.rol === "admin" && (
+                <p className="mt-3 text-sm font-medium text-amber-200/95">
+                  Esta cuenta tiene rol de{" "}
+                  <span className="text-amber-100">administrador</span>. Dejará
+                  de poder entrar en Administración.
+                </p>
+              )}
+            </div>
+
+            <div className="mt-5 space-y-2 text-sm text-slate-400">
+              <p className="font-medium text-slate-300">
+                Se eliminarán en cascada, entre otros:
+              </p>
+              <ul className="list-inside list-disc space-y-1.5 pl-1 leading-relaxed marker:text-red-400/80">
+                <li>Toda su colección de juegos y las reseñas en fichas ajenas.</li>
+                <li>Comentarios en discusiones y votos asociados.</li>
+                <li>Seguimientos, recomendaciones y publicaciones de buscar grupo (LFG).</li>
+              </ul>
+            </div>
+
+            <label
+              htmlFor="admin-delete-user-confirm-name"
+              className="mt-6 block text-sm font-medium text-slate-300"
+            >
+              Para confirmar, escribe el <strong className="text-white">nombre público</strong> exacto
+              del usuario (copia y pega si hace falta):
+            </label>
+            <input
+              id="admin-delete-user-confirm-name"
+              type="text"
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck={false}
+              value={deleteConfirmInput}
+              onChange={(e) => {
+                setDeleteConfirmInput(e.target.value);
+                if (deleteModalError) setDeleteModalError("");
+              }}
+              className="figma-input mt-2 border-red-500/20 focus:border-red-400/50 focus:ring-red-500/25"
+              placeholder={userDeleteModal.nombre_usuario}
+              disabled={deleteInProgress}
+            />
+
+            {deleteModalError && (
+              <p className="mt-3 text-sm text-red-400" role="alert">
+                {deleteModalError}
+              </p>
+            )}
+
+            <div className="mt-8 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                className="figma-btn-outline w-full py-3 sm:!w-auto sm:px-5"
+                onClick={closeDeleteUserModal}
+                disabled={deleteInProgress}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="w-full rounded-lg border border-red-500/45 bg-red-950/60 px-5 py-3 text-sm font-bold text-red-100 shadow-lg shadow-black/25 transition hover:bg-red-900/55 disabled:cursor-not-allowed disabled:opacity-45 sm:w-auto"
+                disabled={
+                  deleteInProgress ||
+                  deleteConfirmInput.trim() !==
+                    String(userDeleteModal.nombre_usuario).trim()
+                }
+                onClick={() => void ejecutarEliminarUsuario()}
+              >
+                {deleteInProgress
+                  ? "Eliminando…"
+                  : "Sí, eliminar esta cuenta definitivamente"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-2 h-1 w-14 rounded-full bg-gradient-to-r from-brand-accent to-brand-accent/40" />
       <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex gap-4">
@@ -306,9 +447,9 @@ export default function AdminUsers() {
                   <td className="p-4 text-right">
                     <button
                       type="button"
-                      onClick={() => eliminarUsuario(u.id, u.nombre_usuario)}
+                      onClick={() => openDeleteUserConfirm(u)}
                       className="inline-flex rounded-lg p-2 text-slate-500 transition hover:bg-red-500/10 hover:text-red-400"
-                      title="Eliminar cuenta"
+                      title="Eliminar cuenta (acción grave, pide confirmación)"
                     >
                       <IconTrash className="h-5 w-5" />
                     </button>

@@ -1,5 +1,13 @@
-import { useEffect, useState } from "react";
-import { BrowserRouter, Navigate, Routes, Route, Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import {
+  BrowserRouter,
+  Navigate,
+  Routes,
+  Route,
+  Link,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { API_BASE, authHeaders } from "./api";
 import { SearchProvider } from "./SearchContext";
 import AppShell from "./components/AppShell";
@@ -22,14 +30,69 @@ import RecommendationsPage from "./components/RecommendationsPage";
  */
 
 /**
+ * Solo renderiza el panel de administración si el usuario tiene rol `admin`.
+ * Evita que quien accede a `/admin` por URL, historial o sesión anterior (tras
+ * cerrar sesión en esa ruta) vea siquiera la pantalla de “sin permiso”.
+ */
+function AdminRoute({ user }) {
+  if (user?.rol !== "admin") {
+    return <Navigate to="/" replace />;
+  }
+  return <AdminUsers />;
+}
+
+/**
  * Página principal de la colección del usuario.
  * Muestra el encabezado con el botón "Añadir juego" y el grid de GameList.
- * Es un componente de página sin props: obtiene sus datos a través de GameList.
+ * Si se llega desde guardar un juego (`location.state.flashGameSaved`), muestra un
+ * aviso visible arriba (la ficha de alta suele dejar el scroll abajo del formulario).
+ *
  * @component
  */
 function HomePage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [collectionFlash, setCollectionFlash] = useState(null);
+  const flashBannerRef = useRef(null);
+
+  useEffect(() => {
+    const raw = location.state?.flashGameSaved;
+    const msg = typeof raw === "string" ? raw.trim() : "";
+    if (!msg) return;
+    setCollectionFlash(msg);
+    navigate(location.pathname, { replace: true, state: {} });
+  }, [location.pathname, location.state, navigate]);
+
+  useEffect(() => {
+    if (!collectionFlash) return;
+    flashBannerRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+    const t = window.setTimeout(() => setCollectionFlash(null), 9000);
+    return () => window.clearTimeout(t);
+  }, [collectionFlash]);
+
   return (
     <>
+      {collectionFlash && (
+        <div
+          ref={flashBannerRef}
+          className="mb-8 flex scroll-mt-28 gap-3 rounded-xl border border-emerald-500/40 bg-emerald-950/45 px-4 py-3.5 text-sm text-emerald-100 shadow-[0_8px_28px_-12px_rgba(16,185,129,0.35)] ring-1 ring-emerald-500/15 sm:px-5 sm:text-[0.95rem]"
+          role="status"
+          aria-live="polite"
+        >
+          <p className="min-w-0 flex-1 leading-relaxed">{collectionFlash}</p>
+          <button
+            type="button"
+            onClick={() => setCollectionFlash(null)}
+            className="shrink-0 self-start rounded-lg px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-emerald-200/80 transition hover:bg-white/10 hover:text-emerald-50"
+            aria-label="Cerrar aviso"
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
       <header className="mb-10 flex flex-col gap-6 sm:mb-12 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
@@ -139,7 +202,7 @@ function App() {
                   <ProfileSettings user={user} onUserUpdate={setUser} />
                 }
               />
-              <Route path="/admin" element={<AdminUsers />} />
+              <Route path="/admin" element={<AdminRoute user={user} />} />
               <Route
                 path="/juego/:gameId/discussion"
                 element={<GameDiscussion />}

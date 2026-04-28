@@ -9,7 +9,7 @@ import { API_BASE, apiFetch } from "../api";
  * @param {{ id: number, titulo: string } | null} props.preselectedGame — desde tu colección
  * @param {number | null} props.fixedRecipientId — perfil público
  * @param {string} [props.fixedRecipientName]
- * @param {() => void} [props.onSent]
+ * @param {(detail?: { recipientName: string; gameTitle: string }) => void} [props.onSent]
  */
 export default function RecommendGameModal({
   open,
@@ -27,6 +27,8 @@ export default function RecommendGameModal({
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadLists, setLoadLists] = useState(false);
+  /** Tras POST correcto: texto de confirmación para quien envía la recomendación. */
+  const [sendConfirmation, setSendConfirmation] = useState(null);
   /** Evita vaciar el texto del mensaje si el id del juego cambia de tipo o se actualiza con el modal ya abierto. */
   const prevOpenRef = useRef(false);
 
@@ -44,6 +46,7 @@ export default function RecommendGameModal({
     if (!prevOpenRef.current) {
       setErr("");
       setMensaje("");
+      setSendConfirmation(null);
       prevOpenRef.current = true;
     }
     setRecipientId(fixedRecipientId != null ? String(fixedRecipientId) : "");
@@ -77,6 +80,22 @@ export default function RecommendGameModal({
 
   if (!open) return null;
 
+  const handleClose = () => {
+    setSendConfirmation(null);
+    onClose();
+  };
+
+  const recipientLabelFor = (dest) =>
+    fixedRecipientId != null
+      ? fixedRecipientName || `Usuario #${fixedRecipientId}`
+      : following.find((u) => Number(u.id) === dest)?.nombre_usuario ||
+        `Usuario #${dest}`;
+
+  const gameTitleFor = (juego) =>
+    preselectedGame?.titulo ??
+    myGames.find((g) => Number(g.id) === Number(juego))?.titulo ??
+    "este juego";
+
   const submit = async (e) => {
     e.preventDefault();
     setErr("");
@@ -101,8 +120,12 @@ export default function RecommendGameModal({
         setErr(data.error || "No se pudo enviar.");
         return;
       }
-      onSent?.();
-      onClose();
+      const detail = {
+        recipientName: recipientLabelFor(dest),
+        gameTitle: gameTitleFor(juego),
+      };
+      setSendConfirmation(detail);
+      onSent?.(detail);
     } catch {
       setErr("Error de conexión.");
     } finally {
@@ -116,7 +139,7 @@ export default function RecommendGameModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="reco-modal-title"
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
         className="figma-panel max-h-[90vh] w-full max-w-md overflow-y-auto p-6 shadow-2xl"
@@ -126,12 +149,46 @@ export default function RecommendGameModal({
           id="reco-modal-title"
           className="text-lg font-bold tracking-tight text-white"
         >
-          Recomendar juego
+          {sendConfirmation ? "Listo" : "Recomendar juego"}
         </h2>
-        <p className="mt-2 text-sm text-slate-400">
-          Solo puedes recomendar títulos de tu biblioteca a personas que sigues.
-        </p>
+        {!sendConfirmation && (
+          <p className="mt-2 text-sm text-slate-400">
+            Solo puedes recomendar títulos de tu biblioteca a personas que
+            sigues.
+          </p>
+        )}
 
+        {sendConfirmation ? (
+          <div className="mt-6 space-y-5">
+            <div
+              className="rounded-lg border border-emerald-500/35 bg-emerald-950/30 px-4 py-3.5 text-sm text-emerald-100/95 shadow-[inset_0_1px_0_0_rgba(52,211,153,0.08)]"
+              role="status"
+              aria-live="polite"
+            >
+              <p className="font-semibold text-emerald-50">
+                Recomendación enviada
+              </p>
+              <p className="mt-2 leading-relaxed">
+                Has recomendado{" "}
+                <span className="font-semibold text-white">
+                  «{sendConfirmation.gameTitle}»
+                </span>{" "}
+                a{" "}
+                <span className="font-semibold text-white">
+                  {sendConfirmation.recipientName}
+                </span>
+                . Podrá verlo en su bandeja de recomendaciones (icono de campana).
+              </p>
+            </div>
+            <button
+              type="button"
+              className="figma-btn-primary w-full py-3"
+              onClick={handleClose}
+            >
+              Cerrar
+            </button>
+          </div>
+        ) : (
         <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
           {fixedRecipientId != null ? (
             <div>
@@ -222,7 +279,7 @@ export default function RecommendGameModal({
             <button
               type="button"
               className="figma-btn-outline !w-auto px-4 py-2.5"
-              onClick={onClose}
+              onClick={handleClose}
               disabled={loading}
             >
               Cancelar
@@ -236,6 +293,7 @@ export default function RecommendGameModal({
             </button>
           </div>
         </form>
+        )}
       </div>
     </div>
   );

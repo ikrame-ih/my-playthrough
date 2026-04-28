@@ -28,7 +28,7 @@ Plataformas como HowLongToBeat o Backloggd son útiles, pero suelen saturarse. M
 - **Interfaz de la aplicación** — textos y mensajes al usuario en **español**.
 - **Este README** — sección en **español** primero; después, resumen en **inglés** para quien prefiera leer en ese idioma.
 - **Código** — carpetas, archivos, variables y rutas API en **inglés** (convención habitual en stacks PERN). En el backend, los bloques JSDoc principales están en **español**.
-- **Registro** — contraseña de **al menos 8 caracteres** con **mayúscula, minúscula, número y símbolo** (validación en servidor y aviso en el formulario). El **nombre de usuario** público es **único** (sin distinguir mayúsculas; índice en BD).
+- **Registro** — contraseña de **al menos 8 caracteres** con **mayúscula, minúscula, número y símbolo** (validación en servidor y aviso en el formulario). El **nombre de usuario** público es **único** (sin distinguir mayúsculas; índice en BD). En login y registro: **mostrar u ocultar contraseña** (control accesible).
 - **Inicio de sesión** — **correo** o **nombre de usuario** (el que aparece en comunidad).
 - **Documentación en `docs/`** — índice en [`docs/README.md`](docs/README.md): scripts SQL en `docs/sql/`, documentación HTML en `docs/abrir-en-navegador/`, plan de pruebas en Markdown; redactado en **español** salvo nombres técnicos de ficheros.
 - **Modelo de datos** — el esquema canónico está en [`docs/sql/schema.sql`](docs/sql/schema.sql): **ocho tablas** (`usuarios`, `catalogo_juegos`, `juegos`, `juego_comentarios`, `juego_comentario_votos`, `usuario_seguimientos`, `juego_recomendaciones`, `lfg_publicaciones`). Diagrama interactivo: [`docs/abrir-en-navegador/diagrama_bd.html`](docs/abrir-en-navegador/diagrama_bd.html).
@@ -47,21 +47,21 @@ Plataformas como HowLongToBeat o Backloggd son útiles, pero suelen saturarse. M
 
 ### Funcionalidades
 
-- **Colección personal** — alta, edición y borrado de juegos (estado, plataforma, nota, horas).
+- **Colección personal** — alta, edición y borrado de juegos (estado, plataforma, nota, horas). Tras **guardar o editar** una ficha, un **aviso visible** aparece al volver a la colección (mensaje pasado por estado del router, no solo arriba del formulario).
 - **Búsqueda de carátulas** — combina Steam y RAWG (`RAWG_API_KEY` opcional pero recomendada). Las imágenes pasan por un proxy en el servidor para evitar bloqueos CORS.
 - **Catálogo compartido** — `catalogo_juegos` enlaza cada ficha a un ID canónico para compartir portada entre usuarios.
 - **Comunidad** — miembros (seguir desde tarjeta o perfil), estadísticas globales, **actividad** de quien sigues (comentarios y LFG) y **buscar grupo (LFG)** con modos online / co-op local / otro.
-- **Recomendaciones** — enviar un juego de tu biblioteca solo a usuarios a los que sigues; bandeja en `/recommendations`, campana con contador y **tono opcional** al recibir nuevas (activar o silenciar en **Perfil**; el navegador puede exigir un clic previo en la página para reproducir audio).
+- **Recomendaciones** — enviar un juego de tu biblioteca solo a usuarios a los que sigues; bandeja en `/recommendations`, campana con contador y **tono opcional** al recibir nuevas (activar o silenciar en **Perfil**; el navegador puede exigir un clic previo en la página para reproducir audio). Tras enviar, el **modal confirma** destinatario y título.
 - **Avatares** — 10 robots predefinidos (SVG); el usuario elige el suyo en **Perfil** (`/settings`); se guarda en `usuarios.avatar_id` y se muestra en barra superior, comunidad, perfiles y comentarios.
 - **Hilos de comentarios** — comentarios anidados por juego (`/juego/:id/discussion`).
-- **Panel de administración** — listado de usuarios, de todas las fichas y de publicaciones **LFG** (buscar grupo), con borrado donde la API lo permite; borrado de cuentas (en cascada: juegos y comentarios de ese usuario) y borrado de cualquier ficha. En la **discusión** de un juego, un **admin** puede borrar un comentario ajeno (misma regla que autor o dueño de la ficha). El rol se comprueba en base de datos en cada petición.
+- **Panel de administración** — listado de usuarios, de todas las fichas y de publicaciones **LFG** (buscar grupo), con borrado donde la API lo permite; borrado de cuentas (en cascada: juegos y comentarios de ese usuario) con **modal de confirmación reforzado** (hay que escribir el **nombre público exacto**) y borrado de cualquier ficha. La ruta **`/admin` redirige al inicio** si el usuario no es administrador (evita quedar en esa URL al cerrar sesión o cambiar de cuenta). En la **discusión** de un juego, un **admin** puede borrar un comentario ajeno (misma regla que autor o dueño de la ficha). El rol se comprueba en base de datos en cada petición.
 - **Roles** — visitante (pantalla de login), usuario registrado, administrador.
 - **Carga con skeletons** — placeholders animados mientras llegan los datos.
 - **Sesión centralizada** — `apiFetch()` unifica peticiones autenticadas y expiración del token.
 - **Colección** — resumen (juegos, horas, completados), ordenación (reciente, título, estado, nota) y vista **cuadrícula** o **lista compacta**; estado vacío con mensaje propio.
 - **Accesibilidad** — enlace “Saltar al contenido”, foco al `<main>`, etiquetas en controles de vista y ordenación.
 - **Cuenta demo** — ver apartado siguiente.
-- **Tour guiado** — se ofrece la **primera vez en ese navegador** tras iniciar sesión (se guarda preferencia en `localStorage`; no depende del alta en servidor). La **cuenta demo** en un perfil limpio también lo verá, para facilitar la demostración. Se puede **volver a lanzar** desde **Perfil**.
+- **Tour guiado** — se ofrece la **primera vez en ese navegador** tras iniciar sesión (se guarda preferencia en `localStorage`; no depende del alta en servidor). La **cuenta demo** en un perfil limpio también lo verá, para facilitar la demostración. Se puede **volver a lanzar** desde **Perfil**. Mensaje de bienvenida con **lenguaje neutro** (sin asumir género).
 
 ### Arquitectura del servidor
 
@@ -98,17 +98,17 @@ MyPlaythrough/
 docker compose up --build
 ```
 
-- API en el puerto **3000**, PostgreSQL en **5432**.
+- API en el puerto **3000**, PostgreSQL expuesto en el host en **5433** (mapeado al 5432 del contenedor; así no choca con un Postgres instalado en Windows en **5432**).
 - Con volumen de datos vacío, el esquema se crea desde `docs/sql/schema.sql`.
 
 #### Opción B — Manual (cuatro pasos)
 
 1. **Base de datos** — Crea una base en PostgreSQL y ejecuta **`docs/sql/schema.sql`** una vez.
 2. **Migraciones** (solo si vienes de una versión antigua del proyecto): aplica lo que falte, en este orden habitual — `docs/sql/add-avatar-id-usuarios.sql` si no existe `avatar_id`; en la carpeta `server/`, **`npm run migrate:social`**, **`npm run migrate:votes`** y **`npm run migrate:username-unique`** (equivalentes a los SQL de `docs/sql/add-social-features.sql`, `add-comentario-votos.sql`, `add-usuario-nombre-unique.sql`). Para dar rol admin a un correo concreto, edita y ejecuta `docs/sql/promover-admin.sql`.
-3. **Backend** — `cd server`, `npm install`, copia `server/.env.example` a `server/.env` y configura `DB_*`, `JWT_SECRET`, `CORS_ORIGIN` y, si quieres más resultados en el buscador de carátulas, `RAWG_API_KEY`. Arranque: `npm run dev`.
+3. **Backend** — `cd server`, `npm install`, copia `server/.env.example` a `server/.env` y configura `DB_*`, `JWT_SECRET`, `CORS_ORIGIN` y, si quieres más resultados en el buscador de carátulas, `RAWG_API_KEY`. Si el API en Node se conecta al Postgres del **Docker Compose** desde el host, usa **`DB_PORT=5433`** (ver ejemplo). Arranque: `npm run dev`.
 4. **Frontend** — `cd client`, `npm install`, `npm run dev` (puerto **5173**). Si la API no está en `http://localhost:3000`, crea `client/.env` con `VITE_API_URL=http://…`.
 
-**Si el login falla tras actualizar el repositorio:** casi siempre falta una migración (columna `notificaciones_sonido`, tablas sociales, votos en comentarios o índice de nombre único). Ejecuta los comandos `migrate:*` anteriores y reinicia el servidor.
+**Si el login falla tras actualizar el repositorio:** casi siempre falta una migración (columna `notificaciones_sonido`, tablas sociales, votos en comentarios o índice de nombre único). Ejecuta los comandos `migrate:*` anteriores y reinicia el servidor. La ruta de login también puede operar con una consulta reducida si faltan columnas opcionales en `usuarios` (BD muy antigua), pero lo habitual es alinear el esquema.
 
 **Datos de demostración (opcional, siempre desde `server/`):**
 
@@ -196,7 +196,7 @@ Platforms like HowLongToBeat or Backloggd are useful, but they tend to get clutt
 
 **Database schema:** [`docs/sql/schema.sql`](docs/sql/schema.sql) defines **eight tables** (`usuarios`, `catalogo_juegos`, `juegos`, `juego_comentarios`, `juego_comentario_votos`, `usuario_seguimientos`, `juego_recomendaciones`, `lfg_publicaciones`). Interactive diagram: [`docs/abrir-en-navegador/diagrama_bd.html`](docs/abrir-en-navegador/diagrama_bd.html).
 
-**Registration:** passwords must be **at least 8 characters** with **uppercase, lowercase, a digit, and a symbol** (server-side + form hint). **Display names** (`nombre_usuario`) are **unique** (case-insensitive; DB index).
+**Registration:** passwords must be **at least 8 characters** with **uppercase, lowercase, a digit, and a symbol** (server-side + form hint). **Display names** (`nombre_usuario`) are **unique** (case-insensitive; DB index). **Show/hide password** on login and register (accessible control).
 
 **Login:** **email** or **username** (same public name as in the community).
 
@@ -214,21 +214,21 @@ Platforms like HowLongToBeat or Backloggd are useful, but they tend to get clutt
 
 ### Features
 
-- **Personal collection** — add, edit, and delete games (status, platform, score, hours played).
+- **Personal collection** — add, edit, and delete games (status, platform, score, hours played). After **saving or updating** an entry, a **prominent confirmation** appears on the **home collection** screen (router `location.state`, not only at the top of the form).
 - **Cover art search** — combines Steam and [RAWG](https://rawg.io/apidocs) (`RAWG_API_KEY` optional but recommended). Images are served through a server-side proxy to avoid CDN hotlink blocks in the browser.
 - **Shared catalogue** — `catalogo_juegos` links each entry to a canonical RAWG/Steam ID so the same title shares artwork across users when picked from the search.
 - **Community** — member list with follow actions, read-only public profiles, global averages (SQL `GROUP BY`), **activity feed** from people you follow (comments + LFG posts), and **LFG** (“looking for group”) posts tied to your library (online / local co-op / other).
-- **Recommendations** — send a game from your library only to users you follow; inbox at `/recommendations`, header bell with unread count, optional **chime** for new items (toggle in **Profile**; browsers may require a click on the page before playing sound).
+- **Recommendations** — send a game from your library only to users you follow; inbox at `/recommendations`, header bell with unread count, optional **chime** for new items (toggle in **Profile**; browsers may require a click on the page before playing sound). The **modal confirms** recipient and game title after sending.
 - **Avatars** — 10 preset robots (SVG); pick yours under **Profile** (`/settings`); stored in `usuarios.avatar_id` and shown in the header, community, profiles, and comments.
 - **Discussion threads** — threaded comments per game entry (`/juego/:id/discussion`).
-- **Admin panel** — list users, all game rows, and **LFG** posts; delete accounts (cascades games and comments), delete any game, delete LFG (same rule as in Community). On a game’s **discussion** page, **admins** may delete someone else’s comment. Role is checked in the database on every request.
+- **Admin panel** — list users, all game rows, and **LFG** posts; delete accounts (cascades games and comments) via a **strong confirmation dialog** (must type the **exact public username**), delete any game, delete LFG (same rule as in Community). The **`/admin` route redirects home** for non-admin users (avoids landing there after logout or account switch). On a game’s **discussion** page, **admins** may delete someone else’s comment. Role is checked in the database on every request.
 - **Roles** — visitor (login wall), registered user, administrator.
 - **Skeleton loading screens** — animated placeholders while data loads.
 - **Centralised session handling** — `apiFetch()` wraps all authenticated requests; a single place handles token expiry across the whole frontend.
 - **Collection UX** — summary stats (games, hours, completed), sorting (recent, title, status, score), grid or compact list view, custom empty state.
 - **Accessibility** — skip link to main content, focus target on `<main>`, labels on sort/view controls.
 - **Demo account** — see “Demo data” below.
-- **Welcome tour** — shown the **first time in that browser** after login (`localStorage` flag; not tied to server-side “new user”). The **demo** account on a clean browser profile will see it too, which helps demos. **Restart from Profile** anytime.
+- **Welcome tour** — shown the **first time in that browser** after login (`localStorage` flag; not tied to server-side “new user”). The **demo** account on a clean browser profile will see it too, which helps demos. **Restart from Profile** anytime. Welcome copy uses **gender-neutral** Spanish.
 
 ### Server architecture
 
@@ -261,16 +261,16 @@ MyPlaythrough/
 docker compose up --build
 ```
 
-API on port **3000**, PostgreSQL on **5432**. Empty volume → schema from `docs/sql/schema.sql`.
+API on port **3000**, PostgreSQL exposed on the host as **5433** (mapped to container `5432`, avoiding clashes with a local Windows PostgreSQL on **5432**). Empty volume → schema from `docs/sql/schema.sql`.
 
 #### Option B — Manual (four steps)
 
 1. **Database** — Create a database and run **`docs/sql/schema.sql`** once.
 2. **Migrations** (only if upgrading an old checkout): apply what you still need, in order — `docs/sql/add-avatar-id-usuarios.sql` if `avatar_id` is missing; in **`server/`**, `npm run migrate:social`, `npm run migrate:votes`, `npm run migrate:username-unique` (same as the SQL files under `docs/sql/`). Edit and run `docs/sql/promover-admin.sql` to grant `admin` to a specific email.
-3. **Backend** — `cd server`, `npm install`, copy `.env.example` to `.env`, set `DB_*`, `JWT_SECRET`, `CORS_ORIGIN`, optional `RAWG_API_KEY`. Run `npm run dev`.
+3. **Backend** — `cd server`, `npm install`, copy `server/.env.example` to `server/.env`, set `DB_*`, `JWT_SECRET`, `CORS_ORIGIN`, optional `RAWG_API_KEY`. If your **local Node** API connects to **Docker Compose** Postgres from the host, set **`DB_PORT=5433`** (see `.env.example`). Run `npm run dev`.
 4. **Frontend** — `cd client`, `npm install`, `npm run dev` (port **5173**). If the API is not at `http://localhost:3000`, add `client/.env` with `VITE_API_URL=...`.
 
-**Login fails after `git pull`:** run the `migrate:*` commands above; the DB is usually missing social tables, sound column, comment votes, or the username index.
+**Login fails after `git pull`:** run the `migrate:*` commands above; the DB is usually missing social tables, sound column, comment votes, or the username index. The login route can fall back to a lean `SELECT` if optional `usuarios` columns are missing, but you should still migrate to the current schema.
 
 **Optional demo data (from `server/`):**
 

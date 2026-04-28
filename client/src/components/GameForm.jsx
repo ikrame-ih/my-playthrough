@@ -335,13 +335,13 @@ export default function GameForm() {
         return;
       }
 
-      setFeedback({
-        type: "ok",
-        text: isEditing
-          ? "Juego actualizado correctamente."
-          : "Juego guardado correctamente.",
+      navigate("/", {
+        state: {
+          flashGameSaved: isEditing
+            ? `«${tituloFinal}» se ha guardado correctamente.`
+            : `Has añadido «${tituloFinal}» a tu colección.`,
+        },
       });
-      setTimeout(() => navigate("/"), 900);
     } catch (error) {
       console.error("Error en la operación:", error);
       setFeedback({
