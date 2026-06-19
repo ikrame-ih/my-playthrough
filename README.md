@@ -4,7 +4,7 @@ A full-stack web app to manage your personal video game library — track what y
 
 Developed as the **final intermodular project** for the **Higher Technical Degree in Web Application Development (DAW)** at CESUR Málaga Este (2025/2026), **awarded the maximum grade**.
 
-**Live demo:** deploy the client to Vercel and the API to Render (see [Deployment](#deployment)).
+**Live demo:** [GitHub Pages](https://ikihga2223-create.github.io/my-playthrough/) (set repo variable `VITE_API_URL` to your Render API) or deploy the client to Vercel (see [Deployment](#deployment)).
 
 ---
 
@@ -23,77 +23,29 @@ Developed as the **final intermodular project** for the **Higher Technical Degre
 
 ## Screenshots
 
-Captured from the local app (1440×900). Regenerate with `node scripts/capture-readme-screenshots.mjs` while client and API are running.
+Captured at 1440×900 from the local stack. Regenerate with `node scripts/capture-readme-screenshots.mjs` (client + API running; run `npm run seed:presentation` first for community data).
 
-### Sign in
+<details open>
+<summary><strong>UI gallery</strong> — click to collapse</summary>
 
-![Sign-in screen](docs/screenshots/01-auth.png)
+<table>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/02-collection.png"><img src="docs/screenshots/02-collection.png" alt="My collection" width="100%" /></a><br/><sub><strong>Collection</strong></sub></td>
+<td width="50%" align="center"><a href="docs/screenshots/03-community-members.png"><img src="docs/screenshots/03-community-members.png" alt="Community" width="100%" /></a><br/><sub><strong>Community</strong></sub></td>
+</tr>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/07-add-game.png"><img src="docs/screenshots/07-add-game.png" alt="Add game" width="100%" /></a><br/><sub><strong>Add game</strong></sub></td>
+<td width="50%" align="center"><a href="docs/screenshots/09-recommendations.png"><img src="docs/screenshots/09-recommendations.png" alt="Recommendations" width="100%" /></a><br/><sub><strong>Recommendations</strong></sub></td>
+</tr>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/11-discussion.png"><img src="docs/screenshots/11-discussion.png" alt="Discussion" width="100%" /></a><br/><sub><strong>Discussion</strong></sub></td>
+<td width="50%" align="center"><a href="docs/screenshots/01-auth.png"><img src="docs/screenshots/01-auth.png" alt="Sign in" width="100%" /></a><br/><sub><strong>Sign in</strong></sub></td>
+</tr>
+</table>
 
-### My collection
+More captures (settings, search, LFG, admin, …) live in [`docs/screenshots/`](docs/screenshots/).
 
-Grid view with stats, sorting, and cover art.
-
-![My collection](docs/screenshots/02-collection.png)
-
-### Community
-
-**Members** — browse profiles and follow other players.
-
-![Community members](docs/screenshots/03-community-members.png)
-
-**Statistics** — community-wide average scores per title.
-
-![Community statistics](docs/screenshots/04-community-stats.png)
-
-**Activity** — feed from people you follow.
-
-![Community activity](docs/screenshots/05-community-activity.png)
-
-**Find group (LFG)** — post or browse teammate searches tied to your library.
-
-![Community LFG](docs/screenshots/06-community-lfg.png)
-
-### Add game
-
-Cover search via Steam and RAWG.
-
-![Add game form](docs/screenshots/07-add-game.png)
-
-### Profile settings
-
-Display name, robot avatar, notification sound, guided tour.
-
-![Profile settings](docs/screenshots/08-settings.png)
-
-### Recommendations
-
-Inbox for games sent by people you follow.
-
-![Recommendations inbox](docs/screenshots/09-recommendations.png)
-
-### Search
-
-Global search across members and registered games.
-
-![Search results](docs/screenshots/10-search.png)
-
-### Game discussion
-
-Threaded reviews with helpful / not recommended votes.
-
-![Game discussion](docs/screenshots/11-discussion.png)
-
-### Public profile
-
-Read-only view of another member's collection.
-
-![Public profile](docs/screenshots/12-public-profile.png)
-
-### Administration
-
-User, game, and LFG moderation (admin role).
-
-![Admin panel](docs/screenshots/13-admin.png)
+</details>
 
 ---
 
@@ -176,13 +128,23 @@ Or use **Try demo account** on the login screen (requires `seed:demo`).
 3. Optionally set **`RAWG_API_KEY`**.
 4. Run `docs/sql/schema.sql` on the Postgres instance after first deploy.
 
-### Frontend (Vercel)
+### Frontend (Vercel or GitHub Pages)
+
+**Vercel**
 
 1. Import the repo; set **Root Directory** to `client`.
 2. Build command: `npm run build` · Output: `dist`.
 3. Environment variable: **`VITE_API_URL`** = your Render API URL (e.g. `https://myplaythrough-api.onrender.com`).
 
-`client/vercel.json` provides SPA fallback rewrites.
+**GitHub Pages**
+
+1. In the repo: **Settings → Pages → Build and deployment → GitHub Actions**.
+2. Add repository variable **`VITE_API_URL`** (same Render URL as above).
+3. Push to `main`; the workflow in `.github/workflows/pages.yml` publishes the client to `https://<user>.github.io/my-playthrough/`.
+
+`client/vite.config.js` sets `base: '/my-playthrough/'` when `GITHUB_PAGES=true` (handled by the workflow).
+
+`client/vercel.json` provides SPA fallback rewrites on Vercel.
 
 ---
 
