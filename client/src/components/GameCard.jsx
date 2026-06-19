@@ -59,7 +59,7 @@ export default function GameCard({
         )}
 
         <span className="absolute left-3 top-3 z-10 rounded-md bg-black/55 px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-slate-200 backdrop-blur-sm">
-          {game.plataforma?.trim() || "Sin plataforma"}
+          {game.plataforma?.trim() || "No platform"}
         </span>
       </div>
 
@@ -81,7 +81,7 @@ export default function GameCard({
               to={discussionTo}
               className="text-xs font-semibold text-brand-accent transition hover:text-teal-300"
             >
-              Ver discusión →
+              View discussion →
             </Link>
           </div>
         )}
@@ -110,8 +110,8 @@ export default function GameCard({
                   type="button"
                   onClick={() => onRecommend(game)}
                   className="rounded-lg p-2 text-slate-500 transition hover:bg-white/[0.06] hover:text-brand-accent"
-                  title="Recomendar a alguien"
-                  aria-label={`Recomendar ${game.titulo}`}
+                  title="Recommend to someone"
+                  aria-label={`Recommend ${game.titulo}`}
                 >
                   <IconGift />
                 </button>
@@ -119,7 +119,7 @@ export default function GameCard({
               <Link
                 to={`/edit/${game.id}`}
                 className="rounded-lg p-2 text-slate-500 transition hover:bg-white/[0.06] hover:text-brand-accent"
-                title="Editar"
+                title="Edit"
               >
                 <IconPencil />
               </Link>
@@ -127,7 +127,7 @@ export default function GameCard({
                 type="button"
                 onClick={() => onDelete?.(game.id, game.titulo)}
                 className="rounded-lg p-2 text-slate-500 transition hover:bg-red-500/10 hover:text-red-400"
-                title="Eliminar"
+                title="Delete"
               >
                 <IconTrash />
               </button>

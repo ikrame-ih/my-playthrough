@@ -24,9 +24,9 @@ function getCurrentUserId() {
 }
 
 function labelLfgModo(m) {
-  if (m === "online") return "Online / multijugador";
-  if (m === "coop_local") return "Co-op local o pantalla compartida";
-  return "Otro";
+  if (m === "online") return "Online / multiplayer";
+  if (m === "coop_local") return "Local co-op or split-screen";
+  return "Other";
 }
 
 /**
@@ -193,12 +193,12 @@ export default function Community() {
     setLfgErr("");
     const juego_id = parseInt(lfgGameId, 10);
     if (!Number.isFinite(juego_id)) {
-      setLfgErr("Elige un juego de tu colección.");
+      setLfgErr("Pick a game from your collection.");
       return;
     }
     const mensaje = lfgMsg.trim();
     if (!mensaje) {
-      setLfgErr("Escribe un mensaje (qué buscas, horario, plataforma…).");
+      setLfgErr("Write a message (what you need, schedule, platform…).");
       return;
     }
     setLfgSubmitting(true);
@@ -213,20 +213,20 @@ export default function Community() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setLfgErr(data.error || "No se pudo publicar.");
+        setLfgErr(data.error || "Could not post.");
         return;
       }
       setLfgMsg("");
       await refreshLfg();
     } catch {
-      setLfgErr("Error de conexión.");
+      setLfgErr("Connection error.");
     } finally {
       setLfgSubmitting(false);
     }
   };
 
   const deleteLfg = async (id) => {
-    if (!window.confirm("¿Eliminar esta publicación?")) return;
+    if (!window.confirm("Delete this post?")) return;
     try {
       const res = await apiFetch(`${API_BASE}/api/social/lfg/${id}`, {
         method: "DELETE",
@@ -264,12 +264,12 @@ export default function Community() {
       <div className="space-y-8">
         <header>
           <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Comunidad
+            Community
           </h1>
         </header>
         <ul
           aria-busy="true"
-          aria-label="Cargando miembros"
+          aria-label="Loading members"
           className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
         >
           {Array.from({ length: 8 }).map((_, i) => (
@@ -287,11 +287,11 @@ export default function Community() {
       <div className="space-y-8">
         <header>
           <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Comunidad
+            Community
           </h1>
         </header>
         <ErrorRetryPanel
-          title="No hemos podido cargar la comunidad."
+          title="We couldn't load the community."
           onRetry={() => setMainRetry((n) => n + 1)}
         />
       </div>
@@ -302,12 +302,11 @@ export default function Community() {
     <div className="space-y-8">
       <header>
         <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-          Comunidad
+          Community
         </h1>
         <p className="mt-2 max-w-2xl text-base text-brand-accent/90">
-          Miembros, estadísticas, actividad de quien sigues y buscar compañeros
-          para jugar (LFG). Las recomendaciones personales están en la campana
-          del encabezado.
+          Members, stats, activity from people you follow, and find players
+          to team up (LFG). Personal recommendations live in the header bell.
         </p>
       </header>
 
@@ -322,22 +321,22 @@ export default function Community() {
           }`}
         >
           <IconUsers className="h-4 w-4 shrink-0 opacity-90" />
-          Miembros
+          Members
         </button>
-        {tabBtn("stats", "Estadísticas")}
-        {tabBtn("activity", "Actividad")}
-        {tabBtn("lfg", "Buscar grupo")}
+        {tabBtn("stats", "Statistics")}
+        {tabBtn("activity", "Activity")}
+        {tabBtn("lfg", "Find group")}
       </div>
 
       {tab === "members" && (
         <section>
           {users.length === 0 ? (
             <p className="figma-panel px-5 py-8 text-sm text-slate-400">
-              Aún no hay otros usuarios registrados además de ti.
+              No other registered users yet besides you.
             </p>
           ) : filteredUsers.length === 0 ? (
             <p className="figma-panel px-5 py-8 text-sm text-slate-400">
-              Ningún miembro coincide con la búsqueda.
+              No members match your search.
             </p>
           ) : (
             <ul className="motion-stagger grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -356,15 +355,15 @@ export default function Community() {
                         <UserAvatar
                           avatarId={u.avatar_id}
                           size="lg"
-                          title={`Avatar de ${name}`}
+                          title={`${name}'s avatar`}
                         />
                         <div className="min-w-0">
                           <p className="truncate font-semibold text-white">
                             {u.nombre_usuario}
                           </p>
                           <p className="truncate text-sm text-slate-500">
-                            {num} {num === 1 ? "juego" : "juegos"} · {seg}{" "}
-                            {seg === 1 ? "seguidor" : "seguidores"} · {plat}
+                            {num} {num === 1 ? "game" : "games"} · {seg}{" "}
+                            {seg === 1 ? "follower" : "followers"} · {plat}
                           </p>
                         </div>
                       </Link>
@@ -377,7 +376,7 @@ export default function Community() {
                             : "bg-slate-800 text-slate-300 hover:bg-slate-700"
                         }`}
                       >
-                        {u.siguiendo ? "Siguiendo" : "Seguir"}
+                        {u.siguiendo ? "Following" : "Follow"}
                       </button>
                     </div>
                   </li>
@@ -392,22 +391,21 @@ export default function Community() {
         <section>
           {isAdmin && (
             <p className="mb-5 max-w-2xl text-sm leading-relaxed text-slate-400">
-              Puntuación media de cada juego calculada a partir de todas las
-              valoraciones guardadas en la comunidad.
+              Average score per title across all community ratings.
             </p>
           )}
           {stats.length === 0 ? (
             <p className="figma-panel px-5 py-8 text-sm text-slate-500">
-              Aún no hay datos suficientes para calcular medias.
+              Not enough data to calculate averages yet.
             </p>
           ) : (
             <div className="figma-table-wrap">
               <table className="w-full text-left text-sm">
                 <thead className="border-b border-white/[0.06] bg-slate-900/40 text-slate-300">
                   <tr>
-                    <th className="p-3 font-semibold">Título</th>
-                    <th className="p-3 font-semibold">Nota media</th>
-                    <th className="p-3 font-semibold">Votos</th>
+                    <th className="p-3 font-semibold">Title</th>
+                    <th className="p-3 font-semibold">Avg. score</th>
+                    <th className="p-3 font-semibold">Votes</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -435,16 +433,15 @@ export default function Community() {
       {tab === "activity" && (
         <section className="space-y-4">
           <p className="max-w-2xl text-sm text-slate-400">
-            Comentarios y publicaciones LFG de personas a las que sigues. Sigue
-            perfiles desde la pestaña Miembros o desde su colección pública.
+            Comments and LFG posts from people you follow. Follow profiles from
+            the Members tab or from their public collection.
           </p>
           {activityLoading && (
-            <p className="text-sm text-slate-500">Cargando actividad…</p>
+            <p className="text-sm text-slate-500">Loading activity…</p>
           )}
           {!activityLoading && activity.length === 0 && (
             <div className="figma-panel px-6 py-10 text-center text-sm text-slate-400">
-              No hay actividad reciente. Sigue a otros miembros para ver
-              novedades aquí.
+              No recent activity. Follow other members to see updates here.
             </div>
           )}
           <ul className="space-y-3">
@@ -462,8 +459,8 @@ export default function Community() {
                     </span>
                     <span className="text-slate-500">
                       {row.tipo === "comentario"
-                        ? "comentó en"
-                        : "busca grupo en"}
+                        ? "commented on"
+                        : "is LFG for"}
                     </span>
                     <Link
                       to={
@@ -491,7 +488,7 @@ export default function Community() {
                     </p>
                   )}
                   <p className="mt-2 text-xs text-slate-600">
-                    {new Date(row.en).toLocaleString("es-ES")}
+                    {new Date(row.en).toLocaleString("en-US")}
                   </p>
                 </div>
               </li>
@@ -503,17 +500,16 @@ export default function Community() {
       {tab === "lfg" && (
         <section className="space-y-8">
           <div className="figma-panel p-6">
-            <h2 className="text-lg font-bold text-white">Publicar búsqueda</h2>
+            <h2 className="text-lg font-bold text-white">Post a search</h2>
             <p className="mt-2 text-sm text-slate-400">
-              Indica en qué título de tu biblioteca quieres compañía y cómo
-              prefieres jugar (online, en local…). Tú eliges el modo; no
-              bloqueamos títulos “solo un jugador” porque a veces hay modos
-              opcionales o interpretaciones distintas.
+              Pick a title from your library, say how you want to play (online,
+              local…), and what you are looking for. You choose the mode — we
+              do not block single-player titles because optional modes vary.
             </p>
             <form onSubmit={submitLfg} className="mt-5 flex flex-col gap-4">
               <label className="flex flex-col gap-1.5">
                 <span className="text-sm font-medium text-slate-400">
-                  Tu juego
+                  Your game
                 </span>
                 <select
                   className="figma-input py-3 text-sm"
@@ -521,7 +517,7 @@ export default function Community() {
                   onChange={(e) => setLfgGameId(e.target.value)}
                   required
                 >
-                  <option value="">— Elegir —</option>
+                  <option value="">— Choose —</option>
                   {myGames.map((g) => (
                     <option key={g.id} value={g.id}>
                       {g.titulo}
@@ -530,29 +526,29 @@ export default function Community() {
                 </select>
               </label>
               <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-slate-400">Modo</span>
+                <span className="text-sm font-medium text-slate-400">Mode</span>
                 <select
                   className="figma-input py-3 text-sm"
                   value={lfgModo}
                   onChange={(e) => setLfgModo(e.target.value)}
                 >
-                  <option value="online">Online / multijugador</option>
+                  <option value="online">Online / multiplayer</option>
                   <option value="coop_local">
-                    Co-op local o pantalla compartida
+                    Local co-op or split-screen
                   </option>
-                  <option value="otro">Otro</option>
+                  <option value="otro">Other</option>
                 </select>
               </label>
               <label className="flex flex-col gap-1.5">
                 <span className="text-sm font-medium text-slate-400">
-                  Mensaje
+                  Message
                 </span>
                 <textarea
                   className="figma-input min-h-[100px] py-3 text-sm"
                   value={lfgMsg}
                   onChange={(e) => setLfgMsg(e.target.value)}
                   maxLength={500}
-                  placeholder="Ej.: Rankeds por la noche, EUW, con voz…"
+                  placeholder="e.g. Ranked nights, EUW, voice chat…"
                   required
                 />
               </label>
@@ -566,19 +562,19 @@ export default function Community() {
                 disabled={lfgSubmitting}
                 className="figma-btn-primary self-start"
               >
-                {lfgSubmitting ? "Publicando…" : "Publicar"}
+                {lfgSubmitting ? "Posting…" : "Post"}
               </button>
             </form>
           </div>
 
           <div>
             <h2 className="mb-4 text-lg font-bold text-white">
-              Publicaciones activas
+              Active posts
             </h2>
-            {lfgLoading && <p className="text-sm text-slate-500">Cargando…</p>}
+            {lfgLoading && <p className="text-sm text-slate-500">Loading…</p>}
             {!lfgLoading && lfgList.length === 0 && (
               <p className="figma-panel px-6 py-10 text-center text-sm text-slate-400">
-                Nadie ha publicado una búsqueda aún.
+                No one has posted a search yet.
               </p>
             )}
             <ul className="space-y-3">
@@ -608,13 +604,13 @@ export default function Community() {
                           {row.mensaje}
                         </p>
                         <p className="mt-2 text-xs text-slate-600">
-                          {new Date(row.created_at).toLocaleString("es-ES")}
+                          {new Date(row.created_at).toLocaleString("en-US")}
                         </p>
                         <Link
                           to={`/juego/${row.juego_id}/discussion`}
                           className="mt-2 inline-block text-xs font-semibold text-brand-accent hover:text-teal-300"
                         >
-                          Ver ficha y discusión →
+                          View game & discussion →
                         </Link>
                       </div>
                     </div>
@@ -624,7 +620,7 @@ export default function Community() {
                         onClick={() => deleteLfg(row.id)}
                         className="self-end text-xs font-semibold text-red-400 hover:text-red-300 sm:self-start"
                       >
-                        Eliminar
+                        Delete
                       </button>
                     )}
                   </div>

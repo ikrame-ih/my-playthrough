@@ -109,7 +109,7 @@ export default function GameForm() {
           url_imagen: data.url_imagen ?? "",
         });
         if (data.url_imagen) {
-          setCoverHint("Imagen guardada en tu ficha.");
+          setCoverHint("Cover saved on your entry.");
         }
       })
       .catch((err) => {
@@ -188,8 +188,8 @@ export default function GameForm() {
           }));
           setCoverHint(
             list.length === 1
-              ? `1 resultado — confirma que es el juego correcto`
-              : `${list.length} resultados — elige el juego correspondiente`,
+              ? `1 result — confirm this is the right game`
+              : `${list.length} results — pick the matching game`,
           );
         } else {
           selectedCoverKeyRef.current = null;
@@ -198,8 +198,8 @@ export default function GameForm() {
           setFormData((f) => ({ ...f, url_imagen: "" }));
           setCoverHint(
             isAdminUser()
-              ? "No hay coincidencias. Prueba otras palabras o configura RAWG_API_KEY en el servidor para incluir juegos fuera de Steam."
-              : "No hay coincidencias. Prueba con otras palabras en el título.",
+              ? "No matches. Try other words or set RAWG_API_KEY on the server for non-Steam titles."
+              : "No matches. Try different words in the title.",
           );
         }
       } catch {
@@ -276,7 +276,7 @@ export default function GameForm() {
     if (!tituloFinal) {
       setFeedback({
         type: "error",
-        text: "Indica un título o elige un juego de la lista de resultados.",
+        text: "Enter a title or pick a game from the results list.",
       });
       return;
     }
@@ -317,7 +317,7 @@ export default function GameForm() {
       try {
         data = text ? JSON.parse(text) : {};
       } catch {
-        data = { error: "Respuesta del servidor no válida." };
+        data = { error: "Invalid server response." };
       }
 
       if (!response.ok) {
@@ -330,7 +330,7 @@ export default function GameForm() {
           text:
             hint ||
             data.message ||
-            `No se pudo guardar (${response.status}).`,
+            `Could not save (${response.status}).`,
         });
         return;
       }
@@ -339,14 +339,14 @@ export default function GameForm() {
         state: {
           flashGameSaved: isEditing
             ? `«${tituloFinal}» se ha guardado correctamente.`
-            : `Has añadido «${tituloFinal}» a tu colección.`,
+            : `Added «${tituloFinal}» to your collection.`,
         },
       });
     } catch (error) {
       console.error("Error en la operación:", error);
       setFeedback({
         type: "error",
-        text: "No se pudo conectar con el servidor.",
+        text: "Could not connect to the server.",
       });
     } finally {
       setFormSubmitting(false);
@@ -359,10 +359,10 @@ export default function GameForm() {
         <div
           className="figma-panel py-20 text-center"
           aria-busy="true"
-          aria-label="Cargando ficha"
+          aria-label="Loading entry"
         >
           <p className="text-lg font-medium text-brand-accent animate-pulse">
-            Cargando ficha…
+            Loading entry…
           </p>
         </div>
       </div>
@@ -373,12 +373,12 @@ export default function GameForm() {
     return (
       <div className="mx-auto max-w-3xl space-y-4">
         <ErrorRetryPanel
-          title="No hemos encontrado esa ficha."
-          hint="Puede que se haya eliminado o el enlace no sea válido."
+          title="We couldn't find that entry."
+          hint="It may have been deleted or the link is invalid."
         />
         <p className="text-center">
           <Link to="/" className="figma-btn-primary inline-flex">
-            Volver a mi colección
+            Back to my collection
           </Link>
         </p>
       </div>
@@ -389,12 +389,12 @@ export default function GameForm() {
     return (
       <div className="mx-auto max-w-3xl space-y-4">
         <ErrorRetryPanel
-          title="No hemos podido cargar la ficha."
+          title="We couldn't load that entry."
           onRetry={() => setEditRetry((n) => n + 1)}
         />
         <p className="text-center text-sm text-slate-500">
           <Link to="/" className="text-brand-accent hover:text-teal-300">
-            ← Volver a mi colección
+            ← Back to my collection
           </Link>
         </p>
       </div>
@@ -407,18 +407,18 @@ export default function GameForm() {
         <Link
           to="/"
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-brand-input text-slate-400 transition hover:border-white/20 hover:text-white"
-          aria-label="Volver"
+          aria-label="Go back"
         >
           ←
         </Link>
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            {isEditing ? "Editar juego" : "Añadir nuevo juego"}
+            {isEditing ? "Edit game" : "Add new game"}
           </h1>
           <p className="mt-1 text-sm text-slate-400">
             {isEditing
-              ? "Actualiza los datos de tu ficha."
-              : "Escribe el título y elige el juego en la lista de resultados."}
+              ? "Update your entry details."
+              : "Type the title and pick the game from the results list."}
           </p>
         </div>
       </div>
@@ -440,7 +440,7 @@ export default function GameForm() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div>
             <label className="mb-1.5 block text-sm font-medium text-slate-400">
-              Título del juego <span className="text-red-400">*</span>
+              Game title <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
@@ -455,7 +455,7 @@ export default function GameForm() {
             <div className="mt-3 flex flex-wrap items-center gap-3">
               {coverLoading && (
                 <span className="text-xs text-brand-accent animate-pulse">
-                  Buscando coincidencias…
+                  Searching for matches…
                 </span>
               )}
               {!coverLoading && coverHint && (
@@ -466,7 +466,7 @@ export default function GameForm() {
             {!coverLoading && coverOptions.length > 0 && (
               <div className="mt-4">
                 <label className="mb-2 block text-sm font-medium text-slate-400">
-                  Elige el juego
+                  Pick a game
                 </label>
                 <div className="grid max-h-72 grid-cols-2 gap-2 overflow-y-auto rounded-xl border border-white/10 bg-brand-input/40 p-2 sm:grid-cols-3">
                   {coverOptions.map((opt) => {
@@ -511,11 +511,11 @@ export default function GameForm() {
                   className="h-28 w-20 shrink-0 rounded-lg object-cover ring-1 ring-white/10"
                   onError={() => {
                     setFormData((f) => ({ ...f, url_imagen: "" }));
-                    setCoverHint("No se pudo cargar la imagen.");
+                    setCoverHint("Could not load the image.");
                   }}
                 />
                 <p className="text-xs leading-relaxed text-slate-500">
-                  Vista previa; se guarda con la ficha.
+                  Preview; saved with the entry.
                 </p>
               </div>
             )}
@@ -524,7 +524,7 @@ export default function GameForm() {
           <div className="grid gap-6 sm:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-400">
-                Plataforma
+                Platform
               </label>
               <input
                 type="text"
@@ -543,7 +543,7 @@ export default function GameForm() {
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-400">
-                Estado
+                Status
               </label>
               <select
                 name="estado"
@@ -552,8 +552,8 @@ export default function GameForm() {
                 className="figma-input"
               >
                 <option value="Pendiente">Backlog</option>
-                <option value="Jugando">Jugando</option>
-                <option value="Completado">Completado</option>
+                <option value="Jugando">Playing</option>
+                <option value="Completado">Completed</option>
               </select>
             </div>
           </div>
@@ -561,7 +561,7 @@ export default function GameForm() {
           <div className="grid gap-6 sm:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-400">
-                Horas jugadas
+                Hours played
               </label>
               <input
                 type="number"
@@ -574,7 +574,7 @@ export default function GameForm() {
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-400">
-                Nota (0–10)
+                Score (0–10)
               </label>
               <input
                 type="number"
@@ -594,7 +594,7 @@ export default function GameForm() {
               onClick={() => navigate("/")}
               className="rounded-lg border border-white/10 bg-brand-input px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/[0.04]"
             >
-              Cancelar
+              Cancel
             </button>
             <button
               type="submit"
@@ -602,10 +602,10 @@ export default function GameForm() {
               className="figma-btn-primary px-8 py-3 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {formSubmitting
-                ? "Guardando…"
+                ? "Saving…"
                 : isEditing
-                  ? "Guardar cambios"
-                  : "Crear juego"}
+                  ? "Save changes"
+                  : "Create game"}
             </button>
           </div>
         </form>

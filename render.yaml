@@ -1,0 +1,30 @@
+# Blueprint Render.com: al conectar el repositorio MyPlaythrough, revisa CORS_ORIGIN y RAWG_API_KEY en el panel.
+# Tras el primer deploy: ejecuta docs/sql/schema.sql en la consola SQL de Postgres o con psql.
+services:
+  - type: web
+    name: myplaythrough-api
+    runtime: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: myplaythrough-db
+          property: connectionString
+      - key: CORS_ORIGIN
+        sync: false
+      - key: RAWG_API_KEY
+        sync: false
+    healthCheckPath: /api/health
+    plan: free
+
+databases:
+  - name: myplaythrough-db
+    databaseName: myplaythrough
+    user: myplaythrough
+    plan: free

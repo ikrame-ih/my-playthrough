@@ -119,7 +119,7 @@ export default function UserPublicProfile() {
 
   if (loading) {
     return (
-      <div aria-busy="true" aria-label="Cargando perfil">
+      <div aria-busy="true" aria-label="Loading profile">
         <ProfileHeaderSkeleton />
         <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -138,7 +138,7 @@ export default function UserPublicProfile() {
           to="/community"
           className="figma-btn-primary mt-6 inline-flex"
         >
-          Volver a comunidad
+          Back to community
         </Link>
       </div>
     );
@@ -153,7 +153,7 @@ export default function UserPublicProfile() {
         />
         <p className="text-center text-sm text-slate-500">
           <Link to="/community" className="text-brand-accent hover:text-teal-300">
-            ← Volver a comunidad
+            ← Back to community
           </Link>
         </p>
       </div>
@@ -184,17 +184,14 @@ export default function UserPublicProfile() {
           <div className="min-w-0">
             <div className="mb-2 h-1 w-14 rounded-full bg-gradient-to-r from-brand-accent to-brand-accent/40" />
             <h1 className="text-3xl font-bold tracking-tight text-white sm:text-[2.25rem]">
-              Colección de {user.nombre_usuario}
+              {user.nombre_usuario}&apos;s collection
             </h1>
             <p className="mt-2 text-sm text-slate-500">
               {followers}{" "}
-              {followers === 1 ? "seguidor" : "seguidores"}
+              {followers === 1 ? "follower" : "followers"}
               {" · "}
               {games.length}{" "}
-              {games.length === 1 ? "juego" : "juegos"}
-            </p>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-400">
-              Vista solo lectura (no puedes editar ni borrar juegos ajenos).
+              {games.length === 1 ? "game" : "games"}
             </p>
             {!isSelf && (
               <div className="mt-4 flex flex-wrap gap-2">
@@ -204,14 +201,14 @@ export default function UserPublicProfile() {
                   onClick={toggleFollow}
                   className="figma-btn-primary !w-auto px-4 py-2 text-sm disabled:opacity-60"
                 >
-                  {following ? "Dejar de seguir" : "Seguir"}
+                  {following ? "Unfollow" : "Follow"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setRecoOpen(true)}
                   className="figma-btn-outline !w-auto border-brand-accent/25 px-4 py-2 text-sm text-brand-accent hover:bg-brand-accent/10"
                 >
-                  Recomendar un juego
+                  Recommend a game
                 </button>
               </div>
             )}
@@ -221,13 +218,13 @@ export default function UserPublicProfile() {
           to="/community"
           className="text-sm font-medium text-brand-accent transition hover:text-teal-300"
         >
-          ← Comunidad
+          ← Community
         </Link>
       </div>
 
       {games.length === 0 ? (
         <p className="figma-panel border-dashed border-slate-600/80 px-6 py-14 text-center text-sm text-slate-400">
-          Este usuario aún no tiene juegos en su colección.
+          This user has no games in their collection yet.
         </p>
       ) : (
         <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-3">

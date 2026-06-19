@@ -15,15 +15,34 @@ require("dotenv").config();
 
 /**
  * Pool de conexión a PostgreSQL reutilizado en todas las rutas.
+ * En la nube (Neon, Render, Railway…) suele usarse `DATABASE_URL`;
+ * en local, variables `DB_*` sueltas.
+ */
+function poolConfig() {
+  const url = process.env.DATABASE_URL?.trim();
+  if (url) {
+    const disableSsl =
+      process.env.PGSSLMODE === "disable" ||
+      /localhost|127\.0\.0\.1/i.test(url);
+    return {
+      connectionString: url,
+      ssl: disableSsl ? false : { rejectUnauthorized: false },
+    };
+  }
+  return {
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: Number(process.env.DB_PORT) || 5432,
+  };
+}
+
+/**
+ * Pool de conexión a PostgreSQL reutilizado en todas las rutas.
  * La librería `pg` gestiona automáticamente el número de conexiones activas.
  * @type {import("pg").Pool}
  */
-const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-});
+const pool = new Pool(poolConfig());
 
 module.exports = pool;

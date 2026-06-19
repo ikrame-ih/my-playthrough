@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
 import { API_BASE } from "../api";
 import { passwordPolicyMessage } from "../passwordPolicy";
+import { markWelcomeTourAfterRegister } from "./WelcomeTour";
 import { IconController, IconEye, IconEyeOff } from "./icons";
 import RobotAvatar from "./RobotAvatar";
 
 /**
- * Pantalla de autenticación que combina login y registro en un único componente.
- * El estado `mode` controla cuál de los dos formularios se muestra.
- * Al completar la autenticación con éxito, guarda el token en localStorage
- * y notifica al componente padre mediante `onAuthSuccess`.
+ * Authentication screen combining login and registration in a single component.
+ * The `mode` state controls which form is shown.
+ * On successful authentication, saves the token in localStorage
+ * and notifies the parent component via `onAuthSuccess`.
  *
  * @component
  * @param {object}   props
- * @param {Function} props.onAuthSuccess - Callback que recibe el objeto `user` tras autenticarse.
+ * @param {Function} props.onAuthSuccess - Callback that receives the `user` object after authentication.
  */
 export default function AuthPage({ onAuthSuccess }) {
   const [mode, setMode] = useState("login");
@@ -36,13 +37,36 @@ export default function AuthPage({ onAuthSuccess }) {
 
   useEffect(() => {
     const t =
-      mode === "login" ? "Iniciar sesión" : "Crear cuenta";
+      mode === "login" ? "Sign in" : "Create account";
     document.title = `${t} · MyPlaythrough`;
   }, [mode]);
 
   const handleChange = (e) => {
     setFormError("");
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const completeAuth = (data, authMode) => {
+    if (!data.token || !data.user) {
+      setFormError("Incomplete server response.");
+      return false;
+    }
+
+    if (authMode === "login") {
+      if (remember) {
+        localStorage.setItem("rememberLogin", formData.email.trim());
+      } else {
+        localStorage.removeItem("rememberLogin");
+      }
+    }
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    if (authMode === "register") {
+      markWelcomeTourAfterRegister(data.user.id);
+    }
+    onAuthSuccess(data.user);
+    return true;
   };
 
   const handleSubmit = async (e) => {
@@ -83,7 +107,7 @@ export default function AuthPage({ onAuthSuccess }) {
         data = text ? JSON.parse(text) : {};
       } catch {
         setFormError(
-          "Respuesta del servidor no válida. ¿Está arrancado el backend en el puerto 3000?",
+          "Invalid server response. Is the backend running on port 3000?",
         );
         return;
       }
@@ -93,30 +117,56 @@ export default function AuthPage({ onAuthSuccess }) {
         setFormError(
           parts.length > 0
             ? parts.join(" — ")
-            : `Error ${response.status}: no se pudo completar la autenticación.`,
+            : `Error ${response.status}: authentication could not be completed.`,
         );
         return;
       }
 
-      if (!data.token || !data.user) {
-        setFormError("Respuesta incompleta del servidor.");
+      completeAuth(data, mode);
+    } catch {
+      setFormError(
+        "Cannot reach the server. Open a terminal in the server folder and run: npm run dev",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    setFormError("");
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE}/api/auth/demo`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      let data = {};
+      try {
+        const text = await response.text();
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        setFormError(
+          "Invalid server response. Is the backend running on port 3000?",
+        );
         return;
       }
 
-      if (mode === "login") {
-        if (remember) {
-          localStorage.setItem("rememberLogin", formData.email.trim());
-        } else {
-          localStorage.removeItem("rememberLogin");
-        }
+      if (!response.ok) {
+        const parts = [data.error, data.detail].filter(Boolean);
+        setFormError(
+          parts.length > 0
+            ? parts.join(" — ")
+            : `Error ${response.status}: demo login could not be completed.`,
+        );
+        return;
       }
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      onAuthSuccess(data.user);
+      completeAuth(data, "login");
     } catch {
       setFormError(
-        "No hay conexión con el servidor. Abre una terminal en la carpeta server y ejecuta: npm run dev",
+        "Cannot reach the server. Open a terminal in the server folder and run: npm run dev",
       );
     } finally {
       setLoading(false);
@@ -133,8 +183,8 @@ export default function AuthPage({ onAuthSuccess }) {
         </span>
         <h1 className="mt-5 max-w-sm text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-[1.65rem]">
           {mode === "login"
-            ? "Inicia sesión en tu cuenta"
-            : "Crea una cuenta nueva"}
+            ? "Sign in to your account"
+            : "Create a new account"}
         </h1>
         <div className="auth-avatar-bounce mt-6" aria-hidden="true">
           {["robot-0", "robot-2", "robot-4", "robot-5", "robot-7"].map(
@@ -164,13 +214,13 @@ export default function AuthPage({ onAuthSuccess }) {
                 htmlFor="nombre_usuario"
                 className="mb-1.5 block text-sm font-medium text-slate-400"
               >
-                Nombre de usuario
+                Username
               </label>
               <input
                 id="nombre_usuario"
                 type="text"
                 name="nombre_usuario"
-                placeholder="Tu nombre público"
+                placeholder="Your public name"
                 value={formData.nombre_usuario}
                 onChange={handleChange}
                 required
@@ -186,8 +236,8 @@ export default function AuthPage({ onAuthSuccess }) {
               className="mb-1.5 block text-sm font-medium text-slate-400"
             >
               {mode === "login"
-                ? "Email o nombre de usuario"
-                : "Correo electrónico"}
+                ? "Email or username"
+                : "Email address"}
             </label>
             <input
               id="email"
@@ -195,8 +245,8 @@ export default function AuthPage({ onAuthSuccess }) {
               name="email"
               placeholder={
                 mode === "login"
-                  ? "tu@email.com o nombre de usuario"
-                  : "tu@email.com"
+                  ? "you@email.com or username"
+                  : "you@email.com"
               }
               value={formData.email}
               onChange={handleChange}
@@ -211,7 +261,7 @@ export default function AuthPage({ onAuthSuccess }) {
               htmlFor="password"
               className="mb-1.5 block text-sm font-medium text-slate-400"
             >
-              Contraseña
+              Password
             </label>
             <div className="relative">
               <input
@@ -233,8 +283,8 @@ export default function AuthPage({ onAuthSuccess }) {
                 onClick={() => setShowPassword((v) => !v)}
                 aria-label={
                   showPassword
-                    ? "Ocultar contraseña"
-                    : "Mostrar contraseña"
+                    ? "Hide password"
+                    : "Show password"
                 }
                 aria-pressed={showPassword}
                 className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 transition hover:bg-white/10 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-accent/40"
@@ -248,9 +298,9 @@ export default function AuthPage({ onAuthSuccess }) {
             </div>
             {mode === "register" && (
               <p className="mt-2 text-xs leading-relaxed text-slate-500">
-                Mínimo 8 caracteres, con mayúscula, minúscula, número y un símbolo
-                (por ejemplo <span className="font-mono text-slate-400">!</span>{" "}
-                o <span className="font-mono text-slate-400">?</span>).
+                At least 8 characters, with uppercase, lowercase, number, and a symbol
+                (for example <span className="font-mono text-slate-400">!</span>{" "}
+                or <span className="font-mono text-slate-400">?</span>).
               </p>
             )}
           </div>
@@ -263,7 +313,7 @@ export default function AuthPage({ onAuthSuccess }) {
                 onChange={(e) => setRemember(e.target.checked)}
                 className="h-4 w-4 rounded border-white/20 bg-brand-input text-brand-accent focus:ring-brand-accent/40"
               />
-              Recordarme
+              Remember me
             </label>
           )}
 
@@ -271,16 +321,11 @@ export default function AuthPage({ onAuthSuccess }) {
             <p className="text-center text-xs text-slate-500">
               <button
                 type="button"
-                className="font-medium text-brand-accent underline decoration-brand-accent/40 underline-offset-2 transition hover:text-teal-300"
-                onClick={() =>
-                  setFormData((f) => ({
-                    ...f,
-                    email: "Demo Jurado",
-                    password: "Presentacion2026!",
-                  }))
-                }
+                disabled={loading}
+                className="font-medium text-brand-accent underline decoration-brand-accent/40 underline-offset-2 transition hover:text-teal-300 disabled:opacity-60"
+                onClick={() => void handleDemoLogin()}
               >
-                Rellenar cuenta demo
+                Use demo account
               </button>
             </p>
           )}
@@ -291,10 +336,10 @@ export default function AuthPage({ onAuthSuccess }) {
             className="figma-btn-primary mt-1 w-full py-3.5 disabled:opacity-60"
           >
             {loading
-              ? "Procesando..."
+              ? "Processing..."
               : mode === "login"
-                ? "Iniciar sesión"
-                : "Crear cuenta"}
+                ? "Sign in"
+                : "Create account"}
           </button>
         </form>
 
@@ -302,8 +347,8 @@ export default function AuthPage({ onAuthSuccess }) {
           <div className="border-t border-white/10" />
           <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap bg-brand-panel px-3 text-xs text-slate-500">
             {mode === "login"
-              ? "¿No tienes cuenta?"
-              : "¿Ya tienes cuenta?"}
+              ? "Don't have an account?"
+              : "Already have an account?"}
           </span>
         </div>
 
@@ -317,8 +362,8 @@ export default function AuthPage({ onAuthSuccess }) {
           className="figma-btn-outline"
         >
           {mode === "login"
-            ? "Crear una cuenta nueva"
-            : "Iniciar sesión"}
+            ? "Create a new account"
+            : "Sign in"}
         </button>
         </div>
       </div>

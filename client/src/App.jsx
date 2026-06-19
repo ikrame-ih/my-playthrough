@@ -7,6 +7,7 @@ import {
   Link,
   useLocation,
   useNavigate,
+  useParams,
 } from "react-router-dom";
 import { API_BASE, authHeaders } from "./api";
 import { SearchProvider } from "./SearchContext";
@@ -87,26 +88,26 @@ function HomePage() {
             type="button"
             onClick={() => setCollectionFlash(null)}
             className="shrink-0 self-start rounded-lg px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-emerald-200/80 transition hover:bg-white/10 hover:text-emerald-50"
-            aria-label="Cerrar aviso"
+            aria-label="Dismiss notice"
           >
-            Cerrar
+            Dismiss
           </button>
         </div>
       )}
       <header className="mb-10 flex flex-col gap-6 sm:mb-12 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-            Mi colección
+            My collection
           </h1>
           <p className="mt-2 max-w-xl text-base leading-relaxed text-slate-400">
-            Gestiona tu biblioteca personal de videojuegos.
+            Manage your personal video game library.
           </p>
         </div>
         <Link
           to="/game/new"
           className="figma-btn-primary shrink-0 self-start whitespace-nowrap"
         >
-          + Añadir juego
+          + Add game
         </Link>
       </header>
       <GameList />
@@ -138,6 +139,11 @@ function safeReadStoredUser() {
   localStorage.removeItem("user");
   localStorage.removeItem("token");
   return null;
+}
+
+function JuegoDiscussionRedirect() {
+  const { gameId } = useParams();
+  return <Navigate to={`/game/${gameId}/discussion`} replace />;
 }
 
 function App() {
@@ -204,8 +210,12 @@ function App() {
               />
               <Route path="/admin" element={<AdminRoute user={user} />} />
               <Route
-                path="/juego/:gameId/discussion"
+                path="/game/:gameId/discussion"
                 element={<GameDiscussion />}
+              />
+              <Route
+                path="/juego/:gameId/discussion"
+                element={<JuegoDiscussionRedirect />}
               />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

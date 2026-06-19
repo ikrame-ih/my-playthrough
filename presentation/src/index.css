@@ -1,0 +1,121 @@
+@import "tailwindcss";
+@import "./presentation-animations.css";
+
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Syne", ui-sans-serif, system-ui, sans-serif;
+  --color-mp-bg: #0b1120;
+  --color-mp-panel: #161d2f;
+  --color-mp-accent: #2dd4bf;
+  --color-mp-cta: #36d7b7;
+  --color-mp-gold: #fbbf24;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  @apply antialiased text-slate-200 bg-black;
+  font-family: var(--font-sans);
+}
+
+/* Impresión / guardar como PDF — mismo aspecto oscuro que en pantalla */
+@media screen {
+  .print-root {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+    pointer-events: none;
+    opacity: 0;
+  }
+}
+
+@media print {
+  /* Una diapositiva por página, horizontal, con márgenes razonables */
+  @page {
+    margin: 10mm;
+    /* "auto" maximiza compatibilidad con visores PDF; el contenido sigue en apaisado por el ancho de ventana al imprimir */
+    size: auto;
+  }
+
+  html {
+    height: auto !important;
+    background: #0b1120 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    background: #0b1120 !important;
+    color: #e2e8f0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  #root {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: transparent !important;
+  }
+
+  /* El shell del modo presentación tiene overflow:hidden en pantalla; al imprimir hay que soltarlo o el PDF se corta */
+  .presentation-root {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+    background: transparent !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-root {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    overflow: visible !important;
+    clip: auto !important;
+    white-space: normal !important;
+    border: 0 !important;
+    color: inherit;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print-page {
+    box-sizing: border-box;
+    break-after: page;
+    page-break-after: always;
+    min-height: calc(210mm - 20mm); /* alto útil aprox. en A4 apaisado con márgenes */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print-page:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+}

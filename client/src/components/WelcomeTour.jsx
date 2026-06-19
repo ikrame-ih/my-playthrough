@@ -1,28 +1,40 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Joyride, { STATUS } from "react-joyride";
 
-/** Prefijo en localStorage; el estado del tour se guarda por usuario (`…_u{id}`). */
+/** localStorage prefix; tour completed / skipped per account (`…_u{id}`). */
 export const TOUR_STORAGE_KEY = "myplaythrough_tour_v1";
 
 function tourStorageKeyForUser(userId) {
-  return `${TOUR_STORAGE_KEY}_u${userId}`;
+  return `${TOUR_STORAGE_KEY}_u${String(userId)}`;
 }
 
-/** Dispara el tour desde cualquier sitio (p. ej. botón en Perfil). Pasa el id de usuario actual. */
+/** Marks that after a new registration, the tour should show once (until completed or skipped). */
+function tourPendingAfterRegisterKey(userId) {
+  return `myplaythrough_tour_after_register_u${String(userId)}`;
+}
+
+/** Call only after a successful register: the tour does not auto-start on later logins. */
+export function markWelcomeTourAfterRegister(userId) {
+  if (userId == null) return;
+  localStorage.setItem(tourPendingAfterRegisterKey(userId), "1");
+}
+
+/** Trigger the tour from anywhere (e.g. Profile button). Pass the current user id. */
 export function requestWelcomeTour(userId) {
   if (userId != null) {
     localStorage.removeItem(tourStorageKeyForUser(userId));
+    localStorage.removeItem(tourPendingAfterRegisterKey(userId));
   }
   localStorage.removeItem(TOUR_STORAGE_KEY);
   window.dispatchEvent(new CustomEvent("myplaythrough-start-tour"));
 }
 
 /**
- * Tour guiado (react-joyride): menú, búsqueda, campana y perfil.
- * Primera vez **por cuenta** en este navegador: si no hay marca para ese `userId`, se muestra al iniciar sesión.
- * La clave global antigua (`myplaythrough_tour_v1`) ya no bloquea cuentas nuevas en el mismo dispositivo.
+ * Guided tour (react-joyride): menu, search, bell, and profile.
+ * Auto-starts only after **registration** for that account in this browser (`markWelcomeTourAfterRegister`).
+ * Does not show on normal logins; restart from Profile → "Start guided tour" (`requestWelcomeTour`).
  *
- * @param {{ isAdmin: boolean; userId?: number }} props — Si es false, se omite el paso del enlace Administración.
+ * @param {{ isAdmin: boolean; userId?: number }} props — If false, the Administration link step is omitted.
  */
 export default function WelcomeTour({ isAdmin, userId }) {
   const [run, setRun] = useState(false);
@@ -32,48 +44,48 @@ export default function WelcomeTour({ isAdmin, userId }) {
       {
         target: '[data-tour="tour-welcome"]',
         content:
-          "Te damos la bienvenida a MyPlaythrough. En unos pasos verás dónde está cada función principal: tu biblioteca, la comunidad, las recomendaciones y más.",
+          "Welcome to MyPlaythrough. In a few steps you'll see where each main feature lives: your library, the community, recommendations, and more.",
         placement: "center",
         disableBeacon: true,
       },
       {
         target: '[data-tour="sidebar-nav"]',
         content:
-          "Menú lateral: aquí cambias de sección. En pantallas pequeñas ábrelo con el icono ☰ arriba a la izquierda.",
+          "Side menu: switch sections here. On small screens, open it with the ☰ icon at the top left.",
         placement: "right",
         disableBeacon: true,
       },
       {
         target: '[data-tour="nav-coleccion"]',
-        content: "Mi colección: añade juegos, notas y carátulas; cambia entre vista cuadrícula y lista.",
+        content: "My collection: add games, notes, and cover art; switch between grid and list view.",
         placement: "right",
         disableBeacon: true,
       },
       {
         target: '[data-tour="nav-comunidad"]',
         content:
-          "Comunidad: miembros, estadísticas, actividad de quien sigues, buscar grupo (LFG) y enlaces a perfiles públicos.",
+          "Community: members, stats, activity from people you follow, find-a-group (LFG), and links to public profiles.",
         placement: "right",
         disableBeacon: true,
       },
       {
         target: '[data-tour="nav-admin"]',
         content:
-          "Administración (solo admins): revisar usuarios, moderar fichas y borrar cuentas si hace falta.",
+          "Administration (admins only): review users, moderate entries, and delete accounts when needed.",
         placement: "right",
         disableBeacon: true,
       },
       {
         target: '[data-tour="nav-perfil"]',
         content:
-          "Perfil: elige avatar, silencia o activa el tono de nuevas recomendaciones y vuelve a ver este tour cuando quieras.",
+          "Profile: pick an avatar, mute or enable the new-recommendation chime, and replay this tour anytime.",
         placement: "right",
         disableBeacon: true,
       },
       {
         target: '[data-tour="header-tools"]',
         content:
-          "Barra superior: búsqueda global (Intro para resultados), campana de recomendaciones recibidas y acceso rápido al perfil.",
+          "Top bar: global search (Enter for results), recommendation bell, and quick access to your profile.",
         placement: "bottom",
         disableBeacon: true,
       },
@@ -88,8 +100,10 @@ export default function WelcomeTour({ isAdmin, userId }) {
 
   useEffect(() => {
     if (userId == null) return undefined;
-    const key = tourStorageKeyForUser(userId);
-    if (localStorage.getItem(key)) return undefined;
+    const doneKey = tourStorageKeyForUser(userId);
+    if (localStorage.getItem(doneKey)) return undefined;
+    const pendingKey = tourPendingAfterRegisterKey(userId);
+    if (localStorage.getItem(pendingKey) !== "1") return undefined;
     const t = window.setTimeout(() => setRun(true), 700);
     return () => window.clearTimeout(t);
   }, [userId]);
@@ -105,6 +119,7 @@ export default function WelcomeTour({ isAdmin, userId }) {
       if ([STATUS.FINISHED, STATUS.SKIPPED].includes(data.status)) {
         if (userId != null) {
           localStorage.setItem(tourStorageKeyForUser(userId), "1");
+          localStorage.removeItem(tourPendingAfterRegisterKey(userId));
         }
         setRun(false);
       }
@@ -140,11 +155,11 @@ export default function WelcomeTour({ isAdmin, userId }) {
         buttonSkip: { color: "#64748b" },
       }}
       locale={{
-        back: "Atrás",
-        close: "Cerrar",
-        last: "Listo",
-        next: "Siguiente",
-        skip: "Saltar tour",
+        back: "Back",
+        close: "Close",
+        last: "Done",
+        next: "Next",
+        skip: "Skip tour",
       }}
       callback={onCallback}
     />

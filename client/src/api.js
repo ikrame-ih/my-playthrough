@@ -44,7 +44,7 @@ export async function apiFetch(url, opts = {}) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     window.location.reload();
-    throw new Error("Sesión expirada");
+    throw new Error("Session expired");
   }
 
   return res;

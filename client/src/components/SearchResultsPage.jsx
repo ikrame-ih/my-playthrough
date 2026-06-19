@@ -5,7 +5,7 @@ import UserAvatar from "./UserAvatar";
 import ErrorRetryPanel from "./ErrorRetryPanel";
 
 /**
- * Resultados de la búsqueda global (usuarios y fichas de juego en toda la comunidad).
+ * Global search results (users and game entries across the community).
  */
 export default function SearchResultsPage() {
   const [searchParams] = useSearchParams();
@@ -34,7 +34,7 @@ export default function SearchResultsPage() {
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
           if (!cancelled) {
-            setErr(data.error || "No se pudo buscar.");
+            setErr(data.error || "Search failed.");
             setUsers([]);
             setGames([]);
           }
@@ -46,7 +46,7 @@ export default function SearchResultsPage() {
         }
       } catch {
         if (!cancelled) {
-          setErr("Error de conexión.");
+          setErr("Connection error.");
           setUsers([]);
           setGames([]);
         }
@@ -64,16 +64,16 @@ export default function SearchResultsPage() {
     <div>
       <header className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-          Resultados de búsqueda
+          Search results
         </h1>
         {q ? (
           <p className="mt-2 text-slate-400">
-            Coincidencias para «<span className="text-slate-200">{q}</span>»
+            Matches for «<span className="text-slate-200">{q}</span>»
           </p>
         ) : (
           <p className="mt-2 text-sm text-slate-500">
-            Escribe en la barra superior y pulsa Intro para buscar miembros y
-            juegos registrados en la comunidad.
+            Type in the top bar and press Enter to search members and
+            games registered in the community.
           </p>
         )}
       </header>
@@ -82,18 +82,18 @@ export default function SearchResultsPage() {
         <ErrorRetryPanel
           className="mb-6"
           title={err}
-          hint="Puedes probar otra búsqueda o reintentar con los mismos términos."
+          hint="Try another search or retry with the same terms."
           onRetry={() => setRetryTick((t) => t + 1)}
         />
       )}
 
       {loading && (
-        <p className="text-sm text-brand-accent animate-pulse">Buscando…</p>
+        <p className="text-sm text-brand-accent animate-pulse">Searching…</p>
       )}
 
       {!loading && q && !err && users.length === 0 && games.length === 0 && (
         <div className="figma-panel px-6 py-12 text-center text-sm text-slate-400">
-          No hay coincidencias. Prueba con otro término.
+          No matches. Try a different term.
         </div>
       )}
 
@@ -101,7 +101,7 @@ export default function SearchResultsPage() {
         <div className="grid gap-10 lg:grid-cols-2">
           {users.length > 0 && (
             <section>
-              <h2 className="mb-4 text-lg font-bold text-white">Miembros</h2>
+              <h2 className="mb-4 text-lg font-bold text-white">Members</h2>
               <ul className="space-y-2">
                 {users.map((u) => (
                   <li key={u.id}>
@@ -125,19 +125,19 @@ export default function SearchResultsPage() {
           )}
           {games.length > 0 && (
             <section>
-              <h2 className="mb-4 text-lg font-bold text-white">Juegos</h2>
+              <h2 className="mb-4 text-lg font-bold text-white">Games</h2>
               <ul className="space-y-2">
                 {games.map((g) => (
                   <li key={`${g.id}-${g.usuario_id}`}>
                     <Link
-                      to={`/juego/${g.id}/discussion`}
+                      to={`/game/${g.id}/discussion`}
                       className="figma-panel flex flex-col gap-0.5 px-4 py-3 transition hover:border-brand-accent/25"
                     >
                       <span className="font-medium text-brand-accent">
                         {g.titulo}
                       </span>
                       <span className="text-xs text-slate-500">
-                        En la colección de {g.propietario_nombre}
+                        In {g.propietario_nombre}'s collection
                       </span>
                     </Link>
                   </li>

@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { API_BASE, apiFetch } from "../api";
 
 /**
- * Modal para enviar una recomendación (juego de tu colección → usuario al que sigues).
+ * Modal to send a recommendation (game from your collection → user you follow).
  * @param {object} props
  * @param {boolean} props.open
  * @param {() => void} props.onClose
- * @param {{ id: number, titulo: string } | null} props.preselectedGame — desde tu colección
- * @param {number | null} props.fixedRecipientId — perfil público
+ * @param {{ id: number, titulo: string } | null} props.preselectedGame — from your collection
+ * @param {number | null} props.fixedRecipientId — public profile
  * @param {string} [props.fixedRecipientName]
  * @param {(detail?: { recipientName: string; gameTitle: string }) => void} [props.onSent]
  */
@@ -27,14 +27,13 @@ export default function RecommendGameModal({
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadLists, setLoadLists] = useState(false);
-  /** Tras POST correcto: texto de confirmación para quien envía la recomendación. */
+  /** After a successful POST: confirmation text for the sender. */
   const [sendConfirmation, setSendConfirmation] = useState(null);
-  /** Evita vaciar el texto del mensaje si el id del juego cambia de tipo o se actualiza con el modal ya abierto. */
+  /** Avoid clearing the message if the game id changes type or updates while the modal is open. */
   const prevOpenRef = useRef(false);
 
   const stablePreId =
-    preselectedGame?.id != null &&
-    !Number.isNaN(Number(preselectedGame.id))
+    preselectedGame?.id != null && !Number.isNaN(Number(preselectedGame.id))
       ? String(Number(preselectedGame.id))
       : null;
 
@@ -87,14 +86,14 @@ export default function RecommendGameModal({
 
   const recipientLabelFor = (dest) =>
     fixedRecipientId != null
-      ? fixedRecipientName || `Usuario #${fixedRecipientId}`
+      ? fixedRecipientName || `User #${fixedRecipientId}`
       : following.find((u) => Number(u.id) === dest)?.nombre_usuario ||
-        `Usuario #${dest}`;
+        `User #${dest}`;
 
   const gameTitleFor = (juego) =>
     preselectedGame?.titulo ??
     myGames.find((g) => Number(g.id) === Number(juego))?.titulo ??
-    "este juego";
+    "this game";
 
   const submit = async (e) => {
     e.preventDefault();
@@ -102,7 +101,7 @@ export default function RecommendGameModal({
     const dest = parseInt(recipientId, 10);
     const juego = parseInt(gameId, 10);
     if (!Number.isFinite(dest) || !Number.isFinite(juego)) {
-      setErr("Elige destinatario y juego.");
+      setErr("Choose a recipient and a game.");
       return;
     }
     setLoading(true);
@@ -117,7 +116,7 @@ export default function RecommendGameModal({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setErr(data.error || "No se pudo enviar.");
+        setErr(data.error || "Could not send.");
         return;
       }
       const detail = {
@@ -127,7 +126,7 @@ export default function RecommendGameModal({
       setSendConfirmation(detail);
       onSent?.(detail);
     } catch {
-      setErr("Error de conexión.");
+      setErr("Connection error.");
     } finally {
       setLoading(false);
     }
@@ -149,12 +148,12 @@ export default function RecommendGameModal({
           id="reco-modal-title"
           className="text-lg font-bold tracking-tight text-white"
         >
-          {sendConfirmation ? "Listo" : "Recomendar juego"}
+          {sendConfirmation ? "Done" : "Recommend game"}
         </h2>
         {!sendConfirmation && (
           <p className="mt-2 text-sm text-slate-400">
-            Solo puedes recomendar títulos de tu biblioteca a personas que
-            sigues.
+            You can only recommend titles from your library to people you
+            follow.
           </p>
         )}
 
@@ -166,18 +165,19 @@ export default function RecommendGameModal({
               aria-live="polite"
             >
               <p className="font-semibold text-emerald-50">
-                Recomendación enviada
+                Recommendation sent
               </p>
               <p className="mt-2 leading-relaxed">
-                Has recomendado{" "}
+                You recommended{" "}
                 <span className="font-semibold text-white">
                   «{sendConfirmation.gameTitle}»
                 </span>{" "}
-                a{" "}
+                to{" "}
                 <span className="font-semibold text-white">
                   {sendConfirmation.recipientName}
                 </span>
-                . Podrá verlo en su bandeja de recomendaciones (icono de campana).
+                . They can see it in their recommendations inbox (bell
+                icon).
               </p>
             </div>
             <button
@@ -185,114 +185,116 @@ export default function RecommendGameModal({
               className="figma-btn-primary w-full py-3"
               onClick={handleClose}
             >
-              Cerrar
+              Close
             </button>
           </div>
         ) : (
-        <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
-          {fixedRecipientId != null ? (
-            <div>
-              <p className="text-sm font-medium text-slate-300">Para</p>
-              <p className="mt-1 text-sm text-white">
-                {fixedRecipientName || `Usuario #${fixedRecipientId}`}
+          <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
+            {fixedRecipientId != null ? (
+              <div>
+                <p className="text-sm font-medium text-slate-300">To</p>
+                <p className="mt-1 text-sm text-white">
+                  {fixedRecipientName || `User #${fixedRecipientId}`}
+                </p>
+              </div>
+            ) : (
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-slate-400">
+                  Recipient
+                </span>
+                <select
+                  className="figma-input py-3 text-sm"
+                  value={recipientId}
+                  onChange={(e) => setRecipientId(e.target.value)}
+                  disabled={loadLists}
+                  required
+                >
+                  <option value="">— Choose someone —</option>
+                  {following.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.nombre_usuario}
+                    </option>
+                  ))}
+                </select>
+                {following.length === 0 && !loadLists && (
+                  <span className="text-xs text-amber-400/90">
+                    You're not following anyone yet. Open a profile and click Follow.
+                  </span>
+                )}
+              </label>
+            )}
+
+            {preselectedGame ? (
+              <div>
+                <p className="text-sm font-medium text-slate-300">Game</p>
+                <p className="mt-1 text-sm text-white">
+                  {preselectedGame.titulo}
+                </p>
+              </div>
+            ) : (
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-slate-400">
+                  Your game
+                </span>
+                <select
+                  className="figma-input py-3 text-sm"
+                  value={gameId}
+                  onChange={(e) => setGameId(e.target.value)}
+                  disabled={loadLists}
+                  required
+                >
+                  <option value="">— Choose from your collection —</option>
+                  {myGames.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.titulo}
+                    </option>
+                  ))}
+                </select>
+                {myGames.length === 0 && !loadLists && (
+                  <span className="text-xs text-slate-500">
+                    Add games to your collection first.
+                  </span>
+                )}
+              </label>
+            )}
+
+            <label className="flex flex-col gap-1.5">
+              <span className="text-sm font-medium text-slate-400">
+                Message (optional)
+              </span>
+              <textarea
+                className="figma-input min-h-[88px] py-3 text-sm"
+                value={mensaje}
+                onChange={(e) => setMensaje(e.target.value)}
+                maxLength={500}
+                placeholder="Why would you like them to try it?"
+              />
+            </label>
+
+            {err && (
+              <p className="text-sm text-red-400" role="alert">
+                {err}
               </p>
-            </div>
-          ) : (
-            <label className="flex flex-col gap-1.5">
-              <span className="text-sm font-medium text-slate-400">
-                Destinatario
-              </span>
-              <select
-                className="figma-input py-3 text-sm"
-                value={recipientId}
-                onChange={(e) => setRecipientId(e.target.value)}
-                disabled={loadLists}
-                required
+            )}
+
+            <div className="flex flex-wrap justify-end gap-2 pt-2">
+              <button
+                type="button"
+                className="figma-btn-outline !w-auto px-4 py-2.5"
+                onClick={handleClose}
+                disabled={loading}
               >
-                <option value="">— Elige a quién —</option>
-                {following.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.nombre_usuario}
-                  </option>
-                ))}
-              </select>
-              {following.length === 0 && !loadLists && (
-                <span className="text-xs text-amber-400/90">
-                  Aún no sigues a nadie. Abre un perfil y pulsa «Seguir».
-                </span>
-              )}
-            </label>
-          )}
-
-          {preselectedGame ? (
-            <div>
-              <p className="text-sm font-medium text-slate-300">Juego</p>
-              <p className="mt-1 text-sm text-white">{preselectedGame.titulo}</p>
-            </div>
-          ) : (
-            <label className="flex flex-col gap-1.5">
-              <span className="text-sm font-medium text-slate-400">
-                Tu juego
-              </span>
-              <select
-                className="figma-input py-3 text-sm"
-                value={gameId}
-                onChange={(e) => setGameId(e.target.value)}
-                disabled={loadLists}
-                required
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="figma-btn-primary !w-auto px-5"
+                disabled={loading || loadLists}
               >
-                <option value="">— Elige de tu colección —</option>
-                {myGames.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.titulo}
-                  </option>
-                ))}
-              </select>
-              {myGames.length === 0 && !loadLists && (
-                <span className="text-xs text-slate-500">
-                  Añade juegos a tu colección primero.
-                </span>
-              )}
-            </label>
-          )}
-
-          <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-slate-400">
-              Mensaje (opcional)
-            </span>
-            <textarea
-              className="figma-input min-h-[88px] py-3 text-sm"
-              value={mensaje}
-              onChange={(e) => setMensaje(e.target.value)}
-              maxLength={500}
-              placeholder="¿Por qué te gustaría que lo probase?"
-            />
-          </label>
-
-          {err && (
-            <p className="text-sm text-red-400" role="alert">
-              {err}
-            </p>
-          )}
-
-          <div className="flex flex-wrap justify-end gap-2 pt-2">
-            <button
-              type="button"
-              className="figma-btn-outline !w-auto px-4 py-2.5"
-              onClick={handleClose}
-              disabled={loading}
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="figma-btn-primary !w-auto px-5"
-              disabled={loading || loadLists}
-            >
-              {loading ? "Enviando…" : "Enviar"}
-            </button>
-          </div>
-        </form>
+                {loading ? "Sending…" : "Send"}
+              </button>
+            </div>
+          </form>
         )}
       </div>
     </div>

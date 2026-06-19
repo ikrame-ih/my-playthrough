@@ -36,14 +36,33 @@ export default function GameListRow({
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <h3 className="truncate font-semibold text-white">{game.titulo}</h3>
-        <p className="mt-0.5 text-xs text-slate-500">
-          {game.plataforma?.trim() || "—"} · {game.horas_jugadas ?? 0} h · Nota{" "}
-          {game.puntuacion ?? "—"}
-        </p>
+        <h3 className="truncate text-base font-semibold text-white sm:text-[1.05rem]">
+          {game.titulo}
+        </h3>
+        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+          <span className="rounded-md bg-slate-800/80 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-slate-200 ring-1 ring-white/10">
+            {game.plataforma?.trim() || "No platform"}
+          </span>
+          <span className="flex items-center gap-1.5 text-slate-400">
+            <span aria-hidden className="text-base leading-none opacity-90">
+              ⏱
+            </span>
+            <span className="font-semibold tabular-nums text-slate-200">
+              {game.horas_jugadas ?? 0} h
+            </span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span aria-hidden className="text-base leading-none text-amber-400/90">
+              ★
+            </span>
+            <span className="font-semibold tabular-nums text-amber-400">
+              {game.puntuacion ?? "—"}/10
+            </span>
+          </span>
+        </div>
       </div>
       <span
-        className={`inline-flex shrink-0 rounded-md border px-2 py-1 text-[0.6rem] font-bold uppercase tracking-wide ${estadoBadgeClass(game.estado)}`}
+        className={`inline-flex shrink-0 rounded-md border px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wide ${estadoBadgeClass(game.estado)}`}
       >
         {labelEstado(game.estado)}
       </span>
@@ -53,7 +72,7 @@ export default function GameListRow({
             to={discussionTo}
             className="text-xs font-semibold text-brand-accent hover:text-teal-300"
           >
-            Discusión
+            Discussion
           </Link>
         )}
         {showActions && (
@@ -63,8 +82,8 @@ export default function GameListRow({
                 type="button"
                 onClick={() => onRecommend(game)}
                 className="rounded-lg p-2 text-slate-400 transition hover:bg-white/[0.06] hover:text-brand-accent"
-                title="Recomendar"
-                aria-label={`Recomendar ${game.titulo}`}
+                title="Recommend"
+                aria-label={`Recommend ${game.titulo}`}
               >
                 <IconGift className="h-4 w-4" />
               </button>
@@ -72,8 +91,8 @@ export default function GameListRow({
             <Link
               to={`/edit/${game.id}`}
               className="rounded-lg p-2 text-slate-400 transition hover:bg-white/[0.06] hover:text-white"
-              title="Editar"
-              aria-label={`Editar ${game.titulo}`}
+              title="Edit"
+              aria-label={`Edit ${game.titulo}`}
             >
               <IconPencil className="h-4 w-4" />
             </Link>
@@ -81,8 +100,8 @@ export default function GameListRow({
               type="button"
               onClick={() => onDelete?.(game.id, game.titulo)}
               className="rounded-lg p-2 text-slate-400 transition hover:bg-red-500/10 hover:text-red-400"
-              title="Eliminar"
-              aria-label={`Eliminar ${game.titulo}`}
+              title="Delete"
+              aria-label={`Delete ${game.titulo}`}
             >
               <IconTrash className="h-4 w-4" />
             </button>

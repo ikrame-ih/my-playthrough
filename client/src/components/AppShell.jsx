@@ -75,16 +75,16 @@ export default function AppShell({ user, onLogout, children }) {
   useEffect(() => {
     const p = location.pathname;
     const base = "MyPlaythrough";
-    let page = "Mi colección";
-    if (p === "/game/new") page = "Añadir juego";
-    else if (p.startsWith("/edit/")) page = "Editar juego";
-    else if (p === "/community") page = "Comunidad";
-    else if (p === "/search") page = "Búsqueda";
-    else if (p === "/recommendations") page = "Recomendaciones";
-    else if (p.startsWith("/user/")) page = "Perfil";
-    else if (p === "/settings") page = "Ajustes de cuenta";
-    else if (p === "/admin") page = "Administración";
-    else if (p.includes("/discussion")) page = "Discusión del juego";
+    let page = "My collection";
+    if (p === "/game/new") page = "Add game";
+    else if (p.startsWith("/edit/")) page = "Edit game";
+    else if (p === "/community") page = "Community";
+    else if (p === "/search") page = "Search";
+    else if (p === "/recommendations") page = "Recommendations";
+    else if (p.startsWith("/user/")) page = "Profile";
+    else if (p === "/settings") page = "Account settings";
+    else if (p === "/admin") page = "Administration";
+    else if (p.includes("/discussion")) page = "Game discussion";
     document.title = `${page} · ${base}`;
   }, [location.pathname]);
 
@@ -96,14 +96,14 @@ export default function AppShell({ user, onLogout, children }) {
         href="#main-content"
         className="fixed left-3 top-3 z-[100] -translate-y-[120%] rounded-xl bg-brand-tealBtn px-4 py-2.5 text-sm font-bold text-black opacity-0 shadow-lg transition focus:translate-y-0 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-brand-accent/60"
       >
-        Saltar al contenido
+        Skip to content
       </a>
       <button
         type="button"
         className={`fixed inset-0 z-40 bg-black/60 transition-opacity md:hidden ${
           navOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
-        aria-label="Cerrar menú"
+        aria-label="Close menu"
         onClick={closeNav}
       />
       <aside
@@ -127,7 +127,7 @@ export default function AppShell({ user, onLogout, children }) {
 
         <nav
           className="mt-8 flex flex-1 flex-col gap-1 px-3"
-          aria-label="Principal"
+          aria-label="Main navigation"
           data-tour="sidebar-nav"
         >
           <NavLink
@@ -138,7 +138,7 @@ export default function AppShell({ user, onLogout, children }) {
             data-tour="nav-coleccion"
           >
             <IconCollection className="h-5 w-5 shrink-0 opacity-90" />
-            Mi colección
+            My collection
           </NavLink>
           <NavLink
             to="/community"
@@ -147,7 +147,7 @@ export default function AppShell({ user, onLogout, children }) {
             data-tour="nav-comunidad"
           >
             <IconUsers className="h-5 w-5 shrink-0 opacity-90" />
-            Comunidad
+            Community
           </NavLink>
           {user?.rol === "admin" && (
             <NavLink
@@ -157,7 +157,7 @@ export default function AppShell({ user, onLogout, children }) {
               data-tour="nav-admin"
             >
               <IconShield className="h-5 w-5 shrink-0 opacity-90" />
-              Administración
+              Administration
             </NavLink>
           )}
           <NavLink
@@ -167,7 +167,7 @@ export default function AppShell({ user, onLogout, children }) {
             data-tour="nav-perfil"
           >
             <IconUser className="h-5 w-5 shrink-0 opacity-90" />
-            Perfil
+            Profile
           </NavLink>
         </nav>
 
@@ -181,7 +181,7 @@ export default function AppShell({ user, onLogout, children }) {
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 transition hover:bg-white/[0.04] hover:text-slate-200"
           >
             <IconLogout className="h-5 w-5" />
-            Cerrar sesión
+            Sign out
           </button>
         </div>
       </aside>
@@ -192,7 +192,7 @@ export default function AppShell({ user, onLogout, children }) {
             type="button"
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-300 transition hover:bg-white/[0.06] hover:text-white md:hidden"
             onClick={() => setNavOpen(true)}
-            aria-label="Abrir menú de navegación"
+            aria-label="Open navigation menu"
           >
             <IconMenu className="h-6 w-6" />
           </button>
@@ -213,9 +213,9 @@ export default function AppShell({ user, onLogout, children }) {
                   e.preventDefault();
                   navigate(`/search?q=${encodeURIComponent(t)}`);
                 }}
-                placeholder="Buscar juegos, usuarios… (Intro)"
+                placeholder="Search games, users… (Enter)"
                 className="figma-input w-full rounded-full py-2.5 pl-10 pr-4 text-sm"
-                aria-label="Buscar en la aplicación"
+                aria-label="Search the app"
               />
             </div>
             <NotificationBell user={user} />
@@ -223,13 +223,13 @@ export default function AppShell({ user, onLogout, children }) {
               to="/settings"
               data-tour="header-avatar"
               className="shrink-0 rounded-[10px] outline-none ring-brand-accent/0 transition hover:ring-2 hover:ring-brand-accent/40 focus-visible:ring-2 focus-visible:ring-brand-accent/60"
-              title={user?.nombre_usuario || user?.email || "Perfil"}
-              aria-label="Ir a perfil y avatar"
+              title={user?.nombre_usuario || user?.email || "Profile"}
+              aria-label="Go to profile and avatar"
             >
               <UserAvatar
                 avatarId={user?.avatar_id}
                 size="md"
-                title={`Avatar de ${name}`}
+                title={`Avatar for ${name}`}
               />
             </Link>
           </div>

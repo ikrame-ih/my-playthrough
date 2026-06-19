@@ -1,11 +1,11 @@
 /**
- * Bloque de error homogéneo con botón reintentar (misma piel que el resto de la app).
+ * Consistent error block with optional retry button.
  */
 export default function ErrorRetryPanel({
-  title = "No hemos podido cargar el contenido.",
-  hint = "Comprueba que el servidor está en marcha o que la conexión es estable.",
+  title = "We couldn't load this content.",
+  hint = "Check that the server is running and your connection is stable.",
   onRetry,
-  retryLabel = "Reintentar",
+  retryLabel = "Retry",
   className = "",
 }) {
   return (

@@ -1,0 +1,560 @@
+# -*- coding: utf-8 -*-
+"""Genera resumen de exactamente 20_000 caracteres UTF-8 para IA / consulta rápida tribunal."""
+from pathlib import Path
+
+TARGET = 20_000
+OUT = Path(__file__).resolve().parents[1] / "docs" / "resumen-tribunal-20k.txt"
+
+CORE = """MYPLAYTHROUGH — RESUMEN TRIBUNAL (20 000 caracteres exactos) · DAW CESUR Málaga Este · Ikrame Ibn Hayoun
+
+1) QUÉ ES
+MyPlaythrough es una SPA PERN: biblioteca personal de videojuegos + comunidad ligera (seguir, recomendar solo a seguidos, LFG ligado a un juego tuyo, comentarios en hilos con votos, perfil público, panel admin). Objetivo académico: PostgreSQL + Express + React + Node con API REST, JWT, roles, seguridad y modelo relacional bien documentado.
+
+2) STACK
+PostgreSQL (integridad, FK, CASCADE). Express 5 + Node (REST, middleware). React 18 + Vite + Tailwind (UI modular). TypeScript + Framer Motion solo en presentation/ (diapositivas); cliente principal en JSX.
+
+3) FRONT (client/)
+Rutas: colección, alta/edición juego, comunidad, /user/:id, /settings, /recommendations, /search, /juego/:id/discussion, /admin si admin. apiFetch añade JSON + Bearer; 401 limpia token y recarga. Skeletons, grid/lista, ordenación, flash tras guardar (location.state), tour react-joyride tras registro, a11y (skip link, foco main). Portadas vía proxy servidor (Steam+RAWG).
+
+4) BACK (server/)
+index.js: CORS, json 50kb, routers /api/auth, games, users, community, social, admin, covers. authMiddleware JWT; adminMiddleware relee rol en BD. bcryptjs coste 10; SQL parametrizado. Rate limit ~40/15min en login+register. covers valida dominios.
+
+5) OCHO TABLAS
+usuarios (nombre único lower trim, email único, hash, rol, avatar, sonido). catalogo_juegos (título, imagen, rawg_id, steam_app_id UNIQUE — compartido). juegos (por usuario, FK CASCADE usuario, FK catálogo). juego_comentarios (parent_id). juego_comentario_votos (PK comentario+usuario). usuario_seguimientos (PK par). juego_recomendaciones. lfg_publicaciones.
+
+6) DECISIÓN diseño
+catalogo_juegos evita duplicar portada/título: N usuarios con el mismo título comparten una fila de catálogo; cada uno su fila en juegos con estado/notas/horas.
+
+7) FUNCIONES
+Registro contraseña fuerte; login email o nombre_usuario. CRUD juegos. Comunidad+stats+actividad. Recomendaciones a seguidos+bandeja+campana+audio opcional. LFG desde juego propio. Admin moderación+borrado cuenta con modal nombre exacto. Docker opcional puerto 3000 API y 5433 Postgres host.
+
+8) SEGURIDAD
+JWT firmado; bcrypt; CORS_ORIGIN exacto; SQL params; rate limit; proxy imágenes acotado; admin en BD; test-db 404 producción.
+
+9) PRESENTACIÓN
+presentation/: React+Vite+TS+Tailwind+Motion; PrintDeck estático para PDF.
+
+10) DEMO SEED
+seed:presentation contraseña Presentacion2026! botón Rellenar cuenta demo Demo Jurado.
+
+11) GANCHOS
+¿Mongo? Relacional+constraints. ¿JWT? Stateless API. ¿Proxy? CORS/hotlink. ¿Catálogo? Normalización.
+
+12) API orientación
+Detalle en server/routes/*.routes.js JSDoc español: auth register login GET PATCH me; games CRUD; users list+games públicos; community stats; social follows recommendations lfg activity; admin; covers search+proxy.
+
+13) FLUJO portadas
+Cliente pide a API; API Steam/RAWG; dominios permitidos; responde URL o binario según implementación; cliente guarda catalogo_id.
+
+14) CASCADE oral
+Borrar usuario borra en cadena lo colgado para no huérfanos.
+
+15) ROLES token vs BD
+Token lleva rol pero admin se confirma en BD por si cambió.
+
+16) .env
+DB_* JWT_SECRET CORS_ORIGIN RAWG_API_KEY PORT — no git.
+
+17) Convenciones
+UI español código inglés docs español.
+
+18) Pruebas
+docs/pruebas.md HTML imprimible.
+
+19) Comparativa producto
+Más limpio que Backloggd ruidoso; más biblioteca personal que HLTB; multiplataforma vs solo Steam library.
+
+20) Front estado
+hooks apiFetch localStorage refresh /api/auth/me App.
+
+21) Back capas
+routes→queries→pool pg; 23505→409; login SELECT lean si columnas viejas.
+
+22) Índice nombre
+lower trim único.
+
+23) Negocio social
+recomendar requiere follow; LFG desde juego en biblioteca.
+
+24) Comentarios
+árbol parent_id; votos raíz; CHECK cuerpo no vacío.
+
+25) A11y
+skip foco labels.
+
+26) Local
+schema.sql migraciones server+client dev 5173 3000.
+
+27) Docker
+compose db+server 5433 map.
+
+28) Depuración
+Network JSON → Node log → Postgres constraint.
+
+29) Estrategia respuesta tribunal
+Capa producto+ técnica concreta repo.
+
+30) Componentes clave
+AppShell GameList Row forms Community UserPublic ProfileSettings Recommendations Bell Admin modal reco.
+
+31) Archivos
+index.js db.js auth.middleware.js covers.js routes/.
+
+32) Seg extra
+rate limit normalize errors prod sin stack al cliente.
+
+33) Ejemplo Cyberpunk oral
+N filas juegos 1 fila catalogo_juegos.
+
+34) Escalar
+API horizontal JWT sin sesión servidor catálogo comparte metadatos.
+
+35) Tests
+manual doc; Vitest devDep mejora futura.
+
+36) PATCH /api/auth/me acepta nombre_usuario avatar_id notificaciones_sonido validaciones unicidad nombre.
+
+37) Modal admin borrar usuario confirma escribiendo nombre público exacto anti error.
+
+38) NotificationBell contador no leídas endpoint social recomendaciones.
+
+39) Game discussion ruta pública comentarios anidados votos -1 +1.
+
+40) Community GET users lista con flag siguiendo para botón follow/unfollow.
+
+41) Activity feed agrega comentarios y LFG de seguidos orden temporal.
+
+42) LFG modos string online local otro según enum SQL check.
+
+43) express-rate-limit mensaje JSON coherente 429.
+
+44) imagen proxy solo hosts whitelist en covers.js.
+
+45) merge conflict resuelto en desarrollo con cuidado rutas.
+
+46) GitHub README bilingüe español primero.
+
+47) docs/sql schema.sql fuente verdad tablas.
+
+48) diagrama_bd.html visual ER aproximado.
+
+49) seed:demo menos datos que seed:presentation.
+
+50) promover-admin.sql ejemplo rol admin por email.
+
+51) vitest run en server package opcional tests futuros.
+
+52) nodemon reinicia API al editar.
+
+53) vite HMR cliente rápido.
+
+54) JWT expira 7d típico auth.middleware createToken.
+
+55) bcrypt compare login ruta pública.
+
+56) register hashea password antes INSERT.
+
+57) JSON body parser error 400 si malformado.
+
+58) OPTIONS CORS preflight navegador.
+
+59) Authorization Bearer encabezado estándar.
+
+60) 401 apiFetch reload limpia sesión expirada.
+
+61) user localStorage sincroniza tras PATCH perfil.
+
+62) nombreDirty disable botón guardar nombre si igual.
+
+63) welcome tour localStorage claves por userId tras registro.
+
+64) SearchProvider context busca global.
+
+65) flashGameSaved scroll aviso colección.
+
+66) RAWG_API_KEY opcional pero mejora catálogo consolas.
+
+67) steam_app_id biginteger unique nullable.
+
+68) rawg_id integer unique nullable.
+
+69) catalogo_id FK a catálogo; si se elimina la fila de catálogo, en schema juegos usa ON DELETE SET NULL donde aplique — revisar docs/sql/schema.sql.
+
+70) ON DELETE CASCADE usuario borra juegos comentarios votos seguimientos etc según FKs definidas.
+
+71) administración lista todos juegos todas cuentas para moderar.
+
+72) admin puede borrar comentario ajeno discusión.
+
+73) usuario normal solo borra propio o dueño ficha según reglas README.
+
+74) rate limit IP no por usuario — suficiente defensa demo.
+
+75) 50kb body limit abuso.
+
+76) producción NODE_ENV oculta test-db.
+
+77) variables JWT_SECRET obligatorio process.exit si falta middleware.
+
+78) pool pg config desde env DB_HOST PORT USER PASS NAME.
+
+79) Windows postgres nativo 5432 docker 5433 convivencia.
+
+80) presentación Framer blur opacity slides App_print estático.
+
+81) fecha defensa ejemplo slide 5 mayo 2026.
+
+82) cuenta jurado demo email @myplaythrough.local dominio ficticio.
+
+83) contraseña Presentacion2026! cumple política mayúscula número símbolo.
+
+84) política contraseña 8+ complejidad servidor cliente.
+
+85) login identifier login field email trim OR nombre.
+
+86) normalize email lower trim registro.
+
+87) email unique constraint usuarios.
+
+88) password_hash column not null.
+
+89) rol default user check en tablename.
+
+90) avatar_id string robot-N constantes cliente.
+
+91) notificaciones_sonido boolean default true.
+
+92) fecha_registro timestamp default now.
+
+93) juego estado string check valores según app.
+
+94) puntuacion integer nullable 0-10 o similar según formulario.
+
+95) horas_jugadas integer default 0.
+
+96) comentario campo texto ficha usuario largo 1000.
+
+97) url_imagen texto ficha juego o redundancia portada.
+
+98) índice juegos usuario_catalogo unique parcial catalogo not null.
+
+99) comentarios índice juego_id parent_id performance.
+
+100) recomendaciones índice destinatario leida queries bandeja.
+
+101) lfg índice juego usuario activa listados.
+
+102) votos PK evita doble voto.
+
+103) seguimientos PK evita duplicar follow.
+
+104) grafo bidireccional no simétrico A sigue B distinto B sigue A.
+
+105) recomendación solo destinatario en seguidos verificación query.
+
+106) modal reco lista following filtrada.
+
+107) campana PATCH read recomendación.
+
+108) audio WebAudio oscilador corto tono.
+
+109) user agent autoplay policy click página.
+
+110) perfil público GET juegos usuario sin editar ajenos.
+
+111) settings PATCH nombre conflicto 409 mensaje amigable.
+
+112) admin 403 si usuario normal fuerza URL.
+
+113) Navigate replace home si /admin no rol.
+
+114) discuss game propietario nombre en header.
+
+115) search results página listas usuarios juegos.
+
+116) game form select portada grid miniaturas.
+
+117) covers search endpoint combina fuentes.
+
+118) error network usuario mensaje conexión servidor.
+
+119) ECONNREFUSED típico postgres caído.
+
+120) docker desktop requerido si usa compose en Windows.
+
+121) migración social tablas seguimientos recomendaciones lfg si BD vieja.
+
+122) migración votos tabla votos comentarios.
+
+123) migración username unique índice functional.
+
+124) add-avatar sql histórico si falta columna.
+
+125) columnas opcionales login lean query fallback 42703.
+
+126) diseño responsivo tailwind breakpoints.
+
+127) menú móvil hamburguesa datos-tour sidebar.
+
+128) data-tour nav-coleccion comunidad admin perfil header-tools.
+
+129) brand accent color teal dorado diseño README DESIGN_ES.
+
+130) inglés rutas API REST convención.
+
+131) español strings UI coherencia tribunal.
+
+132) papel académico integrar asignaturas cliente servidor BD.
+
+133) demostración oral 2 bloques colección luego social bajo tiempo.
+
+134) mano profesora 2 min fin conclusion demo.
+
+135) DNI cámara recordatorio normativa defensa no código.
+
+136) grabación sesión mencionar si preguntan privacidad datos demo falsos.
+
+137) escalabilidad honesta SPA+REST monolito Node adecuado alcance proyecto.
+
+138) mejoras websocket notif push tiempo real.
+
+139) mejoras paginación listas grandes.
+
+140) mejoras tests e2e playwright futuro.
+
+141) mejoras CI GitHub Actions lint test.
+
+142) mejoras despliegue Vercel+Railway o VPS.
+
+143) backups postgres fuera alcance académico mencionar.
+
+144) OWASP awareness JWT robo mitigar HTTPS futuro XSS mitigado React escape.
+
+145) CSRF menor APIs stateless JSON no cookies sesión tradicional.
+
+146) SameSite cookies no aplican mismo esquema JWT header.
+
+147) hashing cost bcrypt 10 equilibrio seguridad latencia.
+
+148) comparación argon2 mejorable futuro.
+
+149) SSL TLS terminación proxy nginx producción hipotética.
+
+150) variable entorno RAWG rotar si expone repo privado.
+
+151) gitignore env server client.
+
+152) lockfiles package-lock reproducible install.
+
+153) eslint configuración si existe cliente.
+
+154) prettier opcional consistencia.
+
+155) comentarios código JSDoc español servidor útil tribunal.
+
+156) utils normalize email passwordPolicy serverErrorPayload reutiliza.
+
+157) queries helper si existe reduce duplicación SQL.
+
+158) constants avatars lista robot ids.
+
+159) icon components svg inline accesible.
+
+160) motion stagger presentación slide lista features.
+
+161) print stylesheet presentation print media.
+
+162) pdf corrupto motivo framer print tree separado.
+
+163) syne manrope google fonts cdn presentation.
+
+164) hero image assets presentation opcional.
+
+165) repo público URL slide cierre hipervínculo.
+
+166) licencia ISC servidor según package.
+
+167) documentación HTML plan pruebas tablas imprimibles.
+
+168) screenshots carpeta docs sugerida informe.
+
+169) intermodular referencia README pie.
+
+170) CESUR Málaga Este centro texto portada.
+
+171) tutora nombre slide portada coincide Word guion.
+
+172) 2º año DAW mención académica.
+
+173) título proyecto MyPlaythrough branding.
+
+174) comparativa oral slide 2 guion defensa HowLong Backloggd Steam.
+
+175) arquitectura tres cajas PERN slide 3.
+
+176) modelo datos tres núcleo + cuatro social slide 4.
+
+177) seis tarjetas funciones slide 5 enlazan demo.
+
+178) demo enlaces inicio comunidad slide 6.
+
+179) cierre preguntas repo docs slide 7.
+
+180) repaso mental antes tribunal respirar orden slides.
+
+181) si no saber admitir y razonar aproximación honrada.
+
+182) reconciliar pregunta ambigua pedir aclaración corta.
+
+183) conectar pregunta genérica DAW con implementación concreta este repo.
+
+184) evitar divagar 2 min preguntas concisión.
+
+185) demostrar manejo código citar archivo si permiten pantalla.
+
+186) offline demo screenshots fallback si red cae.
+
+187) localhost tunnel ngrok mención solo si conoces — opcional.
+
+188) versión Node 18+ requisito README.
+
+189) postgres 14+ requisito README.
+
+190) utf8 encoding app español acentos BD client_encoding.
+
+191) timezone timestamps timestamptz comentarios.
+
+192) boolean notificaciones sonido default true.
+
+193) integer serial id escalabilidad ids autoincrement simples.
+
+194) bigserial no usado ints suficientes demo.
+
+195) texto ilimitado comentarios hilos moderación admin.
+
+196) spam hipotético futuro captcha rate.
+
+197) reporting contenido futuro flags usuario.
+
+198) bloqueo usuario soft delete alternativa no implementada oral posible.
+
+199) auditoría logs admin acciones futuro.
+
+200) métricas uso futuro analytics respetuoso privacidad.
+
+201) RGPD mención breve datos cuenta email nombre público responsable titular en demo ficticio.
+
+202) export datos derecho olvido borrar cuenta cumple en parte con delete user.
+
+203) cookies solo técnicas terceros imágenes steam rawg vía servidor reduce huella.
+
+204) performance N+1 queries posible optimizar joins en algunas rutas futuro.
+
+205) índices existe varios revisar schema.sql completitud.
+
+206) vacuum postgres mantenimiento DBA futuro.
+
+207) replicación lectura futuro no necesario demo.
+
+208) particionamiento tabla masiva futuro.
+
+209) microservicios fuera alcance monolito adecuado.
+
+210) graphql alternativa REST mención oral si preguntan.
+
+211) websocket sse alternativas notificaciones.
+
+212) PWA offline no implementada.
+
+213) service worker no.
+
+214) localStorage límite 5MB irrelevante tokens pequeños.
+
+215) sessionStorage no usado para auth.
+
+216) indexedDB no.
+
+217) cache http headers estáticos vite build.
+
+218) compresión gzip nginx producción hipótesis.
+
+219) bundler vite rollup producción optimizado chunks.
+
+220) lazy loading rutas React lazy Suspense mejora futura.
+
+221) error boundary react mejora UX futura.
+
+222) suspense datos react query alternativa futura.
+
+223) estado global redux no solo context búsqueda.
+
+224) zustand no.
+
+225) axios no fetch nativo.
+
+226) supertest vitest integración rutas ejemplo futuro.
+
+227) pg tap tests sql opcional.
+
+228) fixtures sql seeds reproducibles.
+
+229) versionado API v1 prefijo no usa v0 implícito.
+
+230) semver proyecto package json 1.0.0 servidor.
+
+231) changelog no formal commits git historia.
+
+232) branching gitflow simple main feature.
+
+233) code review pares en clase si aplica.
+
+234) pair programming episódico mención si verdadero.
+
+235) tiempo total desarrollo estimación honesta semanas.
+
+236) mayor aprendizaje troubleshooting CORS postgres JWT trilogy.
+
+237) satisfacción personal producto usable.
+
+238) feedback tutora incorporado si aplica.
+
+239) limitaciones tiempo académico recortes sensatos.
+
+240) próximos pasos personales portfolio despliegue.
+
+241) agradecimiento tribunal cierre cortés.
+
+242) preguntas técnicas profundidad ajustar nivel interlocutor.
+
+243) analogías simples explicar JWT como pase de concierto.
+
+244) analogía catálogo biblioteca fichas catalogación.
+
+245) analogía cascade domino fichas usuario.
+
+246) analogía rate limit portería entradas repetidas.
+
+247) analogía proxy camarero trae bebida mesa CORS.
+
+248) repaso números 8 tablas 40 req 15 min 50 kb 7 días token 10 bcrypt 3000 5173 5433 docker.
+
+249) cierre mental listo tribunal."""
+
+# Unir y ajustar a TARGET exacto
+text = CORE.strip()
+if len(text) > TARGET:
+    text = text[:TARGET]
+else:
+    pad_unit = (
+        "\n[+] Dato tribunal MyPlaythrough: revisar README sección seguridad y stack si dudas.\n"
+    )
+    while len(text) < TARGET:
+        need = TARGET - len(text)
+        chunk = pad_unit[:need] if need < len(pad_unit) else pad_unit
+        text += chunk
+    text = text[:TARGET]
+
+assert len(text) == TARGET, len(text)
+OUT.write_text(text, encoding="utf-8")
+print(OUT)
+print("LEN", len(text))

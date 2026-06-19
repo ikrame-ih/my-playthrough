@@ -33,15 +33,25 @@ const PORT = process.env.PORT || 3000;
 
 // --- Middlewares globales ---
 
-// Solo el origen configurado (Vite en dev, dominio real en prod) puede llamar a la API.
+// Orígenes permitidos: uno o varios separados por coma (app + presentación en Vercel, etc.).
+const corsOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    origin:
+      corsOrigins.length <= 1 ? corsOrigins[0] || "http://localhost:5173" : corsOrigins,
   }),
 );
 
 // Evita payloads enormes en POST/PUT (protección básica frente a abuso).
 app.use(express.json({ limit: "50kb" }));
+
+// --- Salud del servicio (despliegues / balanceadores) ---
+app.get("/api/health", (_req, res) => {
+  res.json({ ok: true });
+});
 
 // --- Ruta de diagnóstico (solo en desarrollo) ---
 

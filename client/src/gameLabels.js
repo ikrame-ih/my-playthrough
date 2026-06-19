@@ -1,25 +1,16 @@
 /**
- * Traduce el valor de estado almacenado en la BD al texto que ve el usuario.
- * "Pendiente" se muestra como "BACKLOG" porque es el término estándar
- * en la comunidad gamer (lista de juegos comprados pero sin empezar).
- *
- * @param {string} valorBd - Valor del campo `estado` de la BD ('Pendiente' | 'Jugando' | 'Completado').
- * @returns {string} Etiqueta en mayúsculas para mostrar en la UI.
+ * Maps DB `estado` values to user-facing labels.
+ * "Pendiente" is shown as "BACKLOG" (standard gaming term).
  */
 export function labelEstado(valorBd) {
   if (valorBd === "Pendiente") return "BACKLOG";
-  if (valorBd === "Jugando") return "JUGANDO";
-  if (valorBd === "Completado") return "COMPLETADO";
+  if (valorBd === "Jugando") return "PLAYING";
+  if (valorBd === "Completado") return "COMPLETED";
   return valorBd;
 }
 
 /**
- * Devuelve las clases de Tailwind para el badge de estado de un juego.
- * Los estados activos (Jugando, Completado) usan el color de acento `brand-tealBtn`,
- * mientras que Backlog usa un gris neutro para no distraer visualmente.
- *
- * @param {string} valorBd - Valor del campo `estado` de la BD.
- * @returns {string} Clases de Tailwind CSS para aplicar al badge.
+ * Tailwind classes for game status badges.
  */
 export function estadoBadgeClass(valorBd) {
   switch (valorBd) {

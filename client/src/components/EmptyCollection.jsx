@@ -74,17 +74,17 @@ export default function EmptyCollection() {
           <circle cx="154" cy="62" r="3" fill="currentColor" opacity="0.6" />
         </svg>
         <h2 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
-          Tu estantería está esperando el primer juego
+          Your shelf is waiting for its first game
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-slate-400">
-          Añade un título a mano o búscala en Steam y RAWG para traer la
-          carátula. Sin cuentas de terceros: tu colección, tu ritmo.
+          Add a title manually or search Steam and RAWG to pull in the
+          cover art. No third-party accounts: your collection, your pace.
         </p>
         <Link
           to="/game/new"
           className="figma-btn-primary mt-6 px-8 py-3"
         >
-          + Añadir mi primer juego
+          + Add my first game
         </Link>
       </div>
     </div>

@@ -8,6 +8,7 @@ import CollectionStats from "./CollectionStats";
 import { GameCardSkeleton } from "./Skeletons";
 import RecommendGameModal from "./RecommendGameModal";
 import ErrorRetryPanel from "./ErrorRetryPanel";
+import ConfirmDialog from "./ConfirmDialog";
 
 const LS_SORT = "myplaythrough_sort";
 const LS_VIEW = "myplaythrough_view";
@@ -20,15 +21,18 @@ function estadoRank(estado) {
 }
 
 /**
- * Grid o lista de la colección con ordenación, vista y estadísticas.
+ * Grid or list view of the collection with sorting, view mode, and stats.
  */
 export default function GameList() {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [recoGame, setRecoGame] = useState(null);
-  /** Filtro solo de esta pantalla; la barra superior es búsqueda global (Intro). */
+  /** Filter for this screen only; the top bar is global search (Enter). */
   const [collectionFilter, setCollectionFilter] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteError, setDeleteError] = useState("");
+  const [deleteBusy, setDeleteBusy] = useState(false);
 
   const [sort, setSort] = useState(
     () => localStorage.getItem(LS_SORT) || "reciente",
@@ -60,7 +64,7 @@ export default function GameList() {
     switch (sort) {
       case "titulo":
         list.sort((a, b) =>
-          (a.titulo || "").localeCompare(b.titulo || "", "es", {
+          (a.titulo || "").localeCompare(b.titulo || "", "en", {
             sensitivity: "base",
           }),
         );
@@ -69,7 +73,7 @@ export default function GameList() {
         list.sort(
           (a, b) =>
             estadoRank(a.estado) - estadoRank(b.estado) ||
-            (a.titulo || "").localeCompare(b.titulo || "", "es"),
+            (a.titulo || "").localeCompare(b.titulo || "", "en"),
         );
         break;
       case "nota":
@@ -100,7 +104,7 @@ export default function GameList() {
         setLoadError(true);
       }
     } catch (error) {
-      console.error("Error cargando juegos:", error);
+      console.error("Error loading games:", error);
       setLoadError(true);
     } finally {
       setLoading(false);
@@ -111,18 +115,35 @@ export default function GameList() {
     fetchGames();
   }, []);
 
-  const eliminarJuego = async (id, titulo) => {
-    if (window.confirm(`¿Seguro que quieres eliminar "${titulo}"?`)) {
-      try {
-        const response = await apiFetch(`${API_BASE}/api/games/${id}`, {
-          method: "DELETE",
-        });
-        if (response.ok) {
-          fetchGames();
-        }
-      } catch (error) {
-        alert("No se pudo eliminar el juego.");
+  const requestDeleteGame = (id, titulo) => {
+    setDeleteError("");
+    setDeleteTarget({
+      id,
+      title: "Delete game",
+      message: `Are you sure you want to delete "${titulo}"?`,
+    });
+  };
+
+  const confirmDeleteGame = async () => {
+    if (!deleteTarget?.id) return;
+    setDeleteBusy(true);
+    setDeleteError("");
+    try {
+      const response = await apiFetch(
+        `${API_BASE}/api/games/${deleteTarget.id}`,
+        { method: "DELETE" },
+      );
+      if (response.ok) {
+        setDeleteTarget(null);
+        fetchGames();
+      } else {
+        const data = await response.json().catch(() => ({}));
+        setDeleteError(data.error || "Could not delete the game.");
       }
+    } catch {
+      setDeleteError("Could not delete the game.");
+    } finally {
+      setDeleteBusy(false);
     }
   };
 
@@ -130,7 +151,7 @@ export default function GameList() {
     return (
       <div
         aria-busy="true"
-        aria-label="Cargando colección"
+        aria-label="Loading collection"
         className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
       >
         {Array.from({ length: 6 }).map((_, i) => (
@@ -143,8 +164,8 @@ export default function GameList() {
   if (loadError) {
     return (
       <ErrorRetryPanel
-        title="No hemos podido cargar tu colección."
-        hint="Comprueba que el servidor está en marcha (puerto 3000) o que la conexión es estable."
+        title="We couldn't load your collection."
+        hint="Check that the server is running (port 3000) or that your connection is stable."
         onRetry={() => void fetchGames()}
       />
     );
@@ -158,10 +179,10 @@ export default function GameList() {
     return (
       <div className="figma-panel px-6 py-14 text-center text-slate-400">
         <p className="font-medium text-slate-200">
-          Ningún juego coincide con tu búsqueda.
+          No games match your search.
         </p>
         <p className="mt-2 text-sm text-slate-500">
-          Ajusta el filtro de abajo (título o plataforma) o bórralo para ver toda la colección.
+          Adjust the filter below (title or platform) or clear it to see your full collection.
         </p>
       </div>
     );
@@ -169,6 +190,28 @@ export default function GameList() {
 
   return (
     <div>
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        title={deleteTarget?.title}
+        message={deleteTarget?.message}
+        confirmLabel="Delete"
+        busy={deleteBusy}
+        onConfirm={() => void confirmDeleteGame()}
+        onCancel={() => {
+          if (!deleteBusy) {
+            setDeleteTarget(null);
+            setDeleteError("");
+          }
+        }}
+      />
+      {deleteError && (
+        <div
+          className="mb-4 rounded-lg border border-red-500/35 bg-red-950/35 px-4 py-3 text-sm text-red-100"
+          role="alert"
+        >
+          {deleteError}
+        </div>
+      )}
       <RecommendGameModal
         open={Boolean(recoGame)}
         onClose={() => setRecoGame(null)}
@@ -182,7 +225,7 @@ export default function GameList() {
         <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <div className="flex flex-wrap items-center gap-3">
             <label htmlFor="collection-sort" className="sr-only">
-              Ordenar por
+              Sort by
             </label>
             <select
               id="collection-sort"
@@ -190,22 +233,22 @@ export default function GameList() {
               onChange={(e) => setSort(e.target.value)}
               className="figma-select"
             >
-              <option value="reciente">Más recientes primero</option>
-              <option value="titulo">Título (A–Z)</option>
-              <option value="estado">Estado (backlog → completado)</option>
-              <option value="nota">Nota (mayor primero)</option>
+              <option value="reciente">Newest first</option>
+              <option value="titulo">Title (A–Z)</option>
+              <option value="estado">Status (backlog → completed)</option>
+              <option value="nota">Rating (highest first)</option>
             </select>
           </div>
           <div className="min-w-0 w-full sm:w-auto sm:max-w-[240px]">
             <label htmlFor="collection-filter" className="sr-only">
-              Filtrar mi colección por título o plataforma
+              Filter my collection by title or platform
             </label>
             <input
               id="collection-filter"
               type="search"
               value={collectionFilter}
               onChange={(e) => setCollectionFilter(e.target.value)}
-              placeholder="Filtrar mi colección…"
+              placeholder="Filter my collection…"
               autoComplete="off"
               className="figma-input w-full py-2.5 text-sm"
             />
@@ -214,7 +257,7 @@ export default function GameList() {
         <div
           className="inline-flex rounded-xl bg-slate-900/80 p-1 ring-1 ring-white/10"
           role="group"
-          aria-label="Vista de la colección"
+          aria-label="Collection view"
         >
           <button
             type="button"
@@ -226,7 +269,7 @@ export default function GameList() {
                 : "text-slate-500 hover:text-slate-300"
             }`}
           >
-            Cuadrícula
+            Grid
           </button>
           <button
             type="button"
@@ -238,7 +281,7 @@ export default function GameList() {
                 : "text-slate-500 hover:text-slate-300"
             }`}
           >
-            Lista
+            List
           </button>
         </div>
       </div>
@@ -250,9 +293,9 @@ export default function GameList() {
               key={game.id}
               game={game}
               showActions
-              onDelete={eliminarJuego}
+              onDelete={requestDeleteGame}
               onRecommend={setRecoGame}
-              discussionTo={`/juego/${game.id}/discussion`}
+              discussionTo={`/game/${game.id}/discussion`}
             />
           ))}
         </div>
@@ -263,9 +306,9 @@ export default function GameList() {
               <GameListRow
                 game={game}
                 showActions
-                onDelete={eliminarJuego}
+                onDelete={requestDeleteGame}
                 onRecommend={setRecoGame}
-                discussionTo={`/juego/${game.id}/discussion`}
+                discussionTo={`/game/${game.id}/discussion`}
               />
             </div>
           ))}

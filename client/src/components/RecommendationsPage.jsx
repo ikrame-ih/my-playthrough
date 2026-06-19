@@ -6,7 +6,7 @@ import { displayCoverUrl } from "../coverUrl";
 import ErrorRetryPanel from "./ErrorRetryPanel";
 
 /**
- * Bandeja de recomendaciones recibidas.
+ * Inbox of received recommendations.
  */
 export default function RecommendationsPage() {
   const [items, setItems] = useState([]);
@@ -19,13 +19,13 @@ export default function RecommendationsPage() {
     try {
       const res = await apiFetch(`${API_BASE}/api/social/recommendations`);
       if (!res.ok) {
-        setErr("No se pudo cargar la bandeja.");
+        setErr("Could not load the inbox.");
         setItems([]);
         return;
       }
       setItems(await res.json());
     } catch {
-      setErr("Error de conexión.");
+      setErr("Connection error.");
       setItems([]);
     } finally {
       setLoading(false);
@@ -46,7 +46,7 @@ export default function RecommendationsPage() {
         prev.map((r) => (r.id === id ? { ...r, leida: true } : r)),
       );
     } catch {
-      /* ignorar */
+      /* ignore */
     }
   };
 
@@ -55,17 +55,17 @@ export default function RecommendationsPage() {
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Recomendaciones
+            Recommendations
           </h1>
           <p className="mt-2 max-w-xl text-sm text-slate-400">
-            Juegos que otros miembros te han recomendado desde su biblioteca.
+            Games other members have recommended from their libraries.
           </p>
         </div>
         <Link
           to="/community"
           className="text-sm font-medium text-brand-accent transition hover:text-teal-300"
         >
-          ← Comunidad
+          ← Community
         </Link>
       </header>
 
@@ -73,7 +73,7 @@ export default function RecommendationsPage() {
         <ul
           className="space-y-4"
           aria-busy="true"
-          aria-label="Cargando recomendaciones"
+          aria-label="Loading recommendations"
         >
           {Array.from({ length: 3 }).map((_, i) => (
             <li
@@ -89,8 +89,8 @@ export default function RecommendationsPage() {
 
       {!loading && !err && items.length === 0 && (
         <div className="figma-panel px-6 py-12 text-center text-sm text-slate-400">
-          Aún no tienes recomendaciones. Pide a alguien que te siga y te envíe
-          un título desde su colección.
+          No recommendations yet. Ask someone who follows you to send
+          a title from their collection.
         </div>
       )}
 
@@ -121,7 +121,7 @@ export default function RecommendationsPage() {
                     />
                   ) : (
                     <div className="flex h-20 w-14 items-center justify-center rounded-lg bg-slate-800 text-xs text-slate-500">
-                      Sin carátula
+                      No cover
                     </div>
                   )}
                 </div>
@@ -130,7 +130,7 @@ export default function RecommendationsPage() {
                     <span className="font-semibold text-brand-accent">
                       {r.remitente_nombre}
                     </span>{" "}
-                    te recomienda
+                    recommends
                   </p>
                   <h2 className="mt-1 text-lg font-bold text-white">
                     {r.juego_titulo}
@@ -141,17 +141,17 @@ export default function RecommendationsPage() {
                     </p>
                   )}
                   <p className="mt-2 text-xs text-slate-500">
-                    {new Date(r.created_at).toLocaleString("es-ES")}
+                    {new Date(r.created_at).toLocaleString("en-US")}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     <Link
-                      to={`/juego/${r.juego_id}/discussion`}
+                      to={`/game/${r.juego_id}/discussion`}
                       className="text-sm font-semibold text-brand-accent hover:text-teal-300"
                       onClick={() => {
                         if (!r.leida) markRead(r.id);
                       }}
                     >
-                      Ver ficha y discusión →
+                      View entry and discussion →
                     </Link>
                     {!r.leida && (
                       <button
@@ -159,7 +159,7 @@ export default function RecommendationsPage() {
                         className="text-sm font-medium text-slate-400 underline decoration-slate-600 underline-offset-2 hover:text-slate-200"
                         onClick={() => markRead(r.id)}
                       >
-                        Marcar leída
+                        Mark as read
                       </button>
                     )}
                   </div>

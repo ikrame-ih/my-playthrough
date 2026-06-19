@@ -71,8 +71,8 @@ export default function NotificationBell({ user }) {
     <Link
       to="/recommendations"
       className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-300 transition hover:bg-white/[0.06] hover:text-brand-accent"
-      aria-label={`Recomendaciones${count > 0 ? `, ${count} sin leer` : ""}`}
-      title="Recomendaciones"
+      aria-label={`Recommendations${count > 0 ? `, ${count} unread` : ""}`}
+      title="Recommendations"
     >
       <IconBell className="h-5 w-5" />
       {count > 0 && (

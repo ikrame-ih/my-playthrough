@@ -147,7 +147,7 @@ export default function AdminUsers() {
     if (!target) return;
     if (deleteConfirmInput.trim() !== String(target.nombre_usuario).trim()) {
       setDeleteModalError(
-        "Debes escribir el nombre público exactamente como se muestra arriba.",
+        "Type the public display name exactly as shown above.",
       );
       return;
     }
@@ -159,7 +159,7 @@ export default function AdminUsers() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setDeleteModalError(data.error || "No se pudo eliminar la cuenta.");
+        setDeleteModalError(data.error || "Could not delete the account.");
         return;
       }
       closeDeleteUserModal(true);
@@ -167,7 +167,7 @@ export default function AdminUsers() {
       loadGames();
       loadLfg();
     } catch {
-      setDeleteModalError("Error de conexión.");
+      setDeleteModalError("Connection error.");
     } finally {
       setDeleteInProgress(false);
     }
@@ -177,7 +177,7 @@ export default function AdminUsers() {
   const eliminarJuego = async (id, titulo) => {
     if (
       !window.confirm(
-        `¿Eliminar la ficha "${titulo}" (ID ${id}) de la base de datos?`,
+        `Delete entry "${titulo}" (ID ${id}) from the database?`,
       )
     ) {
       return;
@@ -188,37 +188,37 @@ export default function AdminUsers() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        alert(data.error || "No se pudo eliminar.");
+        alert(data.error || "Could not delete.");
         return;
       }
       loadGames();
       loadLfg();
     } catch {
-      alert("Error de conexión.");
+      alert("Connection error.");
     }
   };
 
   const eliminarLfg = async (id) => {
-    if (!window.confirm("¿Eliminar esta publicación de buscar grupo?")) return;
+    if (!window.confirm("Delete this LFG post?")) return;
     try {
       const res = await apiFetch(`${API_BASE}/api/social/lfg/${id}`, {
         method: "DELETE",
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        alert(data.error || "No se pudo eliminar.");
+        alert(data.error || "Could not delete.");
         return;
       }
       loadLfg();
     } catch {
-      alert("Error de conexión.");
+      alert("Connection error.");
     }
   };
 
   const formatDate = (iso) => {
     if (!iso) return "—";
     try {
-      return new Date(iso).toLocaleDateString("es-ES", {
+      return new Date(iso).toLocaleDateString("en-US", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
@@ -232,7 +232,7 @@ export default function AdminUsers() {
   if (loading) {
     return (
       <div className="figma-panel py-16 text-center text-lg font-medium text-brand-accent animate-pulse">
-        Cargando administración...
+        Loading admin panel...
       </div>
     );
   }
@@ -240,7 +240,7 @@ export default function AdminUsers() {
   if (forbidden) {
     return (
       <div className="figma-panel px-6 py-10 text-sm text-slate-400">
-        Esta sección solo la ven cuentas con rol administrador.
+        This section is only visible to administrator accounts.
       </div>
     );
   }
@@ -264,21 +264,21 @@ export default function AdminUsers() {
               id="admin-delete-user-title"
               className="text-xl font-bold tracking-tight text-red-100"
             >
-              Eliminar cuenta de forma permanente
+              Permanently delete account
             </h2>
             <p
               id="admin-delete-user-desc"
               className="mt-3 text-sm leading-relaxed text-slate-300"
             >
-              Vas a borrar la cuenta de un usuario real en la base de datos.
-              No es reversible: dejará de existir como miembro de la
-              plataforma y <strong className="text-white">no se puede deshacer</strong> desde esta
-              aplicación.
+              You are about to delete a real user account from the database.
+              This cannot be undone: they will no longer exist on the platform and{" "}
+              <strong className="text-white">there is no undo</strong> from this
+              app.
             </p>
 
             <div className="mt-5 rounded-xl border border-red-500/30 bg-red-950/35 px-4 py-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-red-300/90">
-                Cuenta afectada
+                Affected account
               </p>
               <p className="mt-2 text-base font-semibold text-white">
                 {userDeleteModal.nombre_usuario}
@@ -288,21 +288,21 @@ export default function AdminUsers() {
               </p>
               {userDeleteModal.rol === "admin" && (
                 <p className="mt-3 text-sm font-medium text-amber-200/95">
-                  Esta cuenta tiene rol de{" "}
-                  <span className="text-amber-100">administrador</span>. Dejará
-                  de poder entrar en Administración.
+                  This account has the{" "}
+                  <span className="text-amber-100">administrator</span> role. They
+                  will lose access to Administration.
                 </p>
               )}
             </div>
 
             <div className="mt-5 space-y-2 text-sm text-slate-400">
               <p className="font-medium text-slate-300">
-                Se eliminarán en cascada, entre otros:
+                The following will be deleted in cascade, among other data:
               </p>
               <ul className="list-inside list-disc space-y-1.5 pl-1 leading-relaxed marker:text-red-400/80">
-                <li>Toda su colección de juegos y las reseñas en fichas ajenas.</li>
-                <li>Comentarios en discusiones y votos asociados.</li>
-                <li>Seguimientos, recomendaciones y publicaciones de buscar grupo (LFG).</li>
+                <li>Their entire game collection and reviews on other entries.</li>
+                <li>Discussion comments and associated votes.</li>
+                <li>Follows, recommendations, and LFG posts.</li>
               </ul>
             </div>
 
@@ -310,8 +310,8 @@ export default function AdminUsers() {
               htmlFor="admin-delete-user-confirm-name"
               className="mt-6 block text-sm font-medium text-slate-300"
             >
-              Para confirmar, escribe el <strong className="text-white">nombre público</strong> exacto
-              del usuario (copia y pega si hace falta):
+              To confirm, type the exact <strong className="text-white">public display name</strong>
+              (copy and paste if needed):
             </label>
             <input
               id="admin-delete-user-confirm-name"
@@ -342,7 +342,7 @@ export default function AdminUsers() {
                 onClick={closeDeleteUserModal}
                 disabled={deleteInProgress}
               >
-                Cancelar
+                Cancel
               </button>
               <button
                 type="button"
@@ -355,8 +355,8 @@ export default function AdminUsers() {
                 onClick={() => void ejecutarEliminarUsuario()}
               >
                 {deleteInProgress
-                  ? "Eliminando…"
-                  : "Sí, eliminar esta cuenta definitivamente"}
+                  ? "Deleting…"
+                  : "Yes, delete this account permanently"}
               </button>
             </div>
           </div>
@@ -371,10 +371,10 @@ export default function AdminUsers() {
           </span>
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-white">
-              Administración
+              Administration
             </h1>
             <p className="mt-1 text-sm text-slate-400">
-              Usuarios, fichas de juego y publicaciones LFG (buscar grupo).
+              Users, game entries, and LFG posts.
             </p>
           </div>
         </div>
@@ -384,13 +384,13 @@ export default function AdminUsers() {
       <div className="figma-panel mb-10 p-5 sm:p-6">
         <div className="mb-4">
           <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-slate-500">
-            Buscar por nombre o email
+            Search by name or email
           </label>
           <input
             type="search"
             value={userSearch}
             onChange={(e) => setUserSearch(e.target.value)}
-            placeholder="Buscar por nombre o email…"
+            placeholder="Search by name or email…"
             className="figma-input max-w-md"
           />
         </div>
@@ -401,8 +401,8 @@ export default function AdminUsers() {
                 <th className="p-4">ID / usuario</th>
                 <th className="p-4">Email</th>
                 <th className="p-4">Rol</th>
-                <th className="p-4">Fecha de alta</th>
-                <th className="w-28 p-4 text-right">Acciones</th>
+                <th className="p-4">Joined</th>
+                <th className="w-28 p-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -449,7 +449,7 @@ export default function AdminUsers() {
                       type="button"
                       onClick={() => openDeleteUserConfirm(u)}
                       className="inline-flex rounded-lg p-2 text-slate-500 transition hover:bg-red-500/10 hover:text-red-400"
-                      title="Eliminar cuenta (acción grave, pide confirmación)"
+                      title="Delete account (requires confirmation)"
                     >
                       <IconTrash className="h-5 w-5" />
                     </button>
@@ -469,7 +469,7 @@ export default function AdminUsers() {
         <div>
           <h2 className="text-xl font-bold text-white">Todos los juegos</h2>
           <p className="text-sm text-slate-500">
-            Borra fichas de cualquier usuario (moderación).
+            Delete any user's game entry (moderation).
           </p>
         </div>
       </div>
@@ -477,13 +477,13 @@ export default function AdminUsers() {
       <div className="figma-panel p-5 sm:p-6">
         <div className="mb-4">
           <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-slate-500">
-            Buscar juego o propietario
+            Search game or owner
           </label>
           <input
             type="search"
             value={gameSearch}
             onChange={(e) => setGameSearch(e.target.value)}
-            placeholder="Título, usuario, ID…"
+            placeholder="Title, user, ID…"
             className="figma-input max-w-md"
           />
         </div>
@@ -520,7 +520,7 @@ export default function AdminUsers() {
                       type="button"
                       onClick={() => eliminarJuego(g.id, g.titulo)}
                       className="inline-flex rounded-lg p-2 text-slate-500 transition hover:bg-red-500/10 hover:text-red-400"
-                      title="Eliminar ficha"
+                      title="Delete entry"
                     >
                       <IconTrash className="h-5 w-5" />
                     </button>
@@ -543,10 +543,10 @@ export default function AdminUsers() {
           LFG
         </span>
         <div>
-          <h2 className="text-xl font-bold text-white">Buscar grupo (LFG)</h2>
+          <h2 className="text-xl font-bold text-white">Find group (LFG)</h2>
           <p className="text-sm text-slate-500">
-            Publicaciones de la comunidad; el borrado usa la misma regla que en
-            Comunidad (admin o autora).
+            Community posts; deletion follows the same rules as in Community
+            (admin or author).
           </p>
         </div>
       </div>
@@ -554,7 +554,7 @@ export default function AdminUsers() {
       <div className="figma-panel p-5 sm:p-6">
         <div className="mb-4">
           <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-slate-500">
-            Buscar en LFG
+            Search LFG
           </label>
           <input
             type="search"
@@ -606,7 +606,7 @@ export default function AdminUsers() {
                       type="button"
                       onClick={() => eliminarLfg(row.id)}
                       className="inline-flex rounded-lg p-2 text-slate-500 transition hover:bg-red-500/10 hover:text-red-400"
-                      title="Eliminar publicación"
+                      title="Delete post"
                     >
                       <IconTrash className="h-5 w-5" />
                     </button>
@@ -618,7 +618,7 @@ export default function AdminUsers() {
         </div>
         {filteredLfg.length === 0 && (
           <p className="py-8 text-center text-sm text-slate-500">
-            No hay publicaciones LFG que coincidan.
+            No matching LFG posts.
           </p>
         )}
       </div>

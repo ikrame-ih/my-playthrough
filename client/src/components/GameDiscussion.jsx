@@ -141,13 +141,13 @@ function CommentBlock({
               onClick={() => onReply(c.id)}
               className="text-xs font-medium text-slate-400 hover:text-brand-accent"
             >
-              Responder
+              Reply
             </button>
             {canDelete && (
               <button
                 type="button"
                 onClick={async () => {
-                  if (!window.confirm("¿Eliminar este comentario?")) return;
+                  if (!window.confirm("Delete this comment?")) return;
                   try {
                     const res = await apiFetch(
                       `${API_BASE}/api/games/${gameId}/comments/${c.id}`,
@@ -155,12 +155,12 @@ function CommentBlock({
                     );
                     if (res.ok) onDeleted();
                   } catch {
-                    alert("No se pudo eliminar.");
+                    alert("Could not delete.");
                   }
                 }}
                 className="text-xs font-medium text-red-400/90 hover:text-red-300"
               >
-                Eliminar
+                Delete
               </button>
             )}
           </div>
@@ -217,7 +217,7 @@ export default function GameDiscussion() {
       ]);
 
       if (!gRes.ok) {
-        setErr("No se encontró el juego.");
+        setErr("Game not found.");
         setLoading(false);
         return;
       }
@@ -272,7 +272,7 @@ export default function GameDiscussion() {
         );
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-          alert(data.error || "No se pudo votar.");
+          alert(data.error || "Could not vote.");
           return;
         }
         setComments((prev) =>
@@ -288,7 +288,7 @@ export default function GameDiscussion() {
           ),
         );
       } catch {
-        alert("Error de conexión.");
+        alert("Connection error.");
       } finally {
         setVoteBusyId(null);
       }
@@ -311,14 +311,14 @@ export default function GameDiscussion() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        alert(data.error || "No se pudo publicar.");
+        alert(data.error || "Could not post.");
         return;
       }
       setText("");
       setReplyTo(null);
       load();
     } catch {
-      alert("Error de conexión.");
+      alert("Connection error.");
     } finally {
       setPosting(false);
     }
@@ -329,7 +329,7 @@ export default function GameDiscussion() {
       <div
         className="figma-panel space-y-4 p-8 sm:p-10"
         aria-busy="true"
-        aria-label="Cargando discusión"
+        aria-label="Loading discussion"
       >
         <div className="h-6 w-2/3 max-w-sm animate-pulse rounded-lg bg-slate-800" />
         <div className="h-4 w-1/2 animate-pulse rounded bg-slate-800/80" />
@@ -342,21 +342,21 @@ export default function GameDiscussion() {
     return (
       <div className="space-y-4">
         <ErrorRetryPanel
-          title={err || "Juego no encontrado."}
+          title={err || "Game not found."}
           hint={
-            err && err !== "No se encontró el juego."
-              ? "Puede ser un fallo de red o de servidor."
-              : "Puede que la ficha se haya eliminado o el enlace no sea válido."
+            err && err !== "Game not found."
+              ? "This may be a network or server issue."
+              : "The entry may have been deleted or the link is invalid."
           }
           onRetry={
-            err && err !== "No se encontró el juego."
+            err && err !== "Game not found."
               ? () => setRetryTick((n) => n + 1)
               : undefined
           }
         />
         <p className="text-center text-sm text-slate-500">
           <Link to="/community" className="figma-btn-primary inline-flex text-base">
-            Volver a comunidad
+            Back to community
           </Link>
         </p>
       </div>
@@ -387,7 +387,7 @@ export default function GameDiscussion() {
           to={`/user/${game.usuario_id}`}
           className="text-sm font-medium text-brand-accent hover:text-teal-300"
         >
-          ← Colección de {game.propietario_nombre}
+          ← {game.propietario_nombre}&apos;s collection
         </Link>
       </div>
 
@@ -401,7 +401,7 @@ export default function GameDiscussion() {
             />
           ) : (
             <div className="flex h-full items-center justify-center text-slate-600">
-              Sin carátula
+              No cover
             </div>
           )}
         </div>
@@ -425,12 +425,11 @@ export default function GameDiscussion() {
 
       <section className="figma-panel p-6 sm:p-8">
         <h2 className="mb-1 text-lg font-bold text-white">
-          Reseñas y discusión
+          Reviews & discussion
         </h2>
         <p className="mb-6 text-sm text-slate-500">
-          Cualquier miembro puede leer y publicar. Las reseñas de primer nivel
-          admiten votación útil / no recomendado (como en Steam). Las respuestas
-          van en hilo.
+          Any member can read and post. Top-level reviews support helpful / not
+          recommended votes (Steam-style). Replies are threaded below.
         </p>
 
         <form onSubmit={submit} className="mb-8 space-y-3">
@@ -442,14 +441,14 @@ export default function GameDiscussion() {
                 className="text-brand-accent hover:underline"
                 onClick={() => setReplyTo(null)}
               >
-                Cancelar
+                Cancel
               </button>
             </p>
           )}
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Escribe tu reseña o respuesta…"
+            placeholder="Write your review or reply…"
             rows={4}
             className="figma-input resize-y"
             maxLength={8000}
@@ -466,7 +465,7 @@ export default function GameDiscussion() {
         <div className="space-y-4">
           {roots.length === 0 ? (
             <p className="text-sm text-slate-500">
-              Aún no hay reseñas. Sé el primero en opinar.
+              No reviews yet. Be the first to share your thoughts.
             </p>
           ) : (
             roots.map((c) => (
