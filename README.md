@@ -21,6 +21,82 @@ Developed as the **final intermodular project** for the **Higher Technical Degre
 
 ---
 
+## Screenshots
+
+Captured from the local app (1440×900). Regenerate with `node scripts/capture-readme-screenshots.mjs` while client and API are running.
+
+### Sign in
+
+![Sign-in screen](docs/screenshots/01-auth.png)
+
+### My collection
+
+Grid view with stats, sorting, and cover art.
+
+![My collection](docs/screenshots/02-collection.png)
+
+### Community
+
+**Members** — browse profiles and follow other players.
+
+![Community members](docs/screenshots/03-community-members.png)
+
+**Statistics** — community-wide average scores per title.
+
+![Community statistics](docs/screenshots/04-community-stats.png)
+
+**Activity** — feed from people you follow.
+
+![Community activity](docs/screenshots/05-community-activity.png)
+
+**Find group (LFG)** — post or browse teammate searches tied to your library.
+
+![Community LFG](docs/screenshots/06-community-lfg.png)
+
+### Add game
+
+Cover search via Steam and RAWG.
+
+![Add game form](docs/screenshots/07-add-game.png)
+
+### Profile settings
+
+Display name, robot avatar, notification sound, guided tour.
+
+![Profile settings](docs/screenshots/08-settings.png)
+
+### Recommendations
+
+Inbox for games sent by people you follow.
+
+![Recommendations inbox](docs/screenshots/09-recommendations.png)
+
+### Search
+
+Global search across members and registered games.
+
+![Search results](docs/screenshots/10-search.png)
+
+### Game discussion
+
+Threaded reviews with helpful / not recommended votes.
+
+![Game discussion](docs/screenshots/11-discussion.png)
+
+### Public profile
+
+Read-only view of another member's collection.
+
+![Public profile](docs/screenshots/12-public-profile.png)
+
+### Administration
+
+User, game, and LFG moderation (admin role).
+
+![Admin panel](docs/screenshots/13-admin.png)
+
+---
+
 ## Features
 
 - **Personal collection** — CRUD for games (status, platform, score, hours). Success feedback on the home screen after save.
@@ -52,7 +128,7 @@ Developed as the **final intermodular project** for the **Higher Technical Degre
 my-playthrough/
 ├── client/          # React SPA (Vite)
 ├── server/          # Express REST API
-├── docs/            # SQL schema, test plan, HTML docs
+├── docs/            # SQL schema, test plan, HTML docs, screenshots
 ├── brand/           # Brand book export
 └── presentation/    # Slide deck (academic defense)
 ```
