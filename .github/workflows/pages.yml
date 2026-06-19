@@ -39,9 +39,11 @@ jobs:
         run: |
           mkdir -p _site/defense
           cp -r docs/* _site/
-          cp DESIGN.md DESIGN_ES.md _site/
+          cp DESIGN.md _site/
           cp -r brand _site/
           cp -r presentation/dist/* _site/defense/
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          sed -i "s/<!-- site-build -->/Pages build ${SHORT_SHA}/" _site/index.html
           touch _site/.nojekyll
 
       - uses: actions/upload-pages-artifact@v3
