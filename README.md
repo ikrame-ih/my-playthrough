@@ -2,13 +2,13 @@
 
 A full-stack web app to manage your personal video game library — track what you are playing, what you have finished, and what is still on your backlog. Optional community features let you follow other players, share recommendations, and find teammates (LFG).
 
-Built as a **Higher Technical Degree (DAW) capstone project** and maintained as a **portfolio piece** for professional job applications.
+Developed as the **final intermodular project** for the **Higher Technical Degree in Web Application Development (DAW)** at CESUR Málaga Este (2025/2026), **awarded the maximum grade**.
 
 **Live demo:** deploy the client to Vercel and the API to Render (see [Deployment](#deployment)).
 
 ---
 
-## Highlights (for recruiters)
+## At a glance
 
 | Area | Details |
 |------|---------|
@@ -49,12 +49,12 @@ Built as a **Higher Technical Degree (DAW) capstone project** and maintained as 
 ## Project structure
 
 ```
-MyPlaythrough/
+my-playthrough/
 ├── client/          # React SPA (Vite)
 ├── server/          # Express REST API
 ├── docs/            # SQL schema, test plan, HTML docs
 ├── brand/           # Brand book export
-└── presentation/    # Separate slide deck (academic defense only)
+└── presentation/    # Slide deck (academic defense)
 ```
 
 ---
@@ -150,4 +150,4 @@ Core features implemented and covered by a manual test plan in `docs/pruebas.md`
 
 ## License
 
-Academic / portfolio project — contact the author for reuse terms.
+Academic project — contact the author for reuse terms.
