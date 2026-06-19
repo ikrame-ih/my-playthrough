@@ -11,7 +11,7 @@ const bcrypt = require("bcryptjs");
 const pool = require("../config/db");
 
 const DEMO_EMAIL = "demo@myplaythrough.local";
-const DEMO_USER = "Demo Jurado";
+const DEMO_USER = "Demo User";
 const DEMO_PASS = "Presentacion2026!";
 
 const DEMO_GAMES = [

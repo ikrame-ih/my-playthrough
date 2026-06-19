@@ -100,44 +100,44 @@ const CATALOG = [
 
 const SEED_USERS = [
   {
-    email: "rufleto@myplaythrough.local",
-    nombre_usuario: "Rufleto",
+    email: "admin1@myplaythrough.local",
+    nombre_usuario: "Alex Morgan",
     rol: "admin",
     avatar_id: "robot-2",
   },
   {
-    email: "tizza@myplaythrough.local",
-    nombre_usuario: "Tizza",
+    email: "admin2@myplaythrough.local",
+    nombre_usuario: "Jordan Lee",
     rol: "admin",
     avatar_id: "robot-3",
   },
   {
-    email: "elotro@myplaythrough.local",
-    nombre_usuario: "ElOtro",
+    email: "user1@myplaythrough.local",
+    nombre_usuario: "Sam Rivera",
     rol: "user",
     avatar_id: "robot-4",
   },
   {
-    email: "knekro@myplaythrough.local",
-    nombre_usuario: "Knekro",
+    email: "user2@myplaythrough.local",
+    nombre_usuario: "Casey Brooks",
     rol: "user",
     avatar_id: "robot-5",
   },
   {
-    email: "sequian@myplaythrough.local",
-    nombre_usuario: "SequianCalvísimo",
+    email: "user3@myplaythrough.local",
+    nombre_usuario: "Riley Chen",
     rol: "user",
     avatar_id: "robot-6",
   },
   {
-    email: "laquete@myplaythrough.local",
-    nombre_usuario: "LaQueTeCuento>:(",
+    email: "user4@myplaythrough.local",
+    nombre_usuario: "Morgan Blake",
     rol: "user",
     avatar_id: "robot-7",
   },
   {
     email: "demo@myplaythrough.local",
-    nombre_usuario: "Demo Jurado",
+    nombre_usuario: "Demo User",
     rol: "admin",
     avatar_id: "robot-0",
   },
@@ -145,13 +145,8 @@ const SEED_USERS = [
 
 /** Juegos por email (slugs). */
 const GAMES_BY_EMAIL = {
-  "rufleto@myplaythrough.local": [
-    "portal2",
-    "elden",
-    "ds3",
-    "deadcells",
-  ],
-  "tizza@myplaythrough.local": [
+  "admin1@myplaythrough.local": ["portal2", "elden", "ds3", "deadcells"],
+  "admin2@myplaythrough.local": [
     "hades",
     "hollow",
     "cyberpunk",
@@ -159,26 +154,10 @@ const GAMES_BY_EMAIL = {
     "zelda",
     "stardew",
   ],
-  "elotro@myplaythrough.local": [
-    "cyberpunk",
-    "stardew",
-    "portal2",
-  ],
-  "knekro@myplaythrough.local": [
-    "elden",
-    "ds3",
-    "deadcells",
-  ],
-  "sequian@myplaythrough.local": [
-    "stardew",
-    "celeste",
-    "hollow",
-  ],
-  "laquete@myplaythrough.local": [
-    "portal2",
-    "zelda",
-    "hades",
-  ],
+  "user1@myplaythrough.local": ["cyberpunk", "stardew", "portal2"],
+  "user2@myplaythrough.local": ["elden", "ds3", "deadcells"],
+  "user3@myplaythrough.local": ["stardew", "celeste", "hollow"],
+  "user4@myplaythrough.local": ["portal2", "zelda", "hades"],
   "demo@myplaythrough.local": ["portal2", "hades", "zelda"],
 };
 
@@ -199,185 +178,181 @@ const GAME_STATS = {
 /** Ficha del propietario (targetOwner), autor del comentario (authorEmail). */
 const COMMENTS = [
   {
-    targetOwner: "rufleto@myplaythrough.local",
+    targetOwner: "admin1@myplaythrough.local",
     slug: "portal2",
-    authorEmail: "rufleto@myplaythrough.local",
+    authorEmail: "admin1@myplaythrough.local",
     cuerpo:
-      "El humor de GLaDOS sigue siendo oro puro. Me pasé el coop con un amigo y fue un viaje.",
+      "Clever level design and sharp writing. Co-op playthrough was a highlight.",
   },
   {
-    targetOwner: "rufleto@myplaythrough.local",
+    targetOwner: "admin1@myplaythrough.local",
     slug: "portal2",
-    authorEmail: "laquete@myplaythrough.local",
+    authorEmail: "user4@myplaythrough.local",
     cuerpo:
-      "Me reí más con las líneas que con muchas comedias. Corto pero intenso.",
+      "Short but memorable. The pacing keeps every chapter feeling fresh.",
   },
   {
-    targetOwner: "tizza@myplaythrough.local",
+    targetOwner: "admin2@myplaythrough.local",
     slug: "hades",
-    authorEmail: "tizza@myplaythrough.local",
+    authorEmail: "admin2@myplaythrough.local",
     cuerpo:
-      "Llevo como ocho intentos y cada run se siente distinto. La narrativa engancha un montón.",
+      "Each run feels different. The narrative hooks you in quickly.",
   },
   {
-    targetOwner: "tizza@myplaythrough.local",
+    targetOwner: "admin2@myplaythrough.local",
     slug: "zelda",
-    authorEmail: "tizza@myplaythrough.local",
+    authorEmail: "admin2@myplaythrough.local",
     cuerpo:
-      "Me encanta explorar sin prisa; el juego no te empuja y eso se agradece. También te digo, la Switch 1 va fatal...",
+      "Exploration at your own pace works really well here. Great open-world structure.",
   },
   {
-    targetOwner: "tizza@myplaythrough.local",
+    targetOwner: "admin2@myplaythrough.local",
     slug: "zelda",
-    authorEmail: "tizza@myplaythrough.local",
+    authorEmail: "user3@myplaythrough.local",
     cuerpo:
-      "Lo de fusionar cosas no se me da bien xd.",
+      "Crafting took a while to click, but the world makes up for the learning curve.",
   },
   {
-    targetOwner: "knekro@myplaythrough.local",
+    targetOwner: "user2@myplaythrough.local",
     slug: "elden",
-    authorEmail: "knekro@myplaythrough.local",
+    authorEmail: "user2@myplaythrough.local",
     cuerpo:
-      "Boss difíciles pero justos. Cuando cae uno grande es una celebración en el sofá.",
+      "Tough bosses, fair patterns. Big victories feel earned.",
   },
   {
-    targetOwner: "elotro@myplaythrough.local",
+    targetOwner: "user1@myplaythrough.local",
     slug: "cyberpunk",
-    authorEmail: "elotro@myplaythrough.local",
+    authorEmail: "user1@myplaythrough.local",
     cuerpo:
-      "Night City de noche con lluvia… cinemático. Algunos bugs me sacaron pero el vibe pesa más.",
+      "Strong atmosphere and side characters. Night City looks incredible in the rain.",
   },
   {
-    targetOwner: "elotro@myplaythrough.local",
+    targetOwner: "user1@myplaythrough.local",
     slug: "cyberpunk",
-    authorEmail: "rufleto@myplaythrough.local",
+    authorEmail: "admin1@myplaythrough.local",
     cuerpo:
-      "El DLC me entró mejor que el arranque del juego base, la verdad.",
+      "The expansion content landed better for me than the early main story.",
   },
   {
-    targetOwner: "sequian@myplaythrough.local",
+    targetOwner: "user3@myplaythrough.local",
     slug: "stardew",
-    authorEmail: "sequian@myplaythrough.local",
+    authorEmail: "user3@myplaythrough.local",
     cuerpo:
-      "Lo abrí para media hora y son tres horas. Las gallinas me roban la vida.",
+      "Easy to lose track of time. Relaxing loop with just enough goals.",
   },
   {
-    targetOwner: "tizza@myplaythrough.local",
+    targetOwner: "admin2@myplaythrough.local",
     slug: "hollow",
-    authorEmail: "tizza@myplaythrough.local",
+    authorEmail: "admin2@myplaythrough.local",
     cuerpo:
-      "El mapa es enorme y el combate exige ritmo. Me gusta el estilo dibujado.",
+      "Large map and tight combat. The art direction holds up throughout.",
   },
   {
-    targetOwner: "tizza@myplaythrough.local",
+    targetOwner: "admin2@myplaythrough.local",
     slug: "celeste",
-    authorEmail: "tizza@myplaythrough.local",
+    authorEmail: "admin2@myplaythrough.local",
     cuerpo:
-      "Capítulos duros pero el checkpoint es generoso. La historia me pilló por sorpresa.",
+      "Challenging platforming with generous checkpoints. Story caught me off guard.",
   },
   {
     targetOwner: "demo@myplaythrough.local",
     slug: "hades",
     authorEmail: "demo@myplaythrough.local",
-    cuerpo:
-      "Para probar en clase: se nota el ritmo desde el primer run.",
+    cuerpo: "Good sample title for demos — fast to understand and fun to replay.",
   },
   {
-    targetOwner: "rufleto@myplaythrough.local",
+    targetOwner: "admin1@myplaythrough.local",
     slug: "elden",
-    authorEmail: "tizza@myplaythrough.local",
+    authorEmail: "admin2@myplaythrough.local",
     cuerpo:
-      "Me costó el principio pero cuando engancha no sueltas el mando. El mundo interconectado se nota en cada atajo que descubres.",
+      "Slow start, then it clicks. Interconnected level design rewards exploration.",
   },
   {
-    targetOwner: "laquete@myplaythrough.local",
+    targetOwner: "user4@myplaythrough.local",
     slug: "hades",
-    authorEmail: "knekro@myplaythrough.local",
+    authorEmail: "user2@myplaythrough.local",
     cuerpo:
-      "OST brutal. Un día más diciendo 'solo un intento más' a las 2 de la mañana.",
+      "Soundtrack stands out. One-more-run pacing is hard to resist.",
   },
   {
-    targetOwner: "tizza@myplaythrough.local",
+    targetOwner: "admin2@myplaythrough.local",
     slug: "cyberpunk",
-    authorEmail: "sequian@myplaythrough.local",
+    authorEmail: "user3@myplaythrough.local",
     cuerpo:
-      "Lo dejé en su día por bugs; ahora con parches es otra historia. Los personajes secundarios están muy trabajados.",
+      "Patches improved stability a lot. Side quests carry most of the emotional weight.",
   },
   {
-    targetOwner: "tizza@myplaythrough.local",
+    targetOwner: "admin2@myplaythrough.local",
     slug: "stardew",
-    authorEmail: "rufleto@myplaythrough.local",
+    authorEmail: "admin1@myplaythrough.local",
     cuerpo:
-      "Ideal para desconectar. No hay prisa y el pixel art aguanta mil horas.",
+      "Perfect wind-down game. Pixel art and music pair nicely for long sessions.",
   },
   {
-    targetOwner: "knekro@myplaythrough.local",
+    targetOwner: "user2@myplaythrough.local",
     slug: "deadcells",
-    authorEmail: "elotro@myplaythrough.local",
+    authorEmail: "user1@myplaythrough.local",
     cuerpo:
-      "Rápido, exigente, adictivo. Si te gusta repetir runs hasta dominar el ritmo, aquí estás en casa.",
+      "Fast runs and high skill ceiling. Great if you like mastering movement.",
   },
 ];
 
-/** Votos sobre reseñas (índice en el array COMMENTS, email del votante, 1 o -1). */
 const VOTES_ON_COMMENTS = [
-  { commentIndex: 0, email: "tizza@myplaythrough.local", val: 1 },
+  { commentIndex: 0, email: "admin2@myplaythrough.local", val: 1 },
   { commentIndex: 0, email: "demo@myplaythrough.local", val: 1 },
-  { commentIndex: 0, email: "elotro@myplaythrough.local", val: 1 },
-  { commentIndex: 1, email: "tizza@myplaythrough.local", val: 1 },
-  { commentIndex: 1, email: "rufleto@myplaythrough.local", val: -1 },
-  { commentIndex: 2, email: "rufleto@myplaythrough.local", val: 1 },
-  { commentIndex: 2, email: "tizza@myplaythrough.local", val: 1 },
-  { commentIndex: 3, email: "laquete@myplaythrough.local", val: 1 },
-  { commentIndex: 4, email: "tizza@myplaythrough.local", val: 1 },
-  { commentIndex: 5, email: "knekro@myplaythrough.local", val: 1 },
-  { commentIndex: 6, email: "tizza@myplaythrough.local", val: -1 },
-  { commentIndex: 7, email: "sequian@myplaythrough.local", val: 1 },
+  { commentIndex: 0, email: "user1@myplaythrough.local", val: 1 },
+  { commentIndex: 1, email: "admin2@myplaythrough.local", val: 1 },
+  { commentIndex: 1, email: "admin1@myplaythrough.local", val: -1 },
+  { commentIndex: 2, email: "admin1@myplaythrough.local", val: 1 },
+  { commentIndex: 2, email: "admin2@myplaythrough.local", val: 1 },
+  { commentIndex: 3, email: "user4@myplaythrough.local", val: 1 },
+  { commentIndex: 4, email: "admin2@myplaythrough.local", val: 1 },
+  { commentIndex: 5, email: "user2@myplaythrough.local", val: 1 },
+  { commentIndex: 6, email: "admin2@myplaythrough.local", val: -1 },
+  { commentIndex: 7, email: "user3@myplaythrough.local", val: 1 },
   { commentIndex: 8, email: "demo@myplaythrough.local", val: 1 },
-  { commentIndex: 9, email: "tizza@myplaythrough.local", val: 1 },
+  { commentIndex: 9, email: "admin2@myplaythrough.local", val: 1 },
   { commentIndex: 10, email: "demo@myplaythrough.local", val: 1 },
-  { commentIndex: 11, email: "laquete@myplaythrough.local", val: 1 },
-  { commentIndex: 12, email: "rufleto@myplaythrough.local", val: 1 },
-  { commentIndex: 13, email: "elotro@myplaythrough.local", val: 1 },
-  { commentIndex: 14, email: "knekro@myplaythrough.local", val: 1 },
+  { commentIndex: 11, email: "user4@myplaythrough.local", val: 1 },
+  { commentIndex: 12, email: "admin1@myplaythrough.local", val: 1 },
+  { commentIndex: 13, email: "user1@myplaythrough.local", val: 1 },
+  { commentIndex: 14, email: "user2@myplaythrough.local", val: 1 },
   { commentIndex: 15, email: "demo@myplaythrough.local", val: 1 },
-  { commentIndex: 16, email: "tizza@myplaythrough.local", val: 1 },
+  { commentIndex: 16, email: "admin2@myplaythrough.local", val: 1 },
 ];
 
-/** [seguidor, seguido] */
 const FOLLOWS = [
-  ["rufleto@myplaythrough.local", "tizza@myplaythrough.local"],
-  ["tizza@myplaythrough.local", "rufleto@myplaythrough.local"],
-  ["rufleto@myplaythrough.local", "elotro@myplaythrough.local"],
-  ["tizza@myplaythrough.local", "demo@myplaythrough.local"],
-  ["elotro@myplaythrough.local", "knekro@myplaythrough.local"],
-  ["knekro@myplaythrough.local", "sequian@myplaythrough.local"],
-  ["sequian@myplaythrough.local", "laquete@myplaythrough.local"],
-  ["laquete@myplaythrough.local", "rufleto@myplaythrough.local"],
-  ["demo@myplaythrough.local", "tizza@myplaythrough.local"],
-  ["demo@myplaythrough.local", "elotro@myplaythrough.local"],
-  ["laquete@myplaythrough.local", "tizza@myplaythrough.local"],
+  ["admin1@myplaythrough.local", "admin2@myplaythrough.local"],
+  ["admin2@myplaythrough.local", "admin1@myplaythrough.local"],
+  ["admin1@myplaythrough.local", "user1@myplaythrough.local"],
+  ["admin2@myplaythrough.local", "demo@myplaythrough.local"],
+  ["user1@myplaythrough.local", "user2@myplaythrough.local"],
+  ["user2@myplaythrough.local", "user3@myplaythrough.local"],
+  ["user3@myplaythrough.local", "user4@myplaythrough.local"],
+  ["user4@myplaythrough.local", "admin1@myplaythrough.local"],
+  ["demo@myplaythrough.local", "admin2@myplaythrough.local"],
+  ["demo@myplaythrough.local", "user1@myplaythrough.local"],
+  ["user4@myplaythrough.local", "admin2@myplaythrough.local"],
 ];
 
-/** remitente debe seguir a destinatario. [from, to, slug, mensaje] */
 const RECOS = [
   [
-    "tizza@myplaythrough.local",
-    "rufleto@myplaythrough.local",
+    "admin2@myplaythrough.local",
+    "admin1@myplaythrough.local",
     "hades",
-    "Tenías que probarlo, el ritmo de combate es adictivo.",
+    "Worth trying — combat rhythm is easy to get into.",
   ],
   [
-    "rufleto@myplaythrough.local",
-    "tizza@myplaythrough.local",
+    "admin1@myplaythrough.local",
+    "admin2@myplaythrough.local",
     "portal2",
-    "Cortito pero redondo, ideal si quieres algo distinto.",
+    "Compact and polished. Good change of pace from long RPGs.",
   ],
   [
-    "tizza@myplaythrough.local",
-    "elotro@myplaythrough.local",
+    "admin2@myplaythrough.local",
+    "user1@myplaythrough.local",
     "celeste",
-    "Si te gusta el plataformeo difícil, esto es de manual.",
+    "If you like precise platforming, this is a strong pick.",
   ],
 ];
 
@@ -417,12 +392,17 @@ async function main() {
   try {
     await client.query("BEGIN");
 
-    // Un solo usuario de demostración con nombre público «Rufleto» (email canónico del seed).
+    const LEGACY_EMAILS = [
+      "rufleto@myplaythrough.local",
+      "tizza@myplaythrough.local",
+      "elotro@myplaythrough.local",
+      "knekro@myplaythrough.local",
+      "sequian@myplaythrough.local",
+      "laquete@myplaythrough.local",
+    ];
     await client.query(
-      `DELETE FROM usuarios
-       WHERE LOWER(TRIM(nombre_usuario)) = 'rufleto'
-         AND LOWER(TRIM(email)) <> LOWER($1)`,
-      ["rufleto@myplaythrough.local"],
+      `DELETE FROM usuarios WHERE LOWER(TRIM(email)) = ANY($1::text[])`,
+      [LEGACY_EMAILS.map((e) => e.toLowerCase())],
     );
 
     await client.query(
@@ -602,7 +582,7 @@ async function main() {
     await client.query("COMMIT");
     console.log("OK: datos de presentación cargados.");
     console.log("Contraseña de todas las cuentas:", PASS);
-    console.log("Administradores: Tizza, Rufleto, Demo Jurado.");
+    console.log("Administrators: Alex Morgan, Jordan Lee, Demo User.");
   } catch (e) {
     await client.query("ROLLBACK");
     throw e;
