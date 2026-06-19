@@ -2,7 +2,7 @@
 
 Index for evaluation materials and repository readers. Installation, environment variables, and API overview are in the root [`README.md`](../README.md).
 
-**Browse online:** [Project documentation on GitHub Pages](https://ikihga2223-create.github.io/MyPlaythrough/) — diagrams, test plan, schema, and screenshots.
+**Browse online:** [Project documentation on GitHub Pages](https://ikihga2223-create.github.io/MyPlaythrough/) — start with the [defense presentation](https://ikihga2223-create.github.io/MyPlaythrough/defense/), then diagrams and test plan.
 
 For the full test plan, open [`abrir-en-navegador/plan_pruebas.html`](abrir-en-navegador/plan_pruebas.html) in a browser (print to PDF). Markdown source: [`test-plan.md`](test-plan.md). Totals: **58 manual tests** (46 **P-**, 8 **S-**, 4 **V-**) plus **27 unit tests** (Vitest).
 

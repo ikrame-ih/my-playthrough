@@ -15,25 +15,44 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: presentation/package-lock.json
+
+      - name: Build project defense deck
+        env:
+          GITHUB_PAGES: "true"
+        run: |
+          npm ci
+          npm run build
+        working-directory: presentation
+
       - name: Assemble documentation site
         run: |
-          mkdir -p _site
+          mkdir -p _site/defense
           cp -r docs/* _site/
           cp DESIGN.md DESIGN_ES.md _site/
           cp -r brand _site/
+          cp -r presentation/dist/* _site/defense/
           touch _site/.nojekyll
 
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - uses: actions/deploy-pages@v4
         id: deployment

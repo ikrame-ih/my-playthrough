@@ -6,20 +6,20 @@ A full-stack web app to manage your personal video game library — track what y
 
 Developed as the **final intermodular project** for the **Higher Technical Degree in Web Application Development (DAW)** at CESUR Málaga Este (2025/2026), **awarded the maximum grade**.
 
-**Project documentation** (architecture diagrams, database model, test plan, screenshots): **[GitHub Pages](https://ikihga2223-create.github.io/MyPlaythrough/)**
+**Project documentation** (defense deck, architecture diagrams, database model, test plan, screenshots): **[GitHub Pages](https://ikihga2223-create.github.io/MyPlaythrough/)** — start with the [defense presentation](https://ikihga2223-create.github.io/MyPlaythrough/defense/).
 
 ---
 
 ## At a glance
 
-| Area | Details |
-|------|---------|
-| **Stack** | PERN — PostgreSQL, Express 5, React 18, Node.js |
-| **Auth** | JWT, bcrypt password hashing, role-based access (`user` / `admin`) |
-| **Security** | Parameterized SQL, CORS, rate-limited auth, 50 KB JSON limit, image proxy allowlist |
-| **UX** | Skeleton loading, accessible skip link, grid/list collection views, onboarding tour |
-| **Social** | Follow users, game recommendations inbox, threaded discussions with Steam-style votes, LFG posts |
-| **DevOps** | Docker Compose for local API + Postgres, `render.yaml` for optional cloud API |
+| Area         | Details                                                                                          |
+| ------------ | ------------------------------------------------------------------------------------------------ |
+| **Stack**    | PERN — PostgreSQL, Express 5, React 18, Node.js                                                  |
+| **Auth**     | JWT, bcrypt password hashing, role-based access (`user` / `admin`)                               |
+| **Security** | Parameterized SQL, CORS, rate-limited auth, 50 KB JSON limit, image proxy allowlist              |
+| **UX**       | Skeleton loading, accessible skip link, grid/list collection views, onboarding tour              |
+| **Social**   | Follow users, game recommendations inbox, threaded discussions with Steam-style votes, LFG posts |
+| **DevOps**   | Docker Compose for local API + Postgres, `render.yaml` for optional cloud API                    |
 
 ---
 
@@ -67,12 +67,12 @@ More captures live in [`docs/screenshots/`](docs/screenshots/) and on [GitHub Pa
 
 ## Tech stack
 
-| Layer | Technology |
-|-------|------------|
+| Layer    | Technology                                       |
+| -------- | ------------------------------------------------ |
 | Frontend | React 18, Vite 7, Tailwind CSS 3, React Router 7 |
-| Backend | Node.js, Express 5, JWT, bcryptjs |
-| Database | PostgreSQL 14+ |
-| Tests | Vitest (client + server) |
+| Backend  | Node.js, Express 5, JWT, bcryptjs                |
+| Database | PostgreSQL 14+                                   |
+| Tests    | Vitest (client + server)                         |
 
 ---
 
@@ -83,6 +83,7 @@ my-playthrough/
 ├── client/          # React SPA (Vite)
 ├── server/          # Express REST API
 ├── docs/            # SQL schema, test plan, HTML diagrams, screenshots
+├── presentation/    # Defense slide deck (built into GitHub Pages)
 └── brand/           # Brand book export
 ```
 
@@ -122,17 +123,17 @@ Or use **Use demo account** on the login screen (requires `seed:demo`).
 
 ## API overview
 
-| Method | Route | Description | Auth |
-|--------|-------|-------------|------|
-| POST | `/api/auth/register` | Create account | — |
-| POST | `/api/auth/login` | Sign in | — |
-| POST | `/api/auth/demo` | Demo sign-in | — |
-| GET | `/api/auth/me` | Current user | ✓ |
-| PATCH | `/api/auth/me` | Update profile | ✓ |
-| CRUD | `/api/games` | Collection | ✓ |
-| GET | `/api/users` | Community members | ✓ |
-| * | `/api/social/*` | Follows, recommendations, LFG | ✓ |
-| * | `/api/admin/*` | Moderation | admin |
+| Method | Route                | Description                   | Auth  |
+| ------ | -------------------- | ----------------------------- | ----- |
+| POST   | `/api/auth/register` | Create account                | —     |
+| POST   | `/api/auth/login`    | Sign in                       | —     |
+| POST   | `/api/auth/demo`     | Demo sign-in                  | —     |
+| GET    | `/api/auth/me`       | Current user                  | ✓     |
+| PATCH  | `/api/auth/me`       | Update profile                | ✓     |
+| CRUD   | `/api/games`         | Collection                    | ✓     |
+| GET    | `/api/users`         | Community members             | ✓     |
+| \*     | `/api/social/*`      | Follows, recommendations, LFG | ✓     |
+| \*     | `/api/admin/*`       | Moderation                    | admin |
 
 Full route definitions live under `server/routes/`.
 
