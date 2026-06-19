@@ -408,7 +408,7 @@ export default function Community() {
                     <th className="p-3 font-semibold">Votes</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="motion-stagger">
                   {stats.map((row) => (
                     <tr
                       key={row.titulo}
@@ -444,7 +444,7 @@ export default function Community() {
               No recent activity. Follow other members to see updates here.
             </div>
           )}
-          <ul className="space-y-3">
+          <ul className="motion-stagger space-y-3">
             {activity.map((row, i) => (
               <li key={`${row.tipo}-${row.en}-${i}`}>
                 <div className="figma-panel px-4 py-3 text-sm">
@@ -577,7 +577,7 @@ export default function Community() {
                 No one has posted a search yet.
               </p>
             )}
-            <ul className="space-y-3">
+            <ul className="motion-stagger space-y-3">
               {lfgList.map((row) => (
                 <li key={row.id}>
                   <div className="figma-panel flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between">
