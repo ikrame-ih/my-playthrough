@@ -345,7 +345,7 @@ def main():
     add_note(
         doc,
         "ANTES DE EMPEZAR: Tener el navegador preparado con la pestaña de la app abierta, "
-        "sesión iniciada como Demo Jurado (demo@myplaythrough.local / Presentacion2026!) "
+        "sesión iniciada como Demo User (demo@myplaythrough.local / Presentacion2026!) "
         "o con otra cuenta con datos. Tener la colección visible. "
         "Si algo falla, sigue hablando con calma y di 'voy a ir a…' sin pánico.",
     )
@@ -642,7 +642,7 @@ def main():
         "(DB_*, JWT_SECRET, CORS_ORIGIN, RAWG_API_KEY opcional), npm run dev en server/ y client/.\n"
         "Datos de demo: npm run seed:presentation (desde server/) — crea 7 usuarios "
         "con contraseña Presentacion2026!. Login rápido en pantalla de auth: botón 'Rellenar cuenta demo' "
-        "→ usa Demo Jurado (demo@myplaythrough.local).\n"
+        "→ usa Demo User (demo@myplaythrough.local).\n"
         "\n"
         "=== DIAPOSITIVAS (orden de la presentación) ===\n"
         "1. Portada — nombre, datos académicos.\n"

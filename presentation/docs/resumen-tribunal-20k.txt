@@ -27,7 +27,7 @@ JWT firmado; bcrypt; CORS_ORIGIN exacto; SQL params; rate limit; proxy imágenes
 presentation/: React+Vite+TS+Tailwind+Motion; PrintDeck estático para PDF.
 
 10) DEMO SEED
-seed:presentation contraseña Presentacion2026! botón Rellenar cuenta demo Demo Jurado.
+seed:presentation contraseña Presentacion2026! botón Rellenar cuenta demo Demo User.
 
 11) GANCHOS
 ¿Mongo? Relacional+constraints. ¿JWT? Stateless API. ¿Proxy? CORS/hotlink. ¿Catálogo? Normalización.
