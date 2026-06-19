@@ -4,9 +4,9 @@
 
 A full-stack web app to manage your personal video game library — track what you are playing, what you have finished, and what is still on your backlog. Optional community features let you follow other players, share recommendations, and find teammates (LFG).
 
-Developed as the **final intermodular project** for the **Higher Technical Degree in Web Application Development (DAW)** at CESUR Málaga Este (2025/2026), **awarded the maximum grade**.
+Developed as the **final intermodular project** for the **Higher Vocational Training programme in Web Application Development** (2025/2026), **awarded the maximum grade**.
 
-**Project documentation** (animated defense deck, architecture diagrams, database model, test plan, screenshots): **[GitHub Pages](https://ikrame-ih.github.io/my-playthrough/)** — start with the [defense presentation](https://ikrame-ih.github.io/my-playthrough/defense/) (arrow keys / space to navigate; animations included).
+**Project documentation** (animated project defense deck, architecture diagrams, database model, test plan, screenshots): **[GitHub Pages](https://ikrame-ih.github.io/my-playthrough/)** — start with the [project defense presentation](https://ikrame-ih.github.io/my-playthrough/defense/) (arrow keys / space; animations included).
 
 ---
 

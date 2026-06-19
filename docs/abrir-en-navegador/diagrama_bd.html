@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MyPlaythrough — Diagrama lógico de base de datos</title>
+    <title>MyPlaythrough — Logical database diagram</title>
     <style>
       :root {
         --bg: #0b1120;
@@ -260,53 +260,53 @@
       <button
         type="button"
         id="btn-download-html"
-        aria-label="Descargar este diagrama como archivo HTML"
+        aria-label="Download this diagram as an HTML file"
       >
-        Descargar HTML
+        Download HTML
       </button>
       <span class="hint">
-        Descarga: copia del HTML de esta página. En GitHub, la vista
-        <strong>Raw</strong> muestra el mismo contenido como página
-        independiente.
+        Download: a copy of this page's HTML. On GitHub, the
+        <strong>Raw</strong> view shows the same content as a standalone
+        page.
       </span>
     </div>
     <p class="doc-nav">
       <a href="../index.html">Docs home</a>
-      <a href="flujo_pern_tres_capas.html">Arquitectura PERN (flujo)</a>
-      <a href="funciones_principales.html">Funciones en código</a>
-      <a href="plan_pruebas.html">Plan de pruebas (HTML)</a>
+      <a href="diagrama_bd.html">Database diagram</a>
+      <a href="flujo_pern_tres_capas.html">PERN architecture (flow)</a>
+      <a href="funciones_principales.html">Key functions</a>
+      <a href="plan_pruebas.html">Test plan (HTML)</a>
       <a href="../test-plan.md">Test plan (Markdown)</a>
     </p>
-    <h1>Modelo lógico — base de datos</h1>
+    <h1>Logical model — database</h1>
     <p class="sub">
-      Lo mismo que <code>docs/sql/schema.sql</code>, en página: el modelo actual
-      son <strong>ocho tablas</strong> (<code>usuarios</code>,
+      The same content as <code>docs/sql/schema.sql</code>, on a page: the
+      current model has <strong>eight tables</strong> (<code>usuarios</code>,
       <code>catalogo_juegos</code>, <code>juegos</code>,
       <code>juego_comentarios</code>, <code>juego_comentario_votos</code>,
       <code>usuario_seguimientos</code>, <code>juego_recomendaciones</code>,
-      <code>lfg_publicaciones</code>). Tres dibujos para que las flechas no se
-      amontonen; abajo, la tabla de relaciones y el listado de columnas cuentan
-      el detalle (incluida la cardinalidad en palabras, sin números encima del
-      SVG).
+      <code>lfg_publicaciones</code>). Three diagrams so arrows do not pile up;
+      below, the relationships table and column listing provide the detail
+      (including cardinality in words, without numbers on the SVG).
     </p>
 
-    <div class="legend" aria-label="Leyenda">
-      <span><span class="dot-pk" aria-hidden></span> Clave primaria (PK)</span>
+    <div class="legend" aria-label="Legend">
+      <span><span class="dot-pk" aria-hidden></span> Primary key (PK)</span>
       <span
-        ><span class="dot-fk" aria-hidden></span> Clave foránea (FK): enlaza con
-        otra tabla</span
+        ><span class="dot-fk" aria-hidden></span> Foreign key (FK): links to
+        another table</span
       >
       <span
-        >Las flechas marcan dependencias; <strong>1:N</strong> y casos raros
-        están en la tabla de relaciones.</span
+        >Arrows mark dependencies; <strong>1:N</strong> and edge cases are in
+        the relationships table.</span
       >
     </div>
 
     <div class="diagram-wrap">
       <div class="diagram-fig">
         <h3>
-          1. Núcleo de la aplicación (quién es el dueño y de dónde sale el
-          título oficial)
+          1. Application core (who owns entries and where the official title
+          comes from)
         </h3>
         <svg
           viewBox="0 0 460 150"
@@ -403,15 +403,15 @@
           />
         </svg>
         <p class="diagram-caption">
-          Un usuario puede tener muchas fichas en <code>juegos</code>; una fila
-          de <code>catalogo_juegos</code> puede enlazar muchas fichas cuando
-          llevan <code>catalogo_id</code>.
+          One user can have many entries in <code>juegos</code>; one row in
+          <code>catalogo_juegos</code> can link many entries when they carry
+          <code>catalogo_id</code>.
         </p>
       </div>
       <div class="diagram-fig">
         <h3>
-          2. Discusión en una ficha (comentarios enlazan a juego y autor; votos
-          enlazan a comentario y votante)
+          2. Discussion on an entry (comments link to game and author; votes
+          link to comment and voter)
         </h3>
         <svg
           viewBox="0 0 520 210"
@@ -533,12 +533,12 @@
           />
         </svg>
         <p class="diagram-caption">
-          Cada comentario pertenece a un juego y a un autor; cada voto une un
-          comentario con quien vota.
+          Each comment belongs to a game and an author; each vote links a comment
+          to the person who voted.
         </p>
       </div>
       <div class="diagram-fig">
-        <h3>3. Red social (seguidos, recomendaciones, buscar grupo / LFG)</h3>
+        <h3>3. Social network (follows, recommendations, find group / LFG)</h3>
         <svg
           viewBox="0 0 560 248"
           xmlns="http://www.w3.org/2000/svg"
@@ -693,29 +693,29 @@
           />
         </svg>
         <p class="diagram-caption">
-          Cada tabla de la derecha guarda filas que enlazan
-          <code>usuarios</code> y, cuando aplica, un <code>juego</code> (por
-          ejemplo una recomendación o un LFG asociado a una ficha).
+          Each table on the right stores rows linking <code>usuarios</code> and,
+          where applicable, a <code>juego</code> (for example a recommendation
+          or an LFG tied to an entry).
         </p>
       </div>
     </div>
 
     <h2 class="section">
-      Relaciones (clave foránea → tabla destino) y cardinalidad
+      Relationships (foreign key → target table) and cardinality
     </h2>
     <p class="sub" style="margin-bottom: 1rem">
-      La columna <strong>Cardinalidad</strong> lo dice en una frase (un usuario,
-      muchas fichas…). Donde pone <strong>M:N</strong>, la relación entre
-      usuarios pasa por una tabla intermedia (cada fila es un par
-      seguidor→seguido).
+      The <strong>Cardinality</strong> column states it in one sentence (one
+      user, many entries…). Where it says <strong>M:N</strong>, the relationship
+      between users goes through a junction table (each row is a
+      follower→followed pair).
     </p>
     <table class="fk-matrix">
       <thead>
         <tr>
-          <th>Tabla (hijo)</th>
-          <th>Columna FK</th>
-          <th>Apunta a (padre)</th>
-          <th>Cardinalidad</th>
+          <th>Table (child)</th>
+          <th>FK column</th>
+          <th>Points to (parent)</th>
+          <th>Cardinality</th>
         </tr>
       </thead>
       <tbody>
@@ -723,80 +723,80 @@
           <td>juegos</td>
           <td><code>usuario_id</code></td>
           <td><code>usuarios(id)</code></td>
-          <td>1 usuario : N juegos</td>
+          <td>1 user : N games</td>
         </tr>
         <tr>
           <td>juegos</td>
           <td><code>catalogo_id</code></td>
           <td><code>catalogo_juegos(id)</code></td>
-          <td>1 entrada catálogo : N juegos (FK opcional)</td>
+          <td>1 catalog entry : N games (optional FK)</td>
         </tr>
         <tr>
           <td>juego_comentarios</td>
           <td><code>juego_id</code></td>
           <td><code>juegos(id)</code></td>
-          <td>1 juego : N comentarios</td>
+          <td>1 game : N comments</td>
         </tr>
         <tr>
           <td>juego_comentarios</td>
           <td><code>usuario_id</code></td>
           <td><code>usuarios(id)</code></td>
-          <td>1 usuario : N comentarios</td>
+          <td>1 user : N comments</td>
         </tr>
         <tr>
           <td>juego_comentarios</td>
           <td><code>parent_id</code></td>
-          <td><code>juego_comentarios(id)</code> (respuesta en hilo)</td>
-          <td>1 comentario raíz : N respuestas</td>
+          <td><code>juego_comentarios(id)</code> (thread reply)</td>
+          <td>1 root comment : N replies</td>
         </tr>
         <tr>
           <td>juego_comentario_votos</td>
           <td><code>comentario_id</code></td>
           <td><code>juego_comentarios(id)</code></td>
-          <td>1 comentario : N votos (usuarios distintos)</td>
+          <td>1 comment : N votes (distinct users)</td>
         </tr>
         <tr>
           <td>juego_comentario_votos</td>
           <td><code>usuario_id</code></td>
           <td><code>usuarios(id)</code></td>
-          <td>1 usuario : N votos (en comentarios distintos)</td>
+          <td>1 user : N votes (on distinct comments)</td>
         </tr>
         <tr>
           <td>usuario_seguimientos</td>
           <td><code>seguidor_id</code>, <code>seguido_id</code></td>
-          <td><code>usuarios(id)</code> (dos veces)</td>
-          <td>M:N usuarios vía filas; cada fila es un par seguidor→seguido</td>
+          <td><code>usuarios(id)</code> (twice)</td>
+          <td>M:N users via rows; each row is a follower→followed pair</td>
         </tr>
         <tr>
           <td>juego_recomendaciones</td>
           <td><code>remitente_id</code>, <code>destinatario_id</code></td>
           <td><code>usuarios(id)</code></td>
-          <td>1 remitente o destinatario : N filas de recomendación</td>
+          <td>1 sender or recipient : N recommendation rows</td>
         </tr>
         <tr>
           <td>juego_recomendaciones</td>
           <td><code>juego_id</code></td>
-          <td><code>juegos(id)</code> (ficha del remitente)</td>
+          <td><code>juegos(id)</code> (sender's entry)</td>
           <td>
-            1 juego (ficha remitente) : N envíos a distintos destinatarios
+            1 game (sender's entry) : N sends to distinct recipients
           </td>
         </tr>
         <tr>
           <td>lfg_publicaciones</td>
           <td><code>usuario_id</code></td>
           <td><code>usuarios(id)</code></td>
-          <td>1 usuario : N publicaciones LFG</td>
+          <td>1 user : N LFG posts</td>
         </tr>
         <tr>
           <td>lfg_publicaciones</td>
           <td><code>juego_id</code></td>
           <td><code>juegos(id)</code></td>
-          <td>1 juego : N publicaciones LFG</td>
+          <td>1 game : N LFG posts</td>
         </tr>
       </tbody>
     </table>
 
-    <h2 class="section">Detalle de columnas por tabla</h2>
+    <h2 class="section">Column detail by table</h2>
     <div class="grid">
       <table>
         <caption>
@@ -821,7 +821,7 @@
           </tr>
           <tr>
             <th>rol</th>
-            <td>VARCHAR(50) NOT NULL DEFAULT 'user' (CHECK: 'user' o 'admin')</td>
+            <td>VARCHAR(50) NOT NULL DEFAULT 'user' (CHECK: 'user' or 'admin')</td>
           </tr>
           <tr>
             <th>avatar_id</th>
@@ -937,7 +937,7 @@
           </tr>
           <tr>
             <th class="fk">parent_id</th>
-            <td>FK → juego_comentarios(id) CASCADE (NULL si es raíz del hilo)</td>
+            <td>FK → juego_comentarios(id) CASCADE (NULL if thread root)</td>
           </tr>
           <tr>
             <th>cuerpo</th>
@@ -957,15 +957,15 @@
         <tbody>
           <tr>
             <th class="fk">comentario_id</th>
-            <td>FK → juego_comentarios(id) CASCADE (PK compuesta)</td>
+            <td>FK → juego_comentarios(id) CASCADE (composite PK)</td>
           </tr>
           <tr>
             <th class="fk">usuario_id</th>
-            <td>FK → usuarios(id) CASCADE (PK compuesta)</td>
+            <td>FK → usuarios(id) CASCADE (composite PK)</td>
           </tr>
           <tr>
             <th>valor</th>
-            <td>SMALLINT −1 o 1</td>
+            <td>SMALLINT −1 or 1</td>
           </tr>
         </tbody>
       </table>
@@ -993,7 +993,7 @@
           </tr>
           <tr>
             <th>—</th>
-            <td>UNIQUE(seguidor_id, seguido_id); CHECK distintos</td>
+            <td>UNIQUE(seguidor_id, seguido_id); CHECK distinct</td>
           </tr>
         </tbody>
       </table>
@@ -1017,11 +1017,11 @@
           </tr>
           <tr>
             <th class="fk">juego_id</th>
-            <td>FK → juegos(id) CASCADE (ficha del remitente)</td>
+            <td>FK → juegos(id) CASCADE (sender's entry)</td>
           </tr>
           <tr>
             <th>mensaje</th>
-            <td>TEXT opcional (≤500)</td>
+            <td>TEXT optional (≤500)</td>
           </tr>
           <tr>
             <th>leida</th>
@@ -1053,7 +1053,7 @@
           </tr>
           <tr>
             <th>modo</th>
-            <td>online | coop_local | otro</td>
+            <td>online | coop_local | other</td>
           </tr>
           <tr>
             <th>mensaje</th>
@@ -1091,7 +1091,7 @@
               URL.revokeObjectURL(url);
             }, 1500);
           } catch (e) {
-            alert("Descarga automática no disponible en este entorno.");
+            alert("Automatic download is not available in this environment.");
           }
         });
       })();

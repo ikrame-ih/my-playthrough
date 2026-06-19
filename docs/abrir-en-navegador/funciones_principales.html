@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>
-      Funciones de código — MyPlaythrough (temario de apoyo y referencias)
+      Key functions — MyPlaythrough (support syllabus and references)
     </title>
     <style>
       :root {
@@ -245,204 +245,202 @@
       <button
         type="button"
         id="btn-print"
-        aria-label="Imprimir o guardar como PDF"
+        aria-label="Print or save as PDF"
       >
-        Imprimir / PDF
+        Print / PDF
       </button>
     </div>
     <p class="doc-nav">
       <a href="../index.html">Docs home</a>
-      <a href="diagrama_bd.html">Diagrama BD</a>
-      <a href="flujo_pern_tres_capas.html">Arquitectura PERN (flujo)</a>
-      <a href="plan_pruebas.html">Plan de pruebas</a>
+      <a href="diagrama_bd.html">Database diagram</a>
+      <a href="flujo_pern_tres_capas.html">PERN architecture (flow)</a>
+      <a href="funciones_principales.html">Key functions</a>
+      <a href="plan_pruebas.html">Test plan (HTML)</a>
+      <a href="../test-plan.md">Test plan (Markdown)</a>
     </p>
 
-    <h1>Funciones de código y temario de apoyo</h1>
-    <p class="byline">Ikrame Ibn Hayoun · DAW · CESUR Málaga Este</p>
+    <h1>Key functions and support syllabus</h1>
+    <p class="byline">Ikrame Ibn Hayoun · Web Application Development · 2025/2026</p>
     <p class="lead">
-      Primero van unos <strong>conceptos de apoyo</strong> (HTTP, JWT,
-      middleware…) que <strong>ya se han visto durante el ciclo</strong>; aquí
-      los resumo en corto para que encaje con lo que viene después. Luego está
-      el <strong>detalle del proyecto por ficheros</strong> (funciones concretas
-      y su ruta en el repositorio). Para ir directo a eso, usa el índice: la
-      entrada en <strong style="color: var(--toc-temario)">tono dorado</strong>
-      es el temario; las numeradas (1–7) van en
-      <strong style="color: var(--toc-code)">violeta / magenta</strong>.
+      First come some <strong>support concepts</strong> (HTTP, JWT,
+      middleware…) that <strong>were already covered during the programme</strong>;
+      here I summarise them briefly so they fit with what follows. Then comes
+      the <strong>project detail by file</strong> (specific functions and their
+      path in the repository). To jump straight to that, use the table of
+      contents: the entry in <strong style="color: var(--toc-temario)">gold
+      tone</strong> is the syllabus; the numbered items (1–7) are in
+      <strong style="color: var(--toc-code)">violet / magenta</strong>.
     </p>
 
-    <nav class="toc" aria-label="Índice del documento">
-      <h2>Índice</h2>
+    <nav class="toc" aria-label="Document table of contents">
+      <h2>Table of contents</h2>
       <ul>
         <li>
           <a class="toc-temario" href="#temario"
-            >Temario de apoyo (conceptos transversales)</a
+            >Support syllabus (cross-cutting concepts)</a
           >
         </li>
         <li>
           <a class="toc-code" href="#auth"
-            >1. Autenticación: token y comprobación por petición</a
+            >1. Authentication: token and per-request verification</a
           >
         </li>
         <li>
           <a class="toc-code" href="#cliente"
-            >2. Cliente: cabeceras y tratamiento del 401</a
+            >2. Client: headers and 401 handling</a
           >
         </li>
         <li>
           <a class="toc-code" href="#normalize"
-            >3. Normalización de datos antes de guardar</a
+            >3. Data normalisation before saving</a
           >
         </li>
         <li>
           <a class="toc-code" href="#coleccion"
-            >4. Colección, SQL reutilizable y carátulas (CORS)</a
+            >4. Collection, reusable SQL and covers (CORS)</a
           >
         </li>
         <li>
           <a class="toc-code" href="#discusion"
-            >5. Discusión: agrupar comentarios y votar</a
+            >5. Discussion: grouping comments and voting</a
           >
         </li>
         <li>
           <a class="toc-code" href="#campana"
-            >6. Campana de recomendaciones (sin WebSockets)</a
+            >6. Recommendation bell (without WebSockets)</a
           >
         </li>
         <li>
           <a class="toc-code" href="#esfuerzo"
-            >7. Partes del proyecto que más tiempo llevaron</a
+            >7. Project parts that took the most time</a
           >
         </li>
       </ul>
     </nav>
 
-    <h2 id="temario">Temario de apoyo: lo que cruza el login y la API</h2>
+    <h2 id="temario">Support syllabus: what spans login and the API</h2>
 
     <div class="gloss">
-      <h3>Petición HTTP y códigos de respuesta</h3>
+      <h3>HTTP request and response status codes</h3>
       <p>
-        Cada vez que el navegador (o Thunder Client) llama a la API, el servidor
-        contesta con un <strong>número de estado</strong>. Los que más uso en
-        este proyecto son:
+        Every time the browser (or Thunder Client) calls the API, the server
+        responds with a <strong>status number</strong>. The ones I use most in
+        this project are:
       </p>
       <ul>
         <li>
-          <strong>200</strong> (y 201): todo fue bien; el cuerpo de la respuesta
-          trae datos JSON.
+          <strong>200</strong> (and 201): everything went well; the response body
+          carries JSON data.
         </li>
         <li>
-          <strong>400</strong>: la petición estaba mal formada o faltaban datos
-          (validación).
+          <strong>400</strong>: the request was malformed or data was missing
+          (validation).
         </li>
         <li>
-          <strong>401 Unauthorized</strong>: el servidor
-          <strong>no puede identificar al usuario</strong> con lo enviado en la
-          petición. Típico: no hay token, el token está caducado o la firma no
-          cuadra. No equivale a “sin permiso de rol”; en la práctica significa
-          identidad no válida o ausente.
+          <strong>401 Unauthorized</strong>: the server
+          <strong>cannot identify the user</strong> from what was sent in the
+          request. Typical cases: no token, expired token, or signature mismatch.
+          It does not mean “no role permission”; in practice it means invalid or
+          absent identity.
         </li>
         <li>
-          <strong>403 Forbidden</strong>: el servidor
-          <strong>identifica al usuario</strong> (token válido), pero
-          <strong>esa identidad no puede realizar la acción solicitada</strong>.
-          Ejemplo: usuario normal en rutas de administración.
+          <strong>403 Forbidden</strong>: the server
+          <strong>identifies the user</strong> (valid token), but
+          <strong>that identity cannot perform the requested action</strong>.
+          Example: a normal user on admin routes.
         </li>
-        <li><strong>404</strong>: recurso no encontrado.</li>
+        <li><strong>404</strong>: resource not found.</li>
         <li>
-          <strong>500</strong>: error interno del servidor (bug o fallo de base
-          de datos).
+          <strong>500</strong>: internal server error (bug or database failure).
         </li>
       </ul>
       <p>
-        <strong>Criterio útil:</strong> 401 = identidad no válida o ausente; 403
-        = identidad reconocida, acción no permitida.
+        <strong>Useful rule:</strong> 401 = invalid or absent identity; 403 =
+        recognised identity, action not allowed.
       </p>
     </div>
 
     <div class="gloss">
-      <h3>JWT (JSON Web Token): qué es y qué es el payload</h3>
+      <h3>JWT (JSON Web Token): what it is and what the payload is</h3>
       <p>
-        Un <strong>JWT</strong> es un
-        <strong>texto largo en una sola cadena</strong> que el servidor genera
-        cuando el login o el registro salen bien. Se ve como tres trozos
-        separados por puntos (<code>xxxxx.yyyyy.zzzzz</code>). No es la
-        contraseña del usuario: es un <strong>recibo firmado</strong> que dice,
-        en la práctica, “quien enseñe esto es la persona con id X, email Y, rol
-        Z”, durante un tiempo limitado.
+        A <strong>JWT</strong> is a
+        <strong>long single string</strong> that the server generates when login
+        or registration succeeds. It looks like three chunks separated by dots
+        (<code>xxxxx.yyyyy.zzzzz</code>). It is not the user's password: it is a
+        <strong>signed receipt</strong> that says, in practice, “whoever shows
+        this is the person with id X, email Y, role Z”, for a limited time.
       </p>
       <p>
-        La parte central (el <strong>payload</strong>) lleva datos en JSON
-        codificados (por ejemplo <code>id</code>, <code>email</code>,
-        <code>rol</code>). Cualquiera puede <em>leer</em> esa parte si
-        decodifica el Base64 (no es cifrado total), pero
-        <strong>no puede falsificarla</strong> sin conocer el secreto del
-        servidor, porque la tercera parte es la <strong>firma</strong>.
+        The middle part (the <strong>payload</strong>) carries JSON-encoded data
+        (for example <code>id</code>, <code>email</code>, <code>rol</code>).
+        Anyone can <em>read</em> that part by decoding the Base64 (it is not
+        fully encrypted), but <strong>cannot forge it</strong> without knowing
+        the server secret, because the third part is the <strong>signature</strong>.
       </p>
       <p>
-        <strong>JWT_SECRET</strong> (en el <code>.env</code>) es la “clave
-        maestra” solo del servidor: con ella se <strong>firma</strong> el token
-        al crearlo y se <strong>verifica</strong> al recibirlo. Por eso en la
-        documentación se denomina <strong>secreto</strong>: si alguien lo
-        obtiene, podría fabricar tokens falsos. No se sube a Git ni se envía al
-        navegador.
+        <strong>JWT_SECRET</strong> (in <code>.env</code>) is the server's
+        “master key” only: with it the token is <strong>signed</strong> when
+        created and <strong>verified</strong> when received. That is why
+        documentation calls it a <strong>secret</strong>: if someone obtains it,
+        they could fabricate fake tokens. It is not committed to Git or sent to
+        the browser.
       </p>
     </div>
 
     <div class="gloss">
-      <h3>Sesión “sin guardar sesiones” en el servidor</h3>
+      <h3>Session “without storing sessions” on the server</h3>
       <p>
-        Otra forma habitual de login es que el servidor guarde en memoria o en
-        base de datos una tabla de sesiones (“usuario 7 conectado con id de
-        sesión S”). En este proyecto no hace falta esa tabla para el día a día:
-        se usa el <strong>JWT</strong> que el cliente guarda (en
-        <code>localStorage</code>) y envía en cada petición. El servidor solo
-        tiene que <strong>verificar la firma</strong> y la caducidad:
+        Another common login approach is for the server to store sessions in
+        memory or in a database table (“user 7 connected with session id S”). In
+        this project that table is not needed day to day: the
+        <strong>JWT</strong> that the client stores (in
+        <code>localStorage</code>) and sends on each request is used. The server
+        only has to <strong>verify the signature</strong> and expiry:
         <strong
-          >identidad en cada petición sin almacenar en servidor la lista de
-          sesiones activas</strong
+          >identity on every request without storing an active session list on
+          the server</strong
         >.
       </p>
     </div>
 
     <div class="gloss">
-      <h3>Cabecera <code>Authorization: Bearer …</code></h3>
+      <h3>Header <code>Authorization: Bearer …</code></h3>
       <p>
-        Es el <strong>formato estándar</strong> acordado en la web para mandar
-        un token junto a la petición. La cabecera se llama
-        <code>Authorization</code>; el valor empieza por la palabra
-        <strong>Bearer</strong>, un espacio, y después el JWT completo. Ejemplo:
+        This is the <strong>standard format</strong> agreed on the web for
+        sending a token with a request. The header is called
+        <code>Authorization</code>; the value starts with the word
+        <strong>Bearer</strong>, a space, and then the full JWT. Example:
         <code>Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…</code
-        >. La función <code>authHeaders()</code> en el cliente monta ese formato
-        cuando hay token guardado.
+        >. The <code>authHeaders()</code> function on the client builds that
+        format when a token is stored.
       </p>
     </div>
 
     <div class="gloss">
-      <h3>Middleware en Express</h3>
+      <h3>Middleware in Express</h3>
       <p>
-        En Express, un <strong>middleware</strong> es una función que corre
-        <strong>antes</strong> de la ruta que hace el trabajo (por ejemplo antes
-        de listar juegos). Puede leer cabeceras, cortar con 401 o llamar a
-        <code>next()</code> para seguir. <code>authMiddleware</code> hace de
-        “portero”: sin JWT válido no pasas en las rutas privadas.
+        In Express, <strong>middleware</strong> is a function that runs
+        <strong>before</strong> the route that does the work (for example before
+        listing games). It can read headers, stop with 401, or call
+        <code>next()</code> to continue. <code>authMiddleware</code> acts as a
+        “bouncer”: without a valid JWT you do not pass on private routes.
       </p>
     </div>
 
     <div class="gloss">
-      <h3>Por qué trato el 401 en el cliente con <code>apiFetch</code></h3>
+      <h3>Why I handle 401 on the client with <code>apiFetch</code></h3>
       <p>
-        Si el token caducó, cualquier ruta protegida puede devolver
-        <strong>401</strong>. Si no hago nada en el cliente, la interfaz
-        seguiría mostrando al usuario como registrado aunque el servidor ya no
-        lo acepte. Por eso lo centralicé: si la respuesta es 401,
-        <strong>borro token y usuario del <code>localStorage</code></strong> y
-        <strong>recargo la página</strong> para volver al login con estado
-        limpio.
+        If the token expired, any protected route can return
+        <strong>401</strong>. If I do nothing on the client, the interface would
+        still show the user as logged in even though the server no longer accepts
+        them. That is why I centralised it: if the response is 401,
+        <strong>clear token and user from <code>localStorage</code></strong> and
+        <strong>reload the page</strong> to return to login with a clean state.
       </p>
     </div>
 
     <h2 id="auth">
-      1. Autenticación: crear el token y comprobarlo en cada petición
+      1. Authentication: creating the token and verifying it on each request
     </h2>
 
     <div class="card">
@@ -450,20 +448,19 @@
         >server/middleware/auth.middleware.js →
         <code>createToken(user)</code></span
       >
-      <p class="prob">Qué problema resolvía</p>
+      <p class="prob">What problem it solved</p>
       <p>
-        Tras un login o registro correcto, el backend entrega al cliente una
-        forma <strong>portátil</strong> de demostrar la identidad en las
-        siguientes peticiones, sin mantener una tabla de sesiones en servidor
-        para cada conexión (el modelo JWT está descrito en el bloque de temario
-        anterior).
+        After a successful login or registration, the backend gives the client a
+        <strong>portable</strong> way to prove identity on subsequent requests,
+        without maintaining a server-side session table for each connection (the
+        JWT model is described in the support syllabus above).
       </p>
       <p>
-        <strong>Qué hace la función:</strong> usa <code>jwt.sign</code> para
-        generar un JWT cuyo <strong>payload</strong> incluye <code>id</code>,
-        <code>email</code> y <code>rol</code>, firmado con
-        <code>JWT_SECRET</code> y con caducidad de 7 días. Ese string es el que
-        el navegador guarda y reenvía en <code>Authorization: Bearer …</code>.
+        <strong>What the function does:</strong> uses <code>jwt.sign</code> to
+        generate a JWT whose <strong>payload</strong> includes <code>id</code>,
+        <code>email</code> and <code>rol</code>, signed with
+        <code>JWT_SECRET</code> and expiring in 7 days. That string is what the
+        browser stores and resends in <code>Authorization: Bearer …</code>.
       </p>
       <pre><code>jwt.sign(
   { id: user.id, email: user.email, rol: user.rol || "user" },
@@ -471,14 +468,15 @@
   { expiresIn: "7d" },
 );</code></pre>
       <p>
-        <strong>Nota:</strong> el payload del JWT sirve al cliente para menús y
-        UI, pero para acciones sensibles (p. ej. administración) el servidor
-        vuelve a leer el rol en base de datos cuando procede, porque el token
-        puede quedar desactualizado.
+        <strong>Note:</strong> the JWT payload helps the client with menus and
+        UI, but for sensitive actions (e.g. administration) the server reads the
+        role from the database when needed, because the token can become
+        outdated.
       </p>
       <p>
-        <span class="dif dif-media">Media</span> Configurar bien variables de
-        entorno y no confundir “datos en el token” con “permisos definitivos”.
+        <span class="dif dif-media">Medium</span> Configure environment variables
+        correctly and do not confuse “data in the token” with “definitive
+        permissions”.
       </p>
     </div>
 
@@ -487,134 +485,132 @@
         >server/middleware/auth.middleware.js →
         <code>authMiddleware</code></span
       >
-      <p class="prob">Qué problema resolvía</p>
+      <p class="prob">What problem it solved</p>
       <p>
-        Sin este middleware, cada ruta repetiría el mismo código: leer
-        <code>Authorization</code>, comprobar el prefijo <code>Bearer</code>,
-        extraer el token, <code>jwt.verify</code> y responder con JSON de error
-        si falla algo.
+        Without this middleware, each route would repeat the same code: read
+        <code>Authorization</code>, check the <code>Bearer</code> prefix,
+        extract the token, <code>jwt.verify</code>, and respond with a JSON error
+        if something fails.
       </p>
       <p>
-        <strong>Qué hace:</strong> es el <strong>middleware</strong> que
-        encapsula todo eso: si el token es válido, rellena
-        <code>req.user</code> con lo que venía en el payload; si no, responde
-        <strong>401</strong> con un mensaje claro.
+        <strong>What it does:</strong> it is the <strong>middleware</strong> that
+        wraps all of that: if the token is valid, it fills <code>req.user</code>
+        with what came in the payload; if not, it responds with
+        <strong>401</strong> and a clear message.
       </p>
       <p>
-        <span class="dif dif-baja">Baja</span> Patrón muy documentado en
-        Express; lo importante es encadenarlo bien en el router.
+        <span class="dif dif-baja">Low</span> A well-documented Express pattern;
+        the important part is chaining it correctly on the router.
       </p>
     </div>
 
     <div class="card">
       <span class="path"
         >server/middleware/auth.middleware.js →
-        <code>usuarioEsAdmin(usuarioId)</code> y
+        <code>usuarioEsAdmin(usuarioId)</code> and
         <code>adminMiddleware</code></span
       >
-      <p class="prob">Qué problema resolvía</p>
+      <p class="prob">What problem it solved</p>
       <p>
-        El JWT puede haberse emitido <strong>antes</strong> de un cambio de rol
-        en base de datos. No basta con leer <code>rol</code> solo del payload si
-        se exige certeza sobre quién es administrador en el momento de la
-        petición.
+        The JWT may have been issued <strong>before</strong> a role change in the
+        database. It is not enough to read <code>rol</code> only from the payload
+        when certainty about who is an administrator at request time is required.
       </p>
       <p>
-        <strong>Qué hace:</strong> <code>usuarioEsAdmin</code> ejecuta
+        <strong>What it does:</strong> <code>usuarioEsAdmin</code> runs
         <code>SELECT rol FROM usuarios WHERE id = $1</code>.
-        <code>adminMiddleware</code> va <strong>después</strong> de
-        <code>authMiddleware</code> y, si el rol en BD no es admin, responde
-        <strong>403</strong> (aquí sí: identidad conocida, acción no permitida).
+        <code>adminMiddleware</code> goes <strong>after</strong>
+        <code>authMiddleware</code> and, if the DB role is not admin, responds
+        with <strong>403</strong> (here: known identity, action not allowed).
       </p>
       <p>
-        <span class="dif dif-media">Media</span> Mantener claros los mensajes y
-        no mezclar 401 con 403.
+        <span class="dif dif-media">Medium</span> Keep messages clear and do not
+        mix up 401 with 403.
       </p>
     </div>
 
-    <h2 id="cliente">2. Cliente: cabeceras y un solo sitio para el 401</h2>
+    <h2 id="cliente">2. Client: headers and a single place for 401</h2>
 
     <div class="card">
       <span class="path"
         >client/src/api.js → <code>authHeaders()</code> y
         <code>apiFetch(url, opts)</code></span
       >
-      <p class="prob">Qué problema resolvía</p>
+      <p class="prob">What problem it solved</p>
       <p>
-        Sin capa común, cada componente repetiría cómo montar JSON y el
-        <code>Bearer</code>, y el mismo <code>if (res.status === 401)</code> en
-        múltiples sitios.
+        Without a common layer, each component would repeat how to build JSON and
+        the <code>Bearer</code> header, and the same <code>if (res.status === 401)</code>
+        in multiple places.
       </p>
       <p>
-        <strong>Qué hace:</strong> <code>authHeaders</code> devuelve
-        <code>Content-Type: application/json</code> y, si existe token en
-        <code>localStorage</code>, la cabecera
-        <code>Authorization: Bearer …</code>. <code>apiFetch</code> envuelve a
-        <code>fetch</code> y, si la respuesta es 401, limpia almacenamiento y
-        recarga (comportamiento descrito en el apartado de temario sobre el
-        401).
+        <strong>What it does:</strong> <code>authHeaders</code> returns
+        <code>Content-Type: application/json</code> and, if a token exists in
+        <code>localStorage</code>, the
+        <code>Authorization: Bearer …</code> header. <code>apiFetch</code> wraps
+        <code>fetch</code> and, if the response is 401, clears storage and
+        reloads (behaviour described in the syllabus section on 401).
       </p>
       <pre><code>if (res.status === 401) {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
   window.location.reload();
-  throw new Error("Sesión expirada");
+  throw new Error("Session expired");
 }</code></pre>
       <p>
-        <span class="dif dif-media">Media</span> Un solo lugar donde mantener el
-        comportamiento ante sesión caducada.
+        <span class="dif dif-media">Medium</span> A single place to maintain
+        behaviour when the session has expired.
       </p>
     </div>
 
-    <h2 id="normalize">3. Normalización de datos antes de guardar</h2>
+    <h2 id="normalize">3. Data normalisation before saving</h2>
 
     <div class="card">
       <span class="path">server/utils/normalize.js</span>
-      <p class="prob">Qué problema resolvía</p>
+      <p class="prob">What problem it solved</p>
       <p>
-        La misma dirección escrita como <code>Usuario@Gmail.com</code> y como
-        <code>usuario@gmail.com</code>, sin normalizar, la base de datos la
-        trataría como dos correos distintos.
+        The same address written as <code>Usuario@Gmail.com</code> and as
+        <code>usuario@gmail.com</code>, without normalising, would be treated by
+        the database as two different emails.
       </p>
       <p>
-        <strong>Qué hace:</strong> funciones <strong>puras</strong> (sin tocar
-        base de datos) que unifican emails, títulos y estados; se usan en rutas
-        y están cubiertas por tests en <code>normalize.test.js</code>.
+        <strong>What it does:</strong> <strong>pure</strong> functions (no
+        database access) that unify emails, titles and statuses; used in routes
+        and covered by tests in <code>normalize.test.js</code>.
       </p>
       <p>
-        <span class="dif dif-baja">Baja</span>–<span class="dif dif-media"
-          >Media</span
+        <span class="dif dif-baja">Low</span>–<span class="dif dif-media"
+          >Medium</span
         >
-        La dificultad está en no duplicar reglas entre cliente y servidor.
+        The difficulty is not duplicating rules between client and server.
       </p>
     </div>
 
-    <h2 id="coleccion">4. Colección, SQL reutilizable y carátulas (CORS)</h2>
+    <h2 id="coleccion">4. Collection, reusable SQL and covers (CORS)</h2>
 
     <div class="card">
       <span class="path"
         >server/utils/queries.js →
         <code>queryGamesListForUser(usuarioId)</code></span
       >
-      <p class="prob">Qué problema resolvía</p>
+      <p class="prob">What problem it solved</p>
       <p>
-        Un único lugar con el <code>LEFT JOIN</code> al catálogo evita repetir
-        la consulta en cada ruta y centraliza título e imagen oficiales cuando
-        la ficha está enlazada.
+        A single place with the <code>LEFT JOIN</code> to the catalog avoids
+        repeating the query on each route and centralises official title and image
+        when the entry is linked.
       </p>
       <p>
-        <strong>Qué hace:</strong> un <code>SELECT</code> con
-        <code>COALESCE</code>: en castellano, “si el catálogo tiene título,
-        úsalo; si no, el de la ficha del usuario”. Igual para la URL de imagen.
+        <strong>What it does:</strong> a <code>SELECT</code> with
+        <code>COALESCE</code>: in plain terms, “if the catalog has a title, use
+        it; otherwise use the user's entry title”. Same for the image URL.
       </p>
       <p>
-        <strong><code>COALESCE(a,b)</code></strong> devuelve el primer valor que
-        no sea nulo; aquí prioriza datos del catálogo sin descartar lo
-        introducido a mano.
+        <strong><code>COALESCE(a,b)</code></strong> returns the first non-null
+        value; here it prioritises catalog data without discarding manually
+        entered values.
       </p>
       <p>
-        <span class="dif dif-media">Media</span> Sintaxis SQL y cuidar
-        <code>NULL</code> y espacios en URLs.
+        <span class="dif dif-media">Medium</span> SQL syntax and handling
+        <code>NULL</code> and spaces in URLs.
       </p>
     </div>
 
@@ -623,19 +619,19 @@
         >server/utils/queries.js →
         <code>queryGamePublicById(gameId)</code></span
       >
-      <p class="prob">Qué problema resolvía</p>
+      <p class="prob">What problem it solved</p>
       <p>
-        La vista de discusión muestra juegos de
-        <strong>cualquier</strong> usuario; el endpoint “solo mis juegos” no
-        sirve para eso.
+        The discussion view shows games from <strong>any</strong> user; the “only
+        my games” endpoint does not work for that.
       </p>
       <p>
-        <strong>Qué hace:</strong> trae la ficha pública con datos del
-        propietario (nombre, etc.) para enlaces y cabecera.
+        <strong>What it does:</strong> fetches the public entry with owner data
+        (name, etc.) for links and header.
       </p>
       <p>
-        <span class="dif dif-media">Media</span> Separar bien “leer ficha ajena
-        en comunidad” frente a “editar la colección del usuario autenticado”.
+        <span class="dif dif-media">Medium</span> Clearly separate “read someone
+        else's entry in community” from “edit the authenticated user's
+        collection”.
       </p>
     </div>
 
@@ -643,52 +639,52 @@
       <span class="path"
         >client/src/coverUrl.js → <code>displayCoverUrl(url)</code></span
       >
-      <p class="prob">Qué problema resolvía</p>
+      <p class="prob">What problem it solved</p>
       <p>
-        <strong>CORS</strong> (Cross-Origin Resource Sharing) es el mecanismo
-        por el que el navegador decide si una página en un origen (p. ej. el
-        frontend en Vite) puede cargar recursos de otro (CDN de Steam/RAWG). A
-        veces la imagen no se muestra si el navegador la pide directamente al
-        dominio externo.
+        <strong>CORS</strong> (Cross-Origin Resource Sharing) is the mechanism by
+        which the browser decides whether a page on one origin (e.g. the Vite
+        frontend) can load resources from another (Steam/RAWG CDN). Sometimes the
+        image does not display if the browser requests it directly from the
+        external domain.
       </p>
       <p>
-        <strong>Qué hace:</strong> sustituye la URL por una petición a nuestro
-        backend <code>/api/covers/proxy?u=…</code>, que descarga la imagen y la
-        sirve desde el mismo origen que la API, evitando ese bloqueo en la
-        práctica.
+        <strong>What it does:</strong> replaces the URL with a request to our
+        backend <code>/api/covers/proxy?u=…</code>, which downloads the image
+        and serves it from the same origin as the API, avoiding that block in
+        practice.
       </p>
       <p>
-        <span class="dif dif-baja">Baja</span> Pocas líneas, pero imprescindible
-        para ver carátulas.
+        <span class="dif dif-baja">Low</span> Few lines, but essential for
+        showing covers.
       </p>
     </div>
 
-    <h2 id="discusion">5. Discusión: agrupar comentarios y votar</h2>
+    <h2 id="discusion">5. Discussion: grouping comments and voting</h2>
 
     <div class="card">
       <span class="path"
         >client/src/components/GameDiscussion.jsx → <code>Map</code> por
         <code>parent_id</code></span
       >
-      <p class="prob">Qué problema resolvía</p>
+      <p class="prob">What problem it solved</p>
       <p>
-        El servidor devuelve una <strong>lista plana</strong> de filas; la
-        interfaz necesita un <strong>árbol</strong> (respuestas bajo su padre) y
-        un orden razonable para las reseñas raíz.
+        The server returns a <strong>flat list</strong> of rows; the interface
+        needs a <strong>tree</strong> (replies under their parent) and a sensible
+        order for root reviews.
       </p>
       <p>
-        <strong>Qué hace:</strong> un <code>Map</code> donde cada clave es un
-        <code>parent_id</code> (o 0 para raíz) y el valor es un array de hijos;
-        luego se ordenan las raíces por saldo de votos y fecha. Eso alimenta el
-        componente recursivo <code>CommentBlock</code>.
+        <strong>What it does:</strong> a <code>Map</code> where each key is a
+        <code>parent_id</code> (or 0 for root) and the value is an array of
+        children; then root reviews are sorted by vote balance and date. That
+        feeds the recursive <code>CommentBlock</code> component.
       </p>
       <p>
-        <strong>Nota:</strong> el <code>Map</code> actúa como índice clave →
-        lista para agrupar hijos sin encadenar muchos <code>if</code> a mano.
+        <strong>Note:</strong> the <code>Map</code> acts as a key → list index
+        to group children without chaining many manual <code>if</code> statements.
       </p>
       <p>
-        <span class="dif dif-alta">Alta</span> Visualizar el árbol y no romper
-        el renderizado fue lo más delicado.
+        <span class="dif dif-alta">High</span> Visualising the tree and not
+        breaking rendering was the trickiest part.
       </p>
     </div>
 
@@ -697,18 +693,17 @@
         >client/src/components/GameDiscussion.jsx →
         <code>onVote</code> (<code>useCallback</code>)</span
       >
-      <p class="prob">Qué problema resolvía</p>
+      <p class="prob">What problem it solved</p>
       <p>
-        Tras votar, actualizar solo la fila afectada en el estado de React sin
-        recargar toda la página.
+        After voting, update only the affected row in React state without
+        reloading the whole page.
       </p>
       <p>
-        <strong>Qué hace:</strong> <code>PUT</code> al endpoint de voto y
-        actualización del array de comentarios con los contadores y
-        <code>mi_voto</code> que devuelve el servidor.
-        <code>voteBusyId</code> evita doble clic.
+        <strong>What it does:</strong> <code>PUT</code> to the vote endpoint and
+        update the comments array with the counters and <code>mi_voto</code>
+        returned by the server. <code>voteBusyId</code> prevents double-click.
       </p>
-      <p><span class="dif dif-media">Media</span></p>
+      <p><span class="dif dif-media">Medium</span></p>
     </div>
 
     <div class="card">
@@ -716,64 +711,64 @@
         >server/routes/games.routes.js →
         <code>PUT …/comments/:commentId/vote</code></span
       >
-      <p class="prob">Qué problema resolvía</p>
+      <p class="prob">What problem it solved</p>
       <p>
-        Un usuario solo puede tener un voto por comentario; las reseñas
-        valorables son solo las de primer nivel (<code>parent_id</code> nulo).
+        A user can only have one vote per comment; votable reviews are only
+        top-level ones (<code>parent_id</code> null).
       </p>
       <p>
-        <strong>Qué hace:</strong> valida juego y comentario; si
-        <code>val === 0</code> borra el voto; si no,
-        <code>INSERT … ON CONFLICT DO UPDATE</code> para mantener una fila por
-        par (comentario, usuario). Luego agrega votos con <code>SUM</code> y
-        devuelve <code>mi_voto</code>.
+        <strong>What it does:</strong> validates game and comment; if
+        <code>val === 0</code> deletes the vote; otherwise,
+        <code>INSERT … ON CONFLICT DO UPDATE</code> to keep one row per
+        (comment, user) pair. Then aggregates votes with <code>SUM</code> and
+        returns <code>mi_voto</code>.
       </p>
       <p>
-        <span class="dif dif-alta">Alta</span> Probar bien con herramientas tipo
+        <span class="dif dif-alta">High</span> Test thoroughly with tools like
         Thunder Client.
       </p>
     </div>
 
-    <h2 id="campana">6. Campana de recomendaciones (sin WebSockets)</h2>
+    <h2 id="campana">6. Recommendation bell (without WebSockets)</h2>
 
     <div class="card">
       <span class="path">client/src/components/NotificationBell.jsx</span>
-      <p class="prob">Qué problema resolvía</p>
+      <p class="prob">What problem it solved</p>
       <p>
-        Avisar de recomendaciones nuevas sin montar una conexión en tiempo real
-        permanente (<strong>WebSockets</strong> sería otra arquitectura: canal
-        bidireccional largo). Aquí uso <strong>polling</strong>: cada cierto
-        tiempo pregunto al servidor cuántas hay sin leer.
+        Notify about new recommendations without setting up a permanent real-time
+        connection (<strong>WebSockets</strong> would be a different architecture:
+        a long-lived bidirectional channel). Here I use <strong>polling</strong>:
+        every so often I ask the server how many unread ones there are.
       </p>
       <p>
-        <strong>Qué hace:</strong> intervalo ~45 s, <code>useRef</code> para
-        comparar con el conteo anterior y para saber si ya hubo gesto del
-        usuario (los navegadores restringen el audio automático), y comprobar si
-        la pestaña está visible antes de sonar.
+        <strong>What it does:</strong> ~45 s interval, <code>useRef</code> to
+        compare with the previous count and to know if the user has already
+        interacted (browsers restrict automatic audio), and check whether the tab
+        is visible before playing a sound.
       </p>
       <p>
-        <span class="dif dif-media">Media</span> Las reglas de autoplay del
-        audio dan más guerra de lo que parece.
+        <span class="dif dif-media">Medium</span> Autoplay audio rules are more
+        troublesome than they seem.
       </p>
     </div>
 
-    <h2 id="esfuerzo">7. Partes del proyecto que más tiempo llevaron</h2>
+    <h2 id="esfuerzo">7. Project parts that took the most time</h2>
     <ul>
       <li>
-        <strong>Discusión y votos</strong> (cliente + servidor): montar el árbol
-        de comentarios, el orden, el enlace con <code>?c=</code> y que las
-        reglas de voto cuadren en todas partes.
+        <strong>Discussion and votes</strong> (client + server): building the
+        comment tree, ordering, the <code>?c=</code> link, and making vote rules
+        consistent everywhere.
       </li>
       <li>
-        <strong>Red social en SQL</strong> (<code>social.routes.js</code>):
-        recomendaciones solo a gente a la que sigues, actividad mezclando
-        comentarios y LFG, y un montón de consultas encadenadas.
+        <strong>Social network in SQL</strong> (<code>social.routes.js</code>):
+        recommendations only to people you follow, activity mixing comments and
+        LFG, and many chained queries.
       </li>
     </ul>
 
     <p class="lead" style="margin-top: 2rem">
-      Modelo de datos: <a href="diagrama_bd.html">diagrama_bd.html</a>. Pruebas:
-      <a href="../test-plan.md">test-plan.md</a> y
+      Data model: <a href="diagrama_bd.html">diagrama_bd.html</a>. Tests:
+      <a href="../test-plan.md">test-plan.md</a> and
       <a href="plan_pruebas.html">plan_pruebas.html</a>.
     </p>
 

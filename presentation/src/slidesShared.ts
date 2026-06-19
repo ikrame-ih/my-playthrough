@@ -19,32 +19,32 @@ export type FeatureSlideItem = {
 export const SLIDE_FEATURES_DATA: FeatureSlideItem[] = [
   {
     Icon: IconLock,
-    title: 'Entrar en la app',
-    text: 'Registro con reglas de contraseña e inicio de sesión; la app recuerda tu sesión de forma segura.',
+    title: 'Sign in',
+    text: 'Registration with password policy and login; the app keeps your session secure.',
   },
   {
     Icon: IconCollection,
-    title: 'Tu colección',
-    text: 'Añades juegos desde búsqueda (Steam/RAWG), ves lista o cuadrícula y al guardar te avisa al volver.',
+    title: 'Your collection',
+    text: 'Add games from search (Steam/RAWG), grid or list view, and confirmation when you return after saving.',
   },
   {
     Icon: IconUsers,
-    title: 'Perfiles y comunidad',
-    text: 'Ver otros usuarios, seguir a quien te interese y ver algo de actividad.',
+    title: 'Profiles & community',
+    text: 'Browse other members, follow people you care about, and skim activity.',
   },
   {
     Icon: IconMail,
-    title: 'Recomendaciones',
-    text: 'Solo puedes recomendar a alguien a quien ya sigues; llegan a bandeja y campana.',
+    title: 'Recommendations',
+    text: 'You can only recommend to someone you follow; items land in the inbox and header bell.',
   },
   {
     Icon: IconLfg,
-    title: 'Buscar grupo (LFG)',
-    text: 'Publicación ligada a un juego de tu biblioteca para quedar para jugar.',
+    title: 'Find group (LFG)',
+    text: 'Posts tied to a game in your library to look for teammates.',
   },
   {
     Icon: IconShield,
-    title: 'Administración',
-    text: 'Quien tiene rol admin puede moderar usuarios, fichas y LFG desde panel y API.',
+    title: 'Administration',
+    text: 'Admin role can moderate users, entries, and LFG from the panel and API.',
   },
 ]

@@ -56,7 +56,7 @@ export default function App() {
             <button
               type="button"
               onClick={exportPdf}
-              title="Imprimir o Guardar como PDF. Activa «Gráficos de fondo» en Chrome/Edge para ver bien los tonos oscuros."
+              title="Print or save as PDF. Enable background graphics in Chrome/Edge for dark tones."
               className="relative z-40 inline-flex items-center gap-2 rounded-full border border-mp-accent/40 bg-mp-panel/80 px-3 py-1.5 text-[11px] font-semibold text-mp-accent shadow-sm transition hover:border-mp-accent hover:bg-mp-accent/10 md:px-4 md:text-xs"
             >
               <IconPdf className="h-4 w-4" />
@@ -74,7 +74,7 @@ export default function App() {
               <motion.div
                 key={i}
                 role="group"
-                aria-label={`Diapositiva ${i + 1} de ${n}`}
+                aria-label={`Slide ${i + 1} of ${n}`}
                 className="mx-auto flex h-full min-h-0 max-w-6xl flex-col"
                 initial={{ opacity: 0, y: 36, filter: 'blur(14px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -87,13 +87,13 @@ export default function App() {
           </main>
           <button
             type="button"
-            aria-label="Diapositiva anterior"
+            aria-label="Previous slide"
             className={`${sideNavClass} left-0 cursor-w-resize`}
             onClick={prev}
           />
           <button
             type="button"
-            aria-label="Siguiente diapositiva"
+            aria-label="Next slide"
             className={`${sideNavClass} right-0 cursor-e-resize`}
             onClick={next}
           />
@@ -105,7 +105,7 @@ export default function App() {
               <button
                 key={j}
                 type="button"
-                aria-label={`Ir a la diapositiva ${j + 1}`}
+                aria-label={`Go to slide ${j + 1}`}
                 aria-current={j === i ? 'step' : undefined}
                 onClick={() => setI(j)}
                 className={`h-1.5 flex-1 rounded-full transition-all ${

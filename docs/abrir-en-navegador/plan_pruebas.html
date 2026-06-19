@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Plan de pruebas — MyPlaythrough</title>
+    <title>Test plan — MyPlaythrough</title>
     <style>
       :root {
         --bg: #0b1120;
@@ -226,151 +226,150 @@
       <button
         type="button"
         id="btn-print-pdf"
-        aria-label="Abrir diálogo de impresión para guardar como PDF"
+        aria-label="Open print dialog to save as PDF"
       >
-        Imprimir / guardar PDF
+        Print / save PDF
       </button>
       <button
         type="button"
         id="btn-download-html"
-        aria-label="Descargar este plan como archivo HTML"
+        aria-label="Download this plan as an HTML file"
       >
-        Descargar HTML
+        Download HTML
       </button>
       <p class="hint">
-        Impresión: el cuadro de diálogo del navegador permite destino PDF según
-        el sistema. Descarga: copia del HTML de esta página. En GitHub, la vista
-        <strong>Raw</strong> muestra el documento como página independiente.
+        Print: the browser dialog lets you choose PDF as the destination depending
+        on the system. Download: a copy of this page's HTML. On GitHub, the
+        <strong>Raw</strong> view shows the document as a standalone page.
       </p>
     </div>
 
     <p class="doc-nav no-print">
       <a href="../index.html">Docs home</a>
-      <a href="diagrama_bd.html">Diagrama BD</a>
-      <a href="flujo_pern_tres_capas.html">Arquitectura PERN (flujo)</a>
-      <a href="funciones_principales.html">Funciones en código</a>
-      <a href="../test-plan.md">Plan (Markdown)</a>
+      <a href="diagrama_bd.html">Database diagram</a>
+      <a href="flujo_pern_tres_capas.html">PERN architecture (flow)</a>
+      <a href="funciones_principales.html">Key functions</a>
+      <a href="plan_pruebas.html">Test plan (HTML)</a>
+      <a href="../test-plan.md">Test plan (Markdown)</a>
     </p>
 
-    <h1>Plan de pruebas — MyPlaythrough</h1>
+    <h1>Test plan — MyPlaythrough</h1>
     <div class="meta">
-      <p><strong>Proyecto:</strong> MyPlaythrough</p>
-      <p><strong>Alumna:</strong> Ikrame Ibn Hayoun</p>
+      <p><strong>Project:</strong> MyPlaythrough</p>
+      <p><strong>Author:</strong> Ikrame Ibn Hayoun</p>
       <p>
-        <strong>Ciclo:</strong> Desarrollo de Aplicaciones Web — CESUR Málaga
-        Este
+        <strong>Programme:</strong> Higher Vocational Training in Web Application
+        Development · Academic year 2025/2026
       </p>
-      <p><strong>Curso:</strong> 2025/2026</p>
     </div>
 
     <div class="note">
-      <strong>Consulta para evaluación:</strong> el plan completo se visualiza
-      con más claridad en esta página HTML que en el Markdown; el menú
-      <strong>Imprimir</strong> del navegador permite exportar a
-      <strong>PDF</strong>. <strong>Fuente en texto:</strong>
-      <code>docs/test-plan.md</code> (same content). The top bar links to
-      impresión y descarga del HTML.
+      <strong>For assessment review:</strong> the full plan is easier to read on
+      this HTML page than in Markdown; the browser <strong>Print</strong> menu
+      lets you export to <strong>PDF</strong>. <strong>Text source:</strong>
+      <code>docs/test-plan.md</code> (same content). The top bar links to print
+      and download the HTML.
     </div>
 
-    <h2>1. Finalidad y alcance</h2>
+    <h2>1. Purpose and scope</h2>
     <p>
-      Este documento describe <strong>qué se ha probado</strong>,
-      <strong>cómo</strong> y <strong>con qué resultado</strong> en la
-      aplicación MyPlaythrough. Incluye pruebas
-      <strong>manuales</strong> (interfaz y API con Thunder Client) y
-      <strong>unitarias automáticas</strong> (Vitest), sin sustituir la revisión
-      funcional completa del código en el repositorio.
+      This document describes <strong>what was tested</strong>,
+      <strong>how</strong> and <strong>with what result</strong> in the
+      MyPlaythrough application. It includes <strong>manual</strong> tests
+      (interface and API with Thunder Client) and <strong>automated unit</strong>
+      tests (Vitest), without replacing a full functional review of the code in
+      the repository.
     </p>
 
-    <h2>2. Tipos de prueba realizadas</h2>
+    <h2>2. Types of tests performed</h2>
     <table>
       <thead>
         <tr>
-          <th>Tipo</th>
-          <th>Descripción breve</th>
+          <th>Type</th>
+          <th>Brief description</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Manuales funcionales</td>
+          <td>Manual functional</td>
           <td>
-            Comprobación de flujos de usuario (registro, colección, comunidad,
-            admin, comentarios).
+            Checking user flows (registration, collection, community, admin,
+            comments).
           </td>
         </tr>
         <tr>
-          <td>Seguridad básica</td>
+          <td>Basic security</td>
           <td>
-            Acceso a rutas protegidas sin token, permisos, límites de cuerpo,
-            límite de frecuencia en login/registro, endpoint de diagnóstico en
-            producción.
+            Access to protected routes without a token, permissions, body size
+            limits, login/register rate limiting, diagnostic endpoint in
+            production.
           </td>
         </tr>
         <tr>
-          <td>Validación de datos</td>
+          <td>Data validation</td>
           <td>
-            Normalización de entradas (email, título, estado, plataforma)
-            coherente con el backend.
+            Input normalisation (email, title, status, platform) consistent with
+            the backend.
           </td>
         </tr>
         <tr>
-          <td>Unitarias automáticas</td>
+          <td>Automated unit tests</td>
           <td>
-            Tests repetibles sobre lógica pura (sin navegador ni base de datos),
-            ejecutados con Vitest 3.
+            Repeatable tests on pure logic (no browser or database), run with
+            Vitest 3.
           </td>
         </tr>
       </tbody>
     </table>
 
-    <h2>3. Entorno de prueba</h2>
+    <h2>3. Test environment</h2>
     <table>
       <thead>
         <tr>
-          <th>Parámetro</th>
-          <th>Valor</th>
+          <th>Parameter</th>
+          <th>Value</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Sistema operativo</td>
+          <td>Operating system</td>
           <td>Windows 11</td>
         </tr>
         <tr>
-          <td>Navegador</td>
+          <td>Browser</td>
           <td>Google Chrome 124</td>
         </tr>
         <tr>
           <td>Backend</td>
-          <td>Node.js 20, Express 5, puerto 3000</td>
+          <td>Node.js 20, Express 5, port 3000</td>
         </tr>
         <tr>
           <td>Frontend</td>
-          <td>Vite, React 18, puerto 5173</td>
+          <td>Vite, React 18, port 5173</td>
         </tr>
         <tr>
-          <td>Base de datos</td>
-          <td>PostgreSQL 16 (local o contenedor Docker)</td>
+          <td>Database</td>
+          <td>PostgreSQL 16 (local or Docker container)</td>
         </tr>
         <tr>
-          <td>Cliente API</td>
-          <td>Thunder Client (extensión de VS Code)</td>
+          <td>API client</td>
+          <td>Thunder Client (VS Code extension)</td>
         </tr>
       </tbody>
     </table>
 
-    <h2>4. Pruebas automáticas unitarias (Vitest)</h2>
+    <h2>4. Automated unit tests (Vitest)</h2>
     <p>
-      Se ejecutan en terminal, desde la carpeta de cada paquete,
-      <strong>sin</strong> levantar obligatoriamente Docker ni PostgreSQL para
-      los tests del <code>normalize</code> y utilidades del cliente.
+      Run in the terminal, from each package folder, <strong>without</strong>
+      necessarily starting Docker or PostgreSQL for <code>normalize</code> and
+      client utility tests.
     </p>
     <table>
       <thead>
         <tr>
-          <th>Ubicación</th>
-          <th>Comando</th>
-          <th>Ficheros / ámbito</th>
+          <th>Location</th>
+          <th>Command</th>
+          <th>Files / scope</th>
         </tr>
       </thead>
       <tbody>
@@ -378,8 +377,8 @@
           <td>Backend (<code>server/</code>)</td>
           <td><code>npm test</code></td>
           <td>
-            <code>server/utils/normalize.js</code> (email, título, plataforma,
-            estado, referencia catálogo, payload de error según
+            <code>server/utils/normalize.js</code> (email, title, platform,
+            status, catalog reference, error payload per
             <code>NODE_ENV</code>).
           </td>
         </tr>
@@ -391,652 +390,650 @@
       </tbody>
     </table>
     <p>
-      Modo vigilancia (opcional): <code>npm run test:watch</code> en
-      <code>server</code> o <code>client</code>.
-      <strong>Herramienta:</strong> Vitest 3.
+      Watch mode (optional): <code>npm run test:watch</code> in
+      <code>server</code> or <code>client</code>.
+      <strong>Tool:</strong> Vitest 3.
     </p>
     <p>
-      <strong>Relación con validación manual:</strong> los casos V-01 a V-04 del
-      apartado 8 están alineados con la lógica probada en
-      <code>normalize.js</code>.
+      <strong>Relation to manual validation:</strong> cases V-01 to V-04 in
+      section 8 align with the logic tested in <code>normalize.js</code>.
     </p>
 
-    <h2>5. Pruebas manuales funcionales</h2>
+    <h2>5. Manual functional tests</h2>
 
-    <h3>5.1. RF-01 — Gestión de usuarios (autenticación)</h3>
+    <h3>5.1. RF-01 — User management (authentication)</h3>
     <table>
       <thead>
         <tr>
           <th>ID</th>
-          <th>Caso</th>
-          <th>Pasos (resumen)</th>
-          <th>Esperado</th>
-          <th>Obtenido</th>
-          <th>Estado</th>
+          <th>Case</th>
+          <th>Steps (summary)</th>
+          <th>Expected</th>
+          <th>Actual</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>P-01</td>
-          <td>Registro válido</td>
-          <td>Login → Crear cuenta → datos válidos → Registrarse</td>
-          <td>Redirección al dashboard; JWT en <code>localStorage</code></td>
-          <td>Colección vacía visible; sesión iniciada</td>
+          <td>Valid registration</td>
+          <td>Login → Create account → valid data → Register</td>
+          <td>Redirect to dashboard; JWT in <code>localStorage</code></td>
+          <td>Empty collection visible; session started</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-02</td>
-          <td>Email duplicado</td>
-          <td>Registrar de nuevo el mismo email</td>
-          <td>Error claro; no duplicado</td>
-          <td>Mensaje de error mostrado</td>
+          <td>Duplicate email</td>
+          <td>Register again with the same email</td>
+          <td>Clear error; no duplicate</td>
+          <td>Error message shown</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-03</td>
-          <td>Contraseña corta</td>
-          <td>Contraseña de menos de 8 caracteres</td>
-          <td>Validación; no se envía</td>
-          <td>Mensaje en formulario (política fuerte en servidor)</td>
+          <td>Short password</td>
+          <td>Password fewer than 8 characters</td>
+          <td>Validation; not submitted</td>
+          <td>Form message (strong policy on server)</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-04</td>
-          <td>Login correcto</td>
-          <td>Email y contraseña válidos</td>
-          <td>JWT y acceso al dashboard</td>
-          <td>Dashboard accesible</td>
+          <td>Correct login</td>
+          <td>Valid email and password</td>
+          <td>JWT and access to dashboard</td>
+          <td>Dashboard accessible</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-05</td>
-          <td>Contraseña incorrecta</td>
-          <td>Email válido, contraseña errónea</td>
-          <td>401; sin acceso</td>
-          <td>Error mostrado</td>
+          <td>Incorrect password</td>
+          <td>Valid email, wrong password</td>
+          <td>401; no access</td>
+          <td>Error shown</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-06</td>
-          <td>Email inexistente</td>
-          <td>Email no registrado</td>
-          <td>401; mensaje coherente</td>
-          <td>Error mostrado</td>
+          <td>Non-existent email</td>
+          <td>Unregistered email</td>
+          <td>401; coherent message</td>
+          <td>Error shown</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-07</td>
-          <td>Cerrar sesión</td>
-          <td>Botón en sidebar</td>
-          <td>Token eliminado; pantalla de login</td>
-          <td>Logout correcto</td>
+          <td>Log out</td>
+          <td>Button in sidebar</td>
+          <td>Token removed; login screen</td>
+          <td>Logout successful</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-08</td>
-          <td>Sesión tras F5</td>
-          <td>Recargar estando logueada</td>
-          <td>Sesión mantenida</td>
-          <td>Mantiene autenticación</td>
+          <td>Session after F5</td>
+          <td>Reload while logged in</td>
+          <td>Session maintained</td>
+          <td>Keeps authentication</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-08b</td>
-          <td>Avatar de perfil</td>
-          <td>Ajustes → Perfil → elegir otro robot</td>
+          <td>Profile avatar</td>
+          <td>Settings → Profile → choose another robot</td>
           <td>
-            <code>PATCH /api/auth/me</code> correcto; avatar en barra, comunidad
-            y comentarios
+            Correct <code>PATCH /api/auth/me</code>; avatar in bar, community and
+            comments
           </td>
-          <td>Cambio visible tras guardar</td>
+          <td>Change visible after save</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-08c</td>
-          <td>Avatar inválido (API)</td>
+          <td>Invalid avatar (API)</td>
           <td>
-            Thunder Client: <code>PATCH /api/auth/me</code> con
-            <code>avatar_id</code> no listado
+            Thunder Client: <code>PATCH /api/auth/me</code> with unlisted
+            <code>avatar_id</code>
           </td>
           <td>400</td>
-          <td>Rechazado</td>
+          <td>Rejected</td>
           <td>OK</td>
         </tr>
       </tbody>
     </table>
 
-    <h3>5.2. RF-02 — Biblioteca (CRUD)</h3>
+    <h3>5.2. RF-02 — Library (CRUD)</h3>
     <table>
       <thead>
         <tr>
           <th>ID</th>
-          <th>Caso</th>
-          <th>Pasos (resumen)</th>
-          <th>Esperado</th>
-          <th>Obtenido</th>
-          <th>Estado</th>
+          <th>Case</th>
+          <th>Steps (summary)</th>
+          <th>Expected</th>
+          <th>Actual</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>P-09</td>
-          <td>Añadir manual</td>
-          <td>Añadir juego con título, estado, plataforma</td>
-          <td>Aparece en la colección</td>
-          <td>Visible en dashboard</td>
+          <td>Add manually</td>
+          <td>Add game with title, status, platform</td>
+          <td>Appears in collection</td>
+          <td>Visible on dashboard</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-10</td>
-          <td>Añadir con buscador</td>
-          <td>Búsqueda → elegir resultado → guardar</td>
-          <td>Carátula desde CDN</td>
-          <td>Imagen y ficha correctas</td>
+          <td>Add via search</td>
+          <td>Search → pick result → save</td>
+          <td>Cover from CDN</td>
+          <td>Image and entry correct</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-11</td>
-          <td>Duplicado</td>
-          <td>Mismo título que uno existente</td>
-          <td>Error; no duplicar</td>
-          <td>Mensaje; una sola ficha</td>
+          <td>Duplicate</td>
+          <td>Same title as an existing one</td>
+          <td>Error; no duplicate</td>
+          <td>Message; single entry</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-12</td>
-          <td>Sin título</td>
-          <td>Guardar con título vacío</td>
-          <td>Validación</td>
-          <td>Error en formulario</td>
+          <td>No title</td>
+          <td>Save with empty title</td>
+          <td>Validation</td>
+          <td>Form error</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-13</td>
-          <td>Editar estado</td>
-          <td>Detalle → cambiar estado → guardar</td>
-          <td>Estado actualizado</td>
-          <td>Correcto</td>
+          <td>Edit status</td>
+          <td>Detail → change status → save</td>
+          <td>Status updated</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-14</td>
-          <td>Editar nota y horas</td>
-          <td>Cambiar puntuación y horas</td>
-          <td>Valores persistidos</td>
-          <td>Correcto</td>
+          <td>Edit note and hours</td>
+          <td>Change rating and hours</td>
+          <td>Values persisted</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-15</td>
-          <td>Eliminar</td>
-          <td>Eliminar y confirmar</td>
-          <td>Desaparece de la colección</td>
-          <td>Eliminado</td>
+          <td>Delete</td>
+          <td>Delete and confirm</td>
+          <td>Removed from collection</td>
+          <td>Deleted</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-16</td>
-          <td>Ordenar por estado</td>
-          <td>Colección → «Ordenar por» → «Estado (backlog → completado)»</td>
-          <td>Orden coherente por estado</td>
-          <td>Listado ordenado correctamente</td>
+          <td>Sort by status</td>
+          <td>Collection → “Sort by” → “Status (backlog → completed)”</td>
+          <td>Coherent order by status</td>
+          <td>List sorted correctly</td>
           <td>OK</td>
         </tr>
       </tbody>
     </table>
 
-    <h3>5.3. RF-03 — Edición de detalles</h3>
+    <h3>5.3. RF-03 — Detail editing</h3>
     <table>
       <thead>
         <tr>
           <th>ID</th>
-          <th>Caso</th>
-          <th>Pasos</th>
-          <th>Esperado</th>
-          <th>Obtenido</th>
-          <th>Estado</th>
+          <th>Case</th>
+          <th>Steps</th>
+          <th>Expected</th>
+          <th>Actual</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>P-17</td>
-          <td>Nota fuera de rango</td>
-          <td>Valor &gt; 10</td>
-          <td>Bloqueo o aviso en UI</td>
-          <td><code>max=10</code> en formulario</td>
+          <td>Rating out of range</td>
+          <td>Value &gt; 10</td>
+          <td>Block or UI warning</td>
+          <td><code>max=10</code> on form</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-18</td>
-          <td>Horas negativas</td>
-          <td>Introducir horas negativas</td>
-          <td>Normalización a 0 en servidor</td>
-          <td>Guardado 0 en BD</td>
+          <td>Negative hours</td>
+          <td>Enter negative hours</td>
+          <td>Normalised to 0 on server</td>
+          <td>Saved as 0 in DB</td>
           <td>OK</td>
         </tr>
       </tbody>
     </table>
 
-    <h3>5.4. RF-04 — Comunidad</h3>
+    <h3>5.4. RF-04 — Community</h3>
     <table>
       <thead>
         <tr>
           <th>ID</th>
-          <th>Caso</th>
-          <th>Pasos</th>
-          <th>Esperado</th>
-          <th>Obtenido</th>
-          <th>Estado</th>
+          <th>Case</th>
+          <th>Steps</th>
+          <th>Expected</th>
+          <th>Actual</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>P-19</td>
-          <td>Lista de miembros</td>
-          <td>Entrar en Comunidad</td>
-          <td>Lista con juegos, seguidores y plataforma de ejemplo</td>
-          <td>Correcta</td>
+          <td>Member list</td>
+          <td>Go to Community</td>
+          <td>List with games, followers and sample platform</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-20</td>
-          <td>Perfil ajeno</td>
-          <td>Clic en miembro</td>
-          <td>Colección ajena solo lectura</td>
-          <td>Sin edición</td>
+          <td>Other user's profile</td>
+          <td>Click on member</td>
+          <td>Read-only foreign collection</td>
+          <td>No editing</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-21</td>
-          <td>Sin token</td>
-          <td>Acceder a <code>/community</code> sin sesión</td>
-          <td>401; redirección a login</td>
-          <td>Bloqueado</td>
+          <td>No token</td>
+          <td>Access <code>/community</code> without session</td>
+          <td>401; redirect to login</td>
+          <td>Blocked</td>
           <td>OK</td>
         </tr>
       </tbody>
     </table>
 
-    <h3>5.5. RF-05 — Estadísticas</h3>
+    <h3>5.5. RF-05 — Statistics</h3>
     <table>
       <thead>
         <tr>
           <th>ID</th>
-          <th>Caso</th>
-          <th>Pasos</th>
-          <th>Esperado</th>
-          <th>Obtenido</th>
-          <th>Estado</th>
+          <th>Case</th>
+          <th>Steps</th>
+          <th>Expected</th>
+          <th>Actual</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>P-22</td>
-          <td>Ranking global</td>
-          <td>Comunidad → estadísticas</td>
-          <td>Media y número de votos</td>
-          <td>Cálculo SQL correcto</td>
+          <td>Global ranking</td>
+          <td>Community → statistics</td>
+          <td>Average and vote count</td>
+          <td>Correct SQL calculation</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-23</td>
-          <td>Media con dos votos</td>
-          <td>Mismo juego puntuado por dos usuarios</td>
-          <td>Media aritmética correcta</td>
-          <td>Ej.: 8 y 6 → 7,00</td>
+          <td>Average with two votes</td>
+          <td>Same game rated by two users</td>
+          <td>Correct arithmetic mean</td>
+          <td>E.g. 8 and 6 → 7.00</td>
           <td>OK</td>
         </tr>
       </tbody>
     </table>
 
-    <h3>5.6. RF-06 — Administración</h3>
+    <h3>5.6. RF-06 — Administration</h3>
     <table>
       <thead>
         <tr>
           <th>ID</th>
-          <th>Caso</th>
-          <th>Pasos</th>
-          <th>Esperado</th>
-          <th>Obtenido</th>
-          <th>Estado</th>
+          <th>Case</th>
+          <th>Steps</th>
+          <th>Expected</th>
+          <th>Actual</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>P-24</td>
-          <td>Usuario normal en <code>/admin</code></td>
-          <td>Acceso sin rol admin</td>
-          <td>403; sin enlace en UI</td>
-          <td>Bloqueado</td>
+          <td>Normal user on <code>/admin</code></td>
+          <td>Access without admin role</td>
+          <td>403; no link in UI</td>
+          <td>Blocked</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-25</td>
-          <td>Listado admin</td>
+          <td>Admin listing</td>
           <td>Admin → panel</td>
-          <td>Tabla de usuarios</td>
-          <td>Datos visibles</td>
+          <td>User table</td>
+          <td>Data visible</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-26</td>
-          <td>Borrar otro usuario</td>
-          <td>Eliminar fila de otro usuario</td>
-          <td>Usuario y juegos en cascada</td>
-          <td>Correcto</td>
+          <td>Delete another user</td>
+          <td>Delete another user's row</td>
+          <td>User and games cascade</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-27</td>
-          <td>No auto-borrado</td>
-          <td>Admin intenta borrarse a sí misma</td>
-          <td>Error controlado</td>
-          <td>Operación bloqueada</td>
+          <td>No self-delete</td>
+          <td>Admin tries to delete themselves</td>
+          <td>Controlled error</td>
+          <td>Operation blocked</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-44</td>
-          <td>Panel LFG (admin)</td>
-          <td>Admin → sección Buscar grupo (LFG) → eliminar una fila</td>
-          <td>Publicación borrada; desaparece en Comunidad</td>
-          <td>Correcto</td>
+          <td>LFG panel (admin)</td>
+          <td>Admin → Find group (LFG) section → delete a row</td>
+          <td>Post deleted; disappears in Community</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
       </tbody>
     </table>
 
-    <h3>5.7. Comentarios en ficha de juego</h3>
+    <h3>5.7. Comments on game entry</h3>
     <table>
       <thead>
         <tr>
           <th>ID</th>
-          <th>Caso</th>
-          <th>Pasos</th>
-          <th>Esperado</th>
-          <th>Obtenido</th>
-          <th>Estado</th>
+          <th>Case</th>
+          <th>Steps</th>
+          <th>Expected</th>
+          <th>Actual</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>P-28</td>
-          <td>Publicar comentario</td>
-          <td>Abrir hilo → enviar texto</td>
-          <td>Comentario con autor y fecha</td>
-          <td>Publicado</td>
+          <td>Post comment</td>
+          <td>Open thread → submit text</td>
+          <td>Comment with author and date</td>
+          <td>Posted</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-29</td>
-          <td>Borrar propio</td>
-          <td>Eliminar comentario propio</td>
-          <td>Desaparece del hilo</td>
-          <td>Eliminado correctamente</td>
+          <td>Delete own</td>
+          <td>Delete own comment</td>
+          <td>Removed from thread</td>
+          <td>Deleted correctly</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-30</td>
-          <td>Borrar ajeno (API)</td>
-          <td>Thunder Client: borrar comentario de otra persona</td>
+          <td>Delete someone else's (API)</td>
+          <td>Thunder Client: delete another person's comment</td>
           <td>403</td>
-          <td>Bloqueado</td>
+          <td>Blocked</td>
           <td>OK</td>
         </tr>
       </tbody>
     </table>
 
     <h3>
-      5.8. RF-07 — Social ampliado (seguimientos, recomendaciones, LFG,
-      actividad)
+      5.8. RF-07 — Extended social (follows, recommendations, LFG, activity)
     </h3>
     <table>
       <thead>
         <tr>
           <th>ID</th>
-          <th>Caso</th>
-          <th>Pasos</th>
-          <th>Esperado</th>
-          <th>Obtenido</th>
-          <th>Estado</th>
+          <th>Case</th>
+          <th>Steps</th>
+          <th>Expected</th>
+          <th>Actual</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>P-31</td>
-          <td>Seguir desde perfil</td>
-          <td>Comunidad → perfil ajeno → Seguir</td>
-          <td><code>POST /api/social/follow/:id</code>; estado «Siguiendo»</td>
-          <td>Correcto</td>
+          <td>Follow from profile</td>
+          <td>Community → other user's profile → Follow</td>
+          <td><code>POST /api/social/follow/:id</code>; “Following” state</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-32</td>
-          <td>Dejar de seguir</td>
-          <td>Perfil → Dejar de seguir</td>
-          <td><code>DELETE</code>; puede volver a seguir</td>
-          <td>Correcto</td>
+          <td>Unfollow</td>
+          <td>Profile → Unfollow</td>
+          <td><code>DELETE</code>; can follow again</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-33</td>
-          <td>Seguir desde tarjeta</td>
-          <td>Comunidad → Miembros → botón Seguir sin entrar al perfil</td>
-          <td>Pasa a «Siguiendo»</td>
-          <td>Correcto</td>
+          <td>Follow from card</td>
+          <td>Community → Members → Follow button without opening profile</td>
+          <td>Changes to “Following”</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-34</td>
-          <td>Recomendar sin seguir (API)</td>
+          <td>Recommend without following (API)</td>
           <td>
-            Thunder: <code>POST /api/social/recommendations</code> sin relación
-            de seguimiento
+            Thunder: <code>POST /api/social/recommendations</code> without follow
+            relationship
           </td>
           <td>403</td>
-          <td>Rechazado</td>
+          <td>Rejected</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-35</td>
-          <td>Recomendar desde colección</td>
-          <td>Icono regalo en ficha propia → elegir seguido → enviar</td>
-          <td>Aparece en bandeja del destinatario</td>
-          <td>Correcto</td>
+          <td>Recommend from collection</td>
+          <td>Gift icon on own entry → pick follower → send</td>
+          <td>Appears in recipient's inbox</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-36</td>
-          <td>Bandeja y leídas</td>
-          <td>Campana → Recomendaciones → marcar leída / enlace a discusión</td>
-          <td>Contador y estado coherentes</td>
-          <td>Correcto</td>
+          <td>Inbox and read state</td>
+          <td>Bell → Recommendations → mark read / link to discussion</td>
+          <td>Counter and state consistent</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-37</td>
-          <td>Publicar LFG</td>
-          <td>Comunidad → Buscar grupo → formulario válido</td>
-          <td>Aparece en listado</td>
-          <td>Correcto</td>
+          <td>Post LFG</td>
+          <td>Community → Find group → valid form</td>
+          <td>Appears in listing</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-38</td>
-          <td>Listado LFG</td>
-          <td>Varios usuarios publican</td>
-          <td>Orden reciente; datos de juego y autor</td>
-          <td>Correcto</td>
+          <td>LFG listing</td>
+          <td>Several users post</td>
+          <td>Recent order; game and author data</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-39</td>
-          <td>Borrar LFG propia</td>
-          <td>Eliminar en tarjeta (solo autor o admin)</td>
-          <td>Desaparece del listado</td>
-          <td>Correcto</td>
+          <td>Delete own LFG</td>
+          <td>Delete on card (author or admin only)</td>
+          <td>Removed from listing</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-40</td>
-          <td>Actividad de seguidos</td>
+          <td>Followed users' activity</td>
           <td>
-            Tras seguir a alguien que comenta o publica LFG → pestaña Actividad
+            After following someone who comments or posts LFG → Activity tab
           </td>
-          <td>Entradas recientes enlazadas a la ficha</td>
-          <td>Correcto</td>
+          <td>Recent entries linked to the game entry</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
       </tbody>
     </table>
 
     <h3>
-      5.9. RF-08 — Preferencias y presentación (tour, notificaciones, métricas
-      sociales)
+      5.9. RF-08 — Preferences and presentation (tour, notifications, social
+      metrics)
     </h3>
     <table>
       <thead>
         <tr>
           <th>ID</th>
-          <th>Caso</th>
-          <th>Pasos</th>
-          <th>Esperado</th>
-          <th>Obtenido</th>
-          <th>Estado</th>
+          <th>Case</th>
+          <th>Steps</th>
+          <th>Expected</th>
+          <th>Actual</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>P-41</td>
-          <td>Tour guiado repetible</td>
-          <td>Perfil → Iniciar tour guiado</td>
-          <td>Recorrido por la interfaz; se puede cerrar</td>
-          <td>Correcto</td>
+          <td>Repeatable guided tour</td>
+          <td>Profile → Start guided tour</td>
+          <td>Walkthrough of the interface; can be closed</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-42</td>
-          <td>Tono de recomendaciones</td>
+          <td>Recommendation sound</td>
           <td>
-            Sonido activado en Perfil; dos cuentas; la segunda recomienda a la
-            primera; con la pestaña del destinatario visible, comprobar campana
-            y tono (consulta al servidor cada ~45 s)
+            Sound enabled in Profile; two accounts; the second recommends to the
+            first; with the recipient's tab visible, check bell and sound
+            (server poll every ~45 s)
           </td>
-          <td>Contador y tono opcional coherentes con Perfil</td>
-          <td>Correcto</td>
+          <td>Counter and optional sound consistent with Profile</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>P-43</td>
-          <td>Contador de seguidores</td>
-          <td>Comunidad → Miembros y perfil público</td>
-          <td>Número de seguidores visible y coherente con la API</td>
-          <td>Correcto</td>
+          <td>Follower count</td>
+          <td>Community → Members and public profile</td>
+          <td>Follower count visible and consistent with API</td>
+          <td>Correct</td>
           <td>OK</td>
         </tr>
       </tbody>
     </table>
 
-    <h2>6. Pruebas de seguridad (API / configuración)</h2>
+    <h2>6. Security tests (API / configuration)</h2>
     <table>
       <thead>
         <tr>
           <th>ID</th>
-          <th>Caso</th>
-          <th>Herramienta / condición</th>
-          <th>Esperado</th>
-          <th>Obtenido</th>
-          <th>Estado</th>
+          <th>Case</th>
+          <th>Tool / condition</th>
+          <th>Expected</th>
+          <th>Actual</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>S-01</td>
-          <td>Sin token</td>
-          <td><code>GET /api/games</code> sin <code>Authorization</code></td>
+          <td>No token</td>
+          <td><code>GET /api/games</code> without <code>Authorization</code></td>
           <td>401</td>
-          <td>JSON de error coherente</td>
+          <td>Coherent error JSON</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>S-02</td>
-          <td>JWT alterado</td>
-          <td>Token modificado a mano</td>
+          <td>Altered JWT</td>
+          <td>Token modified manually</td>
           <td>401</td>
-          <td>Rechazado</td>
+          <td>Rejected</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>S-03</td>
-          <td>Juego de otro usuario</td>
+          <td>Another user's game</td>
           <td>
-            <code>GET /api/games/:id</code> con juego de otro
+            <code>GET /api/games/:id</code> with another user's
             <code>usuario_id</code>
           </td>
           <td>404</td>
-          <td>Sin datos ajenos</td>
+          <td>No foreign data</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>S-04</td>
-          <td>Admin sin rol</td>
-          <td><code>GET /api/admin/users</code> con JWT de usuario</td>
+          <td>Admin without role</td>
+          <td><code>GET /api/admin/users</code> with user JWT</td>
           <td>403</td>
-          <td>Mensaje de permisos</td>
+          <td>Permission message</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>S-05</td>
-          <td>test-db en producción</td>
+          <td>test-db in production</td>
           <td>
-            <code>NODE_ENV=production</code> y <code>GET /api/test-db</code>
+            <code>NODE_ENV=production</code> and <code>GET /api/test-db</code>
           </td>
           <td>404</td>
-          <td>Endpoint oculto</td>
+          <td>Endpoint hidden</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>S-06</td>
           <td>Body &gt; 50 KB</td>
-          <td>Registro con payload grande</td>
+          <td>Registration with large payload</td>
           <td>413</td>
-          <td>Rechazado</td>
+          <td>Rejected</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>S-07</td>
-          <td>Social sin token</td>
+          <td>Social without token</td>
           <td>
-            <code>GET /api/social/lfg</code> sin <code>Authorization</code>
+            <code>GET /api/social/lfg</code> without <code>Authorization</code>
           </td>
           <td>401</td>
-          <td>Rechazado</td>
+          <td>Rejected</td>
           <td>OK</td>
         </tr>
         <tr>
           <td>S-08</td>
-          <td>Límite login/registro</td>
+          <td>Login/register limit</td>
           <td>
-            Más de <strong>40</strong> <code>POST</code> a
-            <code>/api/auth/login</code> o <code>/api/auth/register</code> desde
-            la <strong>misma IP</strong> en
-            <strong>15 minutos</strong> (<code>express-rate-limit</code>)
+            More than <strong>40</strong> <code>POST</code> requests to
+            <code>/api/auth/login</code> or <code>/api/auth/register</code> from
+            the <strong>same IP</strong> within
+            <strong>15 minutes</strong> (<code>express-rate-limit</code>)
           </td>
           <td>429</td>
-          <td>JSON de error coherente</td>
+          <td>Coherent error JSON</td>
           <td>OK</td>
         </tr>
       </tbody>
     </table>
 
-    <h2>7. Validación de datos (coherencia con backend)</h2>
+    <h2>7. Data validation (backend consistency)</h2>
     <table>
       <thead>
         <tr>
           <th>ID</th>
-          <th>Caso</th>
-          <th>Entrada / acción</th>
-          <th>Esperado</th>
-          <th>Estado</th>
+          <th>Case</th>
+          <th>Input / action</th>
+          <th>Expected</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
@@ -1044,12 +1041,12 @@
           <td>V-01</td>
           <td>Email</td>
           <td><code>" Usuario@GMAIL.com "</code></td>
-          <td>Normalizado a <code>usuario@gmail.com</code></td>
+          <td>Normalised to <code>usuario@gmail.com</code></td>
           <td>OK</td>
         </tr>
         <tr>
           <td>V-02</td>
-          <td>Título</td>
+          <td>Title</td>
           <td><code>"The Witcher 3"</code></td>
           <td>
             <code>"The Witcher 3"</code> (<code>normalizeGameTitle</code>)
@@ -1058,76 +1055,76 @@
         </tr>
         <tr>
           <td>V-03</td>
-          <td>Estado en inglés</td>
+          <td>Status in English</td>
           <td><code>estado: "Completed"</code></td>
-          <td>Guardado como <code>Completado</code></td>
+          <td>Saved as <code>Completado</code></td>
           <td>OK</td>
         </tr>
         <tr>
           <td>V-04</td>
-          <td>Plataforma vacía</td>
-          <td>Sin campo <code>plataforma</code></td>
-          <td>Por defecto <code>PC</code></td>
+          <td>Empty platform</td>
+          <td>No <code>plataforma</code> field</td>
+          <td>Defaults to <code>PC</code></td>
           <td>OK</td>
         </tr>
       </tbody>
     </table>
 
-    <h2>8. Resumen numérico</h2>
-    <p><strong>Comprobación del recuento (por ID):</strong></p>
+    <h2>8. Numeric summary</h2>
+    <p><strong>Count check (by ID):</strong></p>
     <ul>
       <li>
-        <strong>Prefijo P-</strong> → <strong>46</strong> casos en tablas (P-01 …
-        P-43 y P-44, más <strong>P-08b</strong> y <strong>P-08c</strong> en
-        autenticación / perfil; RF-06 con LFG admin, RF-07 social, RF-08
-        presentación).
+        <strong>P- prefix</strong> → <strong>46</strong> cases in tables (P-01 …
+        P-43 and P-44, plus <strong>P-08b</strong> and <strong>P-08c</strong> in
+        authentication / profile; RF-06 with admin LFG, RF-07 social, RF-08
+        presentation).
       </li>
       <li>
-        <strong>S-01 … S-08</strong> → <strong>8</strong> casos (seguridad API /
-        configuración).
+        <strong>S-01 … S-08</strong> → <strong>8</strong> cases (API security /
+        configuration).
       </li>
       <li>
-        <strong>V-01 … V-04</strong> → <strong>4</strong> casos (validación de
-        datos coherente con el backend).
+        <strong>V-01 … V-04</strong> → <strong>4</strong> cases (data validation
+        consistent with the backend).
       </li>
     </ul>
-    <p><strong>Total pruebas manuales: 46 + 8 + 4 = 58.</strong></p>
+    <p><strong>Total manual tests: 46 + 8 + 4 = 58.</strong></p>
     <table>
       <thead>
         <tr>
-          <th>Categoría</th>
+          <th>Category</th>
           <th>Total</th>
-          <th>Pasadas</th>
-          <th>Fallidas</th>
+          <th>Passed</th>
+          <th>Failed</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Flujo de aplicación (prefijo P-)</td>
+          <td>Application flow (P- prefix)</td>
           <td>46</td>
           <td>46</td>
           <td>0</td>
         </tr>
         <tr>
-          <td>Seguridad API / configuración (S-01 … S-08)</td>
+          <td>API security / configuration (S-01 … S-08)</td>
           <td>8</td>
           <td>8</td>
           <td>0</td>
         </tr>
         <tr>
-          <td>Validación de datos (V-01 … V-04)</td>
+          <td>Data validation (V-01 … V-04)</td>
           <td>4</td>
           <td>4</td>
           <td>0</td>
         </tr>
         <tr>
-          <td><strong>Total pruebas manuales</strong></td>
+          <td><strong>Total manual tests</strong></td>
           <td><strong>58</strong></td>
           <td><strong>58</strong></td>
           <td><strong>0</strong></td>
         </tr>
         <tr>
-          <td>Unitarias automáticas (Vitest)</td>
+          <td>Automated unit tests (Vitest)</td>
           <td>27</td>
           <td>27</td>
           <td>0</td>
@@ -1136,41 +1133,37 @@
     </table>
     <p>
       <em
-        >Las 27 pruebas unitarias corresponden a 17 tests en
-        <code>server</code> y 10 en <code>client</code> (<code>npm test</code>
-        en cada carpeta).</em
+        >The 27 unit tests correspond to 17 tests in <code>server</code> and 10
+        in <code>client</code> (<code>npm test</code> in each folder).</em
       >
     </p>
 
-    <h2>9. Cosas que dejaría para más adelante (no están hechas)</h2>
+    <h2>9. Things I would leave for later (not done yet)</h2>
     <ol>
       <li>
-        <strong>Mensajes de error más uniformes:</strong> ahora mismo según la
-        ruta el JSON de error puede cambiar un poco de forma. Lo suyo sería
-        pasar todo por el mismo sitio (por ejemplo un middleware) y que en
-        producción el usuario no reciba detalles técnicos largos (stack, cosas
-        internas).
+        <strong>More uniform error messages:</strong> right now the error JSON can
+        vary slightly by route. Ideally everything would go through the same
+        place (for example a middleware) so that in production users do not
+        receive long technical details (stack traces, internal information).
       </li>
       <li>
-        <strong>Campana sin ir preguntando cada X segundos:</strong> hoy la
-        campana hace <em>polling</em> (cada poco pregunta al servidor si hay
-        novedades). Para un producto grande habría que valorar
-        <strong>WebSockets</strong> o <strong>SSE</strong> para que el servidor
-        avise al momento; es más trabajo de despliegue y de reconexión si se
-        cae la red.
+        <strong>Bell without polling every X seconds:</strong> today the bell uses
+        <em>polling</em> (asking the server periodically for updates). For a larger
+        product it would be worth considering <strong>WebSockets</strong> or
+        <strong>SSE</strong> so the server notifies immediately; that is more
+        deployment and reconnection work if the network drops.
       </li>
       <li>
-        <strong>Juntar dos fichas del mismo juego:</strong> si alguien tiene dos
-        entradas que en realidad son el mismo título, haría falta una pantalla o
-        proceso de administración que las una y mueva comentarios y votos a la
-        ficha buena (sobre todo si ya comparten <code>catalogo_id</code>).
+        <strong>Merge two entries for the same game:</strong> if someone has two
+        entries that are really the same title, an admin screen or process would be
+        needed to merge them and move comments and votes to the correct entry
+        (especially if they already share <code>catalogo_id</code>).
       </li>
       <li>
-        <strong>Tests que peguen contra la API de verdad:</strong> las
-        unitarias prueban funciones sueltas; faltaría una batería que levante la
-        API (y una base de prueba) y compruebe rutas enteras, tipo
-        <strong>Supertest</strong>, para pillar fallos de integración entre
-        capas.
+        <strong>Tests that hit the real API:</strong> unit tests cover isolated
+        functions; a suite that starts the API (and a test database) and checks
+        whole routes, such as <strong>Supertest</strong>, would catch
+        integration failures between layers.
       </li>
     </ol>
 
@@ -1201,7 +1194,7 @@
               URL.revokeObjectURL(url);
             }, 1500);
           } catch (e) {
-            alert("Descarga automática no disponible en este entorno.");
+            alert("Automatic download is not available in this environment.");
           }
         });
       })();

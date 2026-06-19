@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Arquitectura PERN — flujo en capas (MyPlaythrough)</title>
+    <title>PERN architecture — layered flow (MyPlaythrough)</title>
     <style>
       :root {
         --bg: #0b0e14;
@@ -171,24 +171,27 @@
   <body>
     <p class="doc-nav">
       <a href="../index.html">Docs home</a>
-      <a href="diagrama_bd.html">Diagrama BD</a>
-      <a href="plan_pruebas.html">Plan de pruebas</a>
-      <a href="funciones_principales.html">Funciones en código</a>
+      <a href="diagrama_bd.html">Database diagram</a>
+      <a href="flujo_pern_tres_capas.html">PERN architecture (flow)</a>
+      <a href="funciones_principales.html">Key functions</a>
+      <a href="plan_pruebas.html">Test plan (HTML)</a>
+      <a href="../test-plan.md">Test plan (Markdown)</a>
     </p>
 
-    <h1>Arquitectura PERN y flujo de datos</h1>
+    <h1>PERN architecture and data flow</h1>
     <p class="sub">
-      Tres capas apiladas (presentación, negocio, persistencia) y leyenda numerada 1–8.
+      Three stacked layers (presentation, business, persistence) and a numbered
+      legend 1–8.
     </p>
 
     <div class="page-grid">
-      <div class="diagram-wrap" aria-label="Diagrama de capas apiladas">
+      <div class="diagram-wrap" aria-label="Stacked layer diagram">
         <svg viewBox="0 0 640 868" role="img" aria-labelledby="t d">
-          <title id="t">Arquitectura PERN — capas apiladas y flujo 1 a 8</title>
+          <title id="t">PERN architecture — stacked layers and flow 1 to 8</title>
           <desc id="d">
-            Capa de presentación arriba, negocio al centro, persistencia abajo. Flechas
-            numeradas del uno al ocho entre React, fetch, API, middleware, controladores
-            y PostgreSQL.
+            Presentation layer on top, business in the middle, persistence at the
+            bottom. Numbered arrows from one to eight between React, fetch, API,
+            middleware, controllers and PostgreSQL.
           </desc>
           <defs>
             <marker
@@ -238,7 +241,7 @@
             </clipPath>
           </defs>
 
-          <!-- Capa presentación -->
+          <!-- Presentation layer -->
           <rect
             x="8"
             y="8"
@@ -251,8 +254,8 @@
           />
           <foreignObject x="18" y="14" width="604" height="34">
             <div class="svg-box-text" xmlns="http://www.w3.org/1999/xhtml">
-              <span class="cap teal">CAPA DE PRESENTACIÓN</span>
-              <p class="sub">Navegador — React 18 · Vite · Tailwind CSS</p>
+              <span class="cap teal">PRESENTATION LAYER</span>
+              <p class="sub">Browser — React 18 · Vite · Tailwind CSS</p>
             </div>
           </foreignObject>
           <rect
@@ -267,8 +270,8 @@
           <g clip-path="url(#c-r)">
             <foreignObject x="22" y="52" width="596" height="66">
               <div class="svg-box-text" xmlns="http://www.w3.org/1999/xhtml">
-                <span class="t">Navegador web — componentes React</span>
-                <p class="b">App.jsx · AppShell · rutas y estado</p>
+                <span class="t">Web browser — React components</span>
+                <p class="b">App.jsx · AppShell · routes and state</p>
               </div>
             </foreignObject>
           </g>
@@ -308,14 +311,14 @@
               <div class="svg-box-text" xmlns="http://www.w3.org/1999/xhtml">
                 <span class="t">fetch + apiFetch() — client/src/api.js</span>
                 <p class="b">
-                  JSON · Authorization: Bearer &lt;JWT&gt; | 401 -&gt; tratamiento
-                  centralizado (sesión / redirección)
+                  JSON · Authorization: Bearer &lt;JWT&gt; | 401 -&gt; centralized
+                  handling (session / redirect)
                 </p>
               </div>
             </foreignObject>
           </g>
 
-          <!-- 8: fetch (borde derecho, abajo) -> React (misma columna derecha): no cruza el paso 1 -->
+          <!-- 8: fetch (right edge, bottom) -> React (same right column): does not cross step 1 -->
           <path
             d="M 598 200 Q 618 159 598 118"
             fill="none"
@@ -345,10 +348,10 @@
             font-weight="600"
             font-family="Inter, system-ui, sans-serif"
           >
-            Actualizar vista
+            Update view
           </text>
 
-          <!-- Capa negocio -->
+          <!-- Business layer -->
           <rect
             x="8"
             y="238"
@@ -361,7 +364,7 @@
           />
           <foreignObject x="18" y="244" width="604" height="44">
             <div class="svg-box-text" xmlns="http://www.w3.org/1999/xhtml">
-              <span class="cap blue">CAPA DE NEGOCIO</span>
+              <span class="cap blue">BUSINESS LAYER</span>
               <p class="sub">
                 Node.js — Express 5 · server/index.js · server/routes/*.js
               </p>
@@ -404,7 +407,7 @@
           <g clip-path="url(#c-a)">
             <foreignObject x="22" y="294" width="596" height="92">
               <div class="svg-box-text" xmlns="http://www.w3.org/1999/xhtml">
-                <span class="t">API REST (routers por dominio)</span>
+                <span class="t">REST API (domain routers)</span>
                 <p class="b">
                   /api/auth · /api/games · /api/community · /api/social · /api/admin ·
                   /api/covers…
@@ -447,10 +450,10 @@
           <g clip-path="url(#c-m)">
             <foreignObject x="22" y="394" width="596" height="78">
               <div class="svg-box-text" xmlns="http://www.w3.org/1999/xhtml">
-                <span class="t">Middleware de seguridad y utilidades</span>
+                <span class="t">Security and utility middleware</span>
                 <p class="b">
-                  JWT · CORS · express.json (límite tamaño) · bcryptjs en registro ·
-                  rate-limit login/registro
+                  JWT · CORS · express.json (size limit) · bcryptjs on register ·
+                  rate-limit login/register
                 </p>
               </div>
             </foreignObject>
@@ -490,17 +493,17 @@
           <g clip-path="url(#c-x)">
             <foreignObject x="22" y="480" width="596" height="100">
               <div class="svg-box-text" xmlns="http://www.w3.org/1999/xhtml">
-                <span class="t">Controladores — lógica de negocio</span>
+                <span class="t">Controllers — business logic</span>
                 <p class="b">
-                  Validación · comprobación de usuario / rol admin en BD | Pool
-                  PostgreSQL — server/config/db.js · SQL parametrizado | Respuesta JSON ·
-                  códigos HTTP coherentes
+                  Validation · user / admin role check in DB | PostgreSQL Pool —
+                  server/config/db.js · parameterized SQL | JSON response ·
+                  consistent HTTP status codes
                 </p>
               </div>
             </foreignObject>
           </g>
 
-          <!-- Capa persistencia -->
+          <!-- Persistence layer -->
           <rect
             x="8"
             y="608"
@@ -513,8 +516,8 @@
           />
           <foreignObject x="18" y="614" width="604" height="36">
             <div class="svg-box-text" xmlns="http://www.w3.org/1999/xhtml">
-              <span class="cap purple">CAPA DE PERSISTENCIA</span>
-              <p class="sub">PostgreSQL — docs/sql/schema.sql (8 tablas)</p>
+              <span class="cap purple">PERSISTENCE LAYER</span>
+              <p class="sub">PostgreSQL — docs/sql/schema.sql (8 tables)</p>
             </div>
           </foreignObject>
 
@@ -567,7 +570,7 @@
             usuarios · catalogo_juegos · juegos · comentarios · votos · social · LFG
           </text>
 
-          <!-- 5 Consulta SQL -->
+          <!-- 5 SQL query -->
           <line
             x1="320"
             y1="580"
@@ -598,10 +601,10 @@
             font-weight="600"
             font-family="Inter, system-ui, sans-serif"
           >
-            Consulta SQL
+            SQL query
           </text>
 
-          <!-- 6 Resultado (dashed): PostgreSQL -> controladores -->
+          <!-- 6 Result (dashed): PostgreSQL -> controllers -->
           <path
             d="M 320 738 Q 455 640 320 535"
             fill="none"
@@ -631,10 +634,10 @@
             font-weight="600"
             font-family="Inter, system-ui, sans-serif"
           >
-            Resultado
+            Result
           </text>
 
-          <!-- 7 Respuesta JSON: persistencia -> presentación (arco por la izquierda, hacia fetch) -->
+          <!-- 7 JSON response: persistence -> presentation (arc on the left, toward fetch) -->
           <path
             d="M 218 732 C 20 520 20 280 108 172"
             fill="none"
@@ -663,35 +666,34 @@
             font-weight="600"
             font-family="Inter, system-ui, sans-serif"
           >
-            Respuesta JSON
+            JSON response
           </text>
         </svg>
       </div>
 
-      <aside class="legend" aria-label="Leyenda del flujo">
-        <h2>Pasos del flujo (ejemplo guardar / consultar)</h2>
+      <aside class="legend" aria-label="Flow legend">
+        <h2>Flow steps (example save / query)</h2>
         <ol>
-          <li>Acción del usuario en la interfaz</li>
-          <li>Petición HTTP (JSON) hacia la API</li>
-          <li>Validación JWT y políticas (middleware)</li>
-          <li>Ejecución de la lógica en controladores</li>
-          <li>Consulta SQL parametrizada al motor</li>
-          <li>Filas devueltas al controlador</li>
-          <li>Respuesta JSON al cliente</li>
-          <li>React actualiza estado y vista</li>
+          <li>User action in the interface</li>
+          <li>HTTP request (JSON) to the API</li>
+          <li>JWT validation and policies (middleware)</li>
+          <li>Logic execution in controllers</li>
+          <li>Parameterized SQL query to the engine</li>
+          <li>Rows returned to the controller</li>
+          <li>JSON response to the client</li>
+          <li>React updates state and view</li>
         </ol>
         <hr />
         <p class="foot">
-          Ejemplo de ruta: <code>PUT /api/games/:id</code> o
-          <code>POST /api/games</code> con JWT.
+          Example route: <code>PUT /api/games/:id</code> or
+          <code>POST /api/games</code> with JWT.
         </p>
       </aside>
     </div>
 
     <p class="note">
-      Los nombres de tablas en el pie del diagrama son una leyenda resumida; el esquema
-      desplegable está en <code>docs/sql/schema.sql</code>. Para PDF: imprimir desde el
-      navegador.
+      Table names in the diagram footer are a short legend; the full schema is in
+      <code>docs/sql/schema.sql</code>. For PDF: print from the browser.
     </p>
   </body>
 </html>

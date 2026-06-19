@@ -38,7 +38,7 @@ export function PrintDeck() {
       <PrintPage className="flex flex-col items-center justify-center px-5 py-8 text-center md:px-10 md:py-10">
         <div className="flex max-w-3xl flex-col items-center">
           <span className="mb-5 inline-flex rounded-full border border-mp-accent/35 bg-mp-panel/90 px-5 py-2 text-[11px] font-bold uppercase tracking-[0.25em] text-mp-accent shadow-[0_0_32px_rgba(45,212,191,0.12)]">
-            Defensa proyecto integrado
+            Integrated project defense
           </span>
           <div className="mb-7 h-1.5 w-32 rounded-full bg-gradient-to-r from-mp-accent to-mp-cta shadow-[0_0_28px_rgba(45,212,191,0.45)]" />
           <h1 className="mb-4 text-5xl font-extrabold tracking-tight text-white md:text-7xl" style={fontSyne}>
@@ -47,22 +47,23 @@ export function PrintDeck() {
             through
           </h1>
           <p className="mb-2 max-w-xl text-lg text-slate-300 md:text-2xl">
-            Biblioteca personal de videojuegos y comunidad.
+            Personal video game library and lightweight community.
           </p>
-          <p className="mb-10 text-base text-slate-500 md:text-lg">Proyecto integrado · Stack PERN</p>
+          <p className="mb-10 text-base text-slate-500 md:text-lg">Integrated project · PERN stack</p>
           <div className="w-full max-w-xl rounded-3xl border border-white/10 bg-mp-panel/90 p-8 text-left shadow-2xl ring-1 ring-mp-accent/25">
-            <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.2em] text-mp-accent/90">Datos académicos</p>
+            <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.2em] text-mp-accent/90">Project details</p>
             <p className="text-white">
-              <strong>Alumno/a:</strong> <span className="text-mp-gold">Ikrame Ibn Hayoun</span>
+              <strong>Author:</strong> <span className="text-mp-gold">Ikrame Ibn Hayoun</span>
             </p>
             <p className="mt-3 text-slate-300">
-              <strong>Titulación:</strong> CFGS DAW · <span className="text-slate-500">2.º año</span>
+              <strong>Programme:</strong> Higher Vocational Training in Web Application Development ·{' '}
+              <span className="text-slate-500">2nd year</span>
             </p>
             <p className="mt-3 text-slate-300">
-              <strong>Tutora:</strong> María Jesús Rodríguez Sánchez
+              <strong>Supervisor:</strong> María Jesús Rodríguez Sánchez
             </p>
             <p className="mt-3 text-sm text-slate-500">
-              <strong>Centro:</strong> CESUR Málaga Este · Curso 2025/2026
+              <strong>Academic year:</strong> 2025/2026
             </p>
           </div>
         </div>
@@ -73,10 +74,10 @@ export function PrintDeck() {
         <div className="grid gap-10 md:grid-cols-2 md:items-center">
           <div className="space-y-6">
             <h2 className="text-4xl font-bold text-white md:text-5xl" style={fontSyne}>
-              Qué es MyPlaythrough
+              What is MyPlaythrough
             </h2>
             <p className="text-xl font-medium leading-snug text-slate-200 md:text-2xl">
-              Tu biblioteca de videojuegos + comunidad ligera.
+              Your game library plus a light social layer.
             </p>
             <div className="grid gap-4">
               <div className="grid grid-cols-[auto_1fr] items-center gap-4 rounded-2xl border border-white/5 bg-white/[0.03] p-4">
@@ -84,8 +85,8 @@ export function PrintDeck() {
                   <IconPortrait className="h-9 w-9" />
                 </div>
                 <div className="text-left">
-                  <p className="font-semibold text-white">Colección</p>
-                  <p className="mt-0.5 text-sm text-slate-400">Estado, notas, horas, portadas.</p>
+                  <p className="font-semibold text-white">Collection</p>
+                  <p className="mt-0.5 text-sm text-slate-400">Status, scores, hours, cover art.</p>
                 </div>
               </div>
               <div className="grid grid-cols-[auto_1fr] items-center gap-4 rounded-2xl border border-white/5 bg-white/[0.03] p-4">
@@ -93,15 +94,15 @@ export function PrintDeck() {
                   <IconUsers className="h-9 w-9" />
                 </div>
                 <div className="text-left">
-                  <p className="font-semibold text-white">Comunidad</p>
-                  <p className="mt-0.5 text-sm text-slate-400">Perfiles, seguir, recomendar, LFG.</p>
+                  <p className="font-semibold text-white">Community</p>
+                  <p className="mt-0.5 text-sm text-slate-400">Profiles, follows, recommendations, LFG.</p>
                 </div>
               </div>
             </div>
           </div>
           <div className="flex flex-col gap-4">
             <div className="rounded-3xl border border-white/10 bg-mp-panel/90 p-6 shadow-xl ring-1 ring-white/5">
-              <p className="mb-4 text-xs font-bold uppercase tracking-widest text-mp-accent">Paleta</p>
+              <p className="mb-4 text-xs font-bold uppercase tracking-widest text-mp-accent">Palette</p>
               <div className="flex flex-wrap gap-3">
                 {PRODUCT_SWATCHES.map((c) => (
                   <span
@@ -115,11 +116,11 @@ export function PrintDeck() {
               </div>
             </div>
             <div className="rounded-2xl border border-mp-accent/25 bg-slate-950/80 px-5 py-4 text-center text-sm font-medium text-slate-300 md:text-left">
-              Portadas vía <span className="text-mp-accent">Steam</span> y <span className="text-mp-accent">RAWG</span>
-              <span className="text-slate-500"> · servidor compatible con navegador</span>
+              Cover art via <span className="text-mp-accent">Steam</span> and <span className="text-mp-accent">RAWG</span>
+              <span className="text-slate-500"> · browser-friendly server proxy</span>
             </div>
             <div className="rounded-2xl border border-white/10 bg-mp-panel/60 px-5 py-3 text-center text-xs text-slate-500 md:text-left">
-              Objetivo académico: PERN completo — interfaz, API, base de datos y seguridad.
+              Academic goal: full PERN stack — UI, API, database, and security.
             </div>
           </div>
         </div>
@@ -128,14 +129,14 @@ export function PrintDeck() {
       {/* Arquitectura — SlideArch */}
       <PrintPage className="flex flex-col justify-center px-5 py-8 md:px-10 md:py-10">
         <h2 className="mb-6 text-center text-4xl font-bold text-white md:text-5xl" style={fontSyne}>
-          Arquitectura · PERN
+          Architecture · PERN
         </h2>
         <div className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
           <PrintArchCard
             icon={<IconWindow className="h-12 w-12" />}
-            title="Cliente (React)"
+            title="Client (React)"
             stack="Vite · Tailwind"
-            hint="Interfaz en el navegador, sin recargar de más."
+            hint="Browser UI without unnecessary full reloads."
           />
           <div className="hidden items-center justify-center md:flex">
             <IconArrowEdge className="h-10 w-10 text-mp-accent/90" />
@@ -144,16 +145,16 @@ export function PrintDeck() {
             icon={<IconServer className="h-12 w-12" />}
             title="API (Node)"
             stack="Express · REST"
-            hint="Autenticación, reglas y respuestas seguras."
+            hint="Authentication, business rules, safe responses."
           />
           <div className="hidden items-center justify-center md:flex">
             <IconArrowEdge className="h-10 w-10 text-mp-accent/90" />
           </div>
           <PrintArchCard
             icon={<IconDatabase className="h-12 w-12" />}
-            title="Base de datos"
+            title="Database"
             stack="PostgreSQL"
-            hint="Relaciones, integridad, datos persistentes."
+            hint="Relations, integrity, persistent data."
           />
         </div>
       </PrintPage>
@@ -161,55 +162,55 @@ export function PrintDeck() {
       {/* Modelo de datos — SlideSchema */}
       <PrintPage className="flex flex-col justify-center gap-3 px-5 py-6 md:gap-4 md:px-10 md:py-8">
         <h2 className="text-center text-3xl font-bold text-white md:text-4xl" style={fontSyne}>
-          Modelo de datos
+          Data model
         </h2>
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-x-1 gap-y-2 rounded-2xl border border-mp-accent/20 bg-slate-950/60 px-3 py-3 text-[11px] text-slate-300 md:gap-x-2 md:px-4 md:text-sm">
           <span className="font-semibold text-mp-accent">1</span>
-          <span>cuenta</span>
+          <span>account</span>
           <span className="text-mp-accent/70">→</span>
-          <span className="font-semibold text-white">muchas</span>
-          <span>filas en tu lista</span>
+          <span className="font-semibold text-white">many</span>
+          <span>library rows</span>
           <span className="text-mp-accent/70">→</span>
-          <span>cada una apunta a</span>
-          <span className="font-semibold text-mp-accent">1 ficha</span>
-          <span>del catálogo (compartida)</span>
+          <span>each points to</span>
+          <span className="font-semibold text-mp-accent">1 catalogue entry</span>
+          <span>(shared)</span>
         </div>
         <div className="mx-auto w-full max-w-5xl space-y-4">
           <div className="rounded-3xl border border-mp-accent/25 bg-mp-panel/30 p-4 ring-1 ring-white/5 md:p-5">
             <p className="mb-3 text-center text-xs font-bold uppercase tracking-[0.2em] text-mp-accent/90">
-              Las tres tablas del núcleo
+              Core tables
             </p>
             <div className="mx-auto mb-3 hidden h-1 max-w-md rounded-full bg-gradient-to-r from-mp-accent/80 via-mp-accent/30 to-mp-accent/80 md:block" />
             <div className="grid grid-cols-1 items-stretch gap-2 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:gap-1">
-              <PrintSchemaBlock badge="①" title="Tu cuenta" tech="usuarios" micro="Quién eres: login, perfil, rol." />
-              <PrintSchemaRel label="tiene" sub="muchas filas" />
+              <PrintSchemaBlock badge="①" title="Your account" tech="usuarios" micro="Who you are: login, profile, role." />
+              <PrintSchemaRel label="has" sub="many rows" />
               <PrintSchemaBlock
                 badge="②"
-                title="Tu biblioteca"
+                title="Your library"
                 tech="juegos"
-                micro="Cada fila: un juego añadido + tu estado y notas."
+                micro="Each row: one added game + your status and notes."
               />
-              <PrintSchemaRel label="comparten" sub="la ficha del juego" />
+              <PrintSchemaRel label="share" sub="game record" />
               <PrintSchemaBlock
                 badge="③"
-                title="Catálogo"
+                title="Catalogue"
                 tech="catalogo_juegos"
-                micro="La ficha del juego: título y portada (Steam/RAWG)."
+                micro="Canonical game: title and cover (Steam/RAWG)."
               />
             </div>
           </div>
           <div className="rounded-3xl border border-white/10 bg-slate-950/50 p-4 md:p-5">
-            <p className="mb-1 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Comunidad</p>
+            <p className="mb-1 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Community</p>
             <p className="mb-3 text-center text-[11px] text-slate-500">
-              Cosas sociales enlazadas a usuarios y a fichas de juego
+              Social features linked to users and game entries
             </p>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
               {(
                 [
-                  { k: 'Comentarios · votos', s: 'Sobre la ficha pública' },
-                  { k: 'Seguimientos', s: 'Usuario ↔ usuario' },
-                  { k: 'Recomendaciones', s: 'A la bandeja' },
-                  { k: 'LFG', s: 'Desde un juego tuyo' },
+                  { k: 'Comments · votes', s: 'On the public entry' },
+                  { k: 'Follows', s: 'User ↔ user' },
+                  { k: 'Recommendations', s: 'To the inbox' },
+                  { k: 'LFG', s: 'From your library' },
                 ] as const
               ).map((row) => (
                 <div
@@ -228,7 +229,7 @@ export function PrintDeck() {
       {/* Funciones — SlideFeatures */}
       <PrintPage className="flex flex-col justify-center px-5 py-8 md:px-10 md:py-10">
         <h2 className="mb-8 text-center text-3xl font-bold text-white md:text-4xl" style={fontSyne}>
-          Funciones principales
+          Main features
         </h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {SLIDE_FEATURES_DATA.map((f) => {
@@ -252,38 +253,37 @@ export function PrintDeck() {
       {/* Demo — SlideDemo */}
       <PrintPage className="flex flex-col justify-center gap-6 px-5 py-8 md:px-10 md:py-10">
         <h2 className="text-center text-3xl font-bold text-white md:text-4xl" style={fontSyne}>
-          Demo en vivo
+          Walkthrough
         </h2>
         <div className="mx-auto flex w-full max-w-lg flex-col gap-3 sm:flex-row sm:justify-center">
           <a
-            href={homeHref}
+            href="https://ikrame-ih.github.io/my-playthrough/"
             className="inline-flex flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-mp-accent to-mp-cta px-6 py-4 text-center text-base font-bold text-slate-950 shadow-[0_12px_40px_rgba(45,212,191,0.35)]"
           >
-            Inicio · tu colección
+            Project docs & screenshots
           </a>
           <a
             href={communityHref}
             className="inline-flex flex-1 items-center justify-center rounded-2xl border-2 border-mp-accent/50 bg-mp-panel/80 px-6 py-4 text-center text-base font-semibold text-mp-accent"
           >
-            Comunidad
+            Community
           </a>
         </div>
         <p className="mx-auto max-w-lg text-center font-mono text-[10px] leading-relaxed text-slate-600 md:text-[11px]">
+          <span className="block break-all">https://ikrame-ih.github.io/my-playthrough/</span>
           <span className="block break-all">{homeHref}</span>
-          <span className="block break-all">{communityHref}</span>
         </p>
         <ol className="mx-auto max-w-xl list-decimal space-y-3 rounded-2xl border border-white/10 bg-mp-panel/40 py-6 pl-11 pr-6 text-sm text-slate-300 marker:font-semibold marker:text-mp-accent md:text-base">
           <li className="leading-snug">
-            <strong className="text-white">Colección</strong> — Alta de juego, elegir portada y aviso al volver a la lista.
+            <strong className="text-white">Collection</strong> — Add a game, pick cover art, confirmation when returning to the list.
           </li>
           <li className="leading-snug">
-            <strong className="text-white">Comunidad y social</strong> — Perfil, seguir, recomendar con confirmación en el
-            modal; campana y bandeja de recomendaciones; publicar o mostrar LFG si encaja en el guion · turno de preguntas.
+            <strong className="text-white">Community & social</strong> — Profiles, follows, recommendations with modal confirmation;
+            bell and recommendation inbox; LFG posts when they fit the demo flow.
           </li>
         </ol>
         <p className="text-center text-sm text-slate-500">
-          Defensa · <strong className="text-slate-400">5 mayo 2026 · 18:15</strong> · Cuenta demo en README («Rellenar cuenta
-          demo»).
+          Project defense · <strong className="text-slate-400">5 May 2026 · 18:15</strong> · Demo account in README.
         </p>
       </PrintPage>
 
@@ -299,14 +299,14 @@ export function PrintDeck() {
         />
         <div className="relative z-10 flex flex-col items-center">
           <span className="mb-5 inline-flex rounded-full border border-mp-accent/35 bg-mp-panel/80 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-mp-accent">
-            Cierre
+            Closing
           </span>
           <h2 className="mb-4 text-5xl font-extrabold text-white md:text-6xl" style={fontSyne}>
-            ¿Preguntas?
+            Questions?
           </h2>
-          <p className="text-lg text-slate-400">Gracias por su atención</p>
+          <p className="text-lg text-slate-400">Thank you for your attention</p>
           <div className="mt-10 w-full max-w-lg rounded-2xl border border-white/10 bg-mp-panel/90 px-6 py-5 text-left text-sm text-slate-400 shadow-2xl ring-1 ring-mp-accent/20">
-            <p className="font-semibold text-mp-accent">Código y documentación</p>
+            <p className="font-semibold text-mp-accent">Code & documentation</p>
             <a
               href={REPO_PUBLIC_URL}
               className="mt-3 block break-all text-base font-medium text-white underline decoration-mp-accent/50 underline-offset-4"
@@ -314,9 +314,10 @@ export function PrintDeck() {
               {REPO_PUBLIC_URL}
             </a>
             <p className="mt-4 text-xs font-normal text-slate-500">
-              README · carpeta <span className="font-mono text-slate-500">docs/</span> ·{' '}
-              <span className="font-mono text-slate-500">DESIGN_ES.md</span> · esquema SQL
+              README · <span className="font-mono text-slate-500">docs/</span> ·{' '}
+              <span className="font-mono text-slate-500">DESIGN.md</span> · SQL schema
             </p>
+            <p className="mt-4 text-sm font-medium text-mp-gold">Ikrame Ibn Hayoun · 2025/2026</p>
           </div>
         </div>
       </PrintPage>

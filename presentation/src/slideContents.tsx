@@ -33,7 +33,7 @@ export function SlideCover() {
           variants={fadeUp}
           className="mb-5 inline-flex rounded-full border border-mp-accent/35 bg-mp-panel/80 px-5 py-2 text-[11px] font-bold uppercase tracking-[0.25em] text-mp-accent shadow-[0_0_32px_rgba(45,212,191,0.12)] backdrop-blur-md"
         >
-          Defensa proyecto integrado
+          Integrated project defense
         </motion.span>
         <motion.div
           variants={fadeUp}
@@ -47,27 +47,28 @@ export function SlideCover() {
           My<span className="bg-gradient-to-r from-mp-accent to-mp-cta bg-clip-text text-transparent">Play</span>through
         </motion.h1>
         <motion.p variants={fadeUp} className="mb-2 max-w-xl text-lg text-slate-300 md:text-2xl">
-          Biblioteca personal de videojuegos y comunidad.
+          Personal video game library and lightweight community.
         </motion.p>
         <motion.p variants={fadeUp} className="mb-10 text-base text-slate-500 md:text-lg">
-          Proyecto integrado · Stack PERN
+          Integrated project · PERN stack
         </motion.p>
         <motion.div
           variants={fadeUp}
           className="w-full max-w-xl rounded-3xl border border-white/10 bg-mp-panel/90 p-8 text-left shadow-2xl ring-1 ring-mp-accent/25 backdrop-blur-xl"
         >
-          <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.2em] text-mp-accent/90">Datos académicos</p>
+          <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.2em] text-mp-accent/90">Project details</p>
           <p className="text-white">
-            <strong>Alumno/a:</strong> <span className="text-mp-gold">Ikrame Ibn Hayoun</span>
+            <strong>Author:</strong> <span className="text-mp-gold">Ikrame Ibn Hayoun</span>
           </p>
           <p className="mt-3 text-slate-300">
-            <strong>Titulación:</strong> CFGS DAW · <span className="text-slate-500">2.º año</span>
+            <strong>Programme:</strong> Higher Vocational Training in Web Application Development ·{' '}
+            <span className="text-slate-500">2nd year</span>
           </p>
           <p className="mt-3 text-slate-300">
-            <strong>Tutora:</strong> María Jesús Rodríguez Sánchez
+            <strong>Supervisor:</strong> María Jesús Rodríguez Sánchez
           </p>
           <p className="mt-3 text-sm text-slate-500">
-            <strong>Centro:</strong> CESUR Málaga Este · Curso 2025/2026
+            <strong>Academic year:</strong> 2025/2026
           </p>
         </motion.div>
       </motion.div>
@@ -87,10 +88,10 @@ export function SlideProduct() {
           className="space-y-6"
         >
           <motion.h2 variants={fadeUp} className="font-[family-name:var(--font-display)] text-4xl font-bold text-white md:text-5xl" style={{ fontFamily: '"Syne", sans-serif' }}>
-            Qué es MyPlaythrough
+            What is MyPlaythrough
           </motion.h2>
           <motion.p variants={fadeUp} className="text-xl font-medium leading-snug text-slate-200 md:text-2xl">
-            Tu biblioteca de videojuegos + comunidad ligera.
+            Your game library plus a light social layer.
           </motion.p>
           <motion.div variants={fadeUp} className="grid gap-4">
             <div className="grid grid-cols-[auto_1fr] items-center gap-4 rounded-2xl border border-white/5 bg-white/[0.03] p-4">
@@ -98,8 +99,8 @@ export function SlideProduct() {
                 <IconPortrait className="h-9 w-9" />
               </div>
               <div className="text-left">
-                <p className="font-semibold text-white">Colección</p>
-                <p className="mt-0.5 text-sm text-slate-400">Estado, notas, horas, portadas.</p>
+                <p className="font-semibold text-white">Collection</p>
+                <p className="mt-0.5 text-sm text-slate-400">Status, scores, hours, cover art.</p>
               </div>
             </div>
             <div className="grid grid-cols-[auto_1fr] items-center gap-4 rounded-2xl border border-white/5 bg-white/[0.03] p-4">
@@ -107,8 +108,8 @@ export function SlideProduct() {
                 <IconUsers className="h-9 w-9" />
               </div>
               <div className="text-left">
-                <p className="font-semibold text-white">Comunidad</p>
-                <p className="mt-0.5 text-sm text-slate-400">Perfiles, seguir, recomendar, LFG.</p>
+                <p className="font-semibold text-white">Community</p>
+                <p className="mt-0.5 text-sm text-slate-400">Profiles, follows, recommendations, LFG.</p>
               </div>
             </div>
           </motion.div>
@@ -126,7 +127,7 @@ export function SlideProduct() {
             whileHover={{ y: -4, transition: spring }}
             className="rounded-3xl border border-white/10 bg-mp-panel/90 p-6 shadow-xl ring-1 ring-white/5 backdrop-blur-sm"
           >
-            <p className="mb-4 text-xs font-bold uppercase tracking-widest text-mp-accent">Paleta</p>
+            <p className="mb-4 text-xs font-bold uppercase tracking-widest text-mp-accent">Palette</p>
             <div className="flex flex-wrap gap-3">
               {PRODUCT_SWATCHES.map((c, i) => (
                 <motion.span
@@ -146,14 +147,14 @@ export function SlideProduct() {
             variants={fadeUp}
             className="rounded-2xl border border-mp-accent/25 bg-slate-950/80 px-5 py-4 text-center text-sm font-medium text-slate-300 backdrop-blur-sm md:text-left"
           >
-            Portadas vía <span className="text-mp-accent">Steam</span> y <span className="text-mp-accent">RAWG</span>
-            <span className="text-slate-500"> · servidor compatible con navegador</span>
+            Cover art via <span className="text-mp-accent">Steam</span> and <span className="text-mp-accent">RAWG</span>
+            <span className="text-slate-500"> · browser-friendly server proxy</span>
           </motion.div>
           <motion.div
             variants={fadeUp}
             className="rounded-2xl border border-white/10 bg-mp-panel/60 px-5 py-3 text-center text-xs text-slate-500 md:text-left"
           >
-            Objetivo académico: PERN completo — interfaz, API, base de datos y seguridad.
+            Academic goal: full PERN stack — UI, API, database, and security.
           </motion.div>
         </motion.div>
       </div>
@@ -209,7 +210,7 @@ export function SlideArch() {
         className="mb-6 text-center font-[family-name:var(--font-display)] text-4xl font-bold text-white md:text-5xl"
         style={{ fontFamily: '"Syne", sans-serif' }}
       >
-        Arquitectura · PERN
+        Architecture · PERN
       </motion.h2>
       <motion.div
         initial="hidden"
@@ -219,23 +220,23 @@ export function SlideArch() {
       >
         <ArchCard
           icon={<IconWindow className="h-12 w-12" />}
-          title="Cliente (React)"
+          title="Client (React)"
           stack="Vite · Tailwind"
-          hint="Interfaz en el navegador, sin recargar de más."
+          hint="Browser UI without unnecessary full reloads."
         />
         <FlowArrow />
         <ArchCard
           icon={<IconServer className="h-12 w-12" />}
           title="API (Node)"
           stack="Express · REST"
-          hint="Autenticación, reglas y respuestas seguras."
+          hint="Authentication, business rules, safe responses."
         />
         <FlowArrow />
         <ArchCard
           icon={<IconDatabase className="h-12 w-12" />}
-          title="Base de datos"
+          title="Database"
           stack="PostgreSQL"
-          hint="Relaciones, integridad, datos persistentes."
+          hint="Relations, integrity, persistent data."
         />
       </motion.div>
     </div>
@@ -252,7 +253,6 @@ function SchemaBlock({
   badge: string
   title: string
   tech: string
-  /** Una línea muy corta que ayuda a visualizar el papel de la tabla. */
   micro: string
   children?: ReactNode
 }) {
@@ -309,10 +309,9 @@ export function SlideSchema() {
         className="text-center font-[family-name:var(--font-display)] text-3xl font-bold text-white md:text-4xl"
         style={{ fontFamily: '"Syne", sans-serif' }}
       >
-        Modelo de datos
+        Data model
       </motion.h2>
 
-      {/* Esquema compacto: lectura en una frase */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -320,14 +319,14 @@ export function SlideSchema() {
         className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-x-1 gap-y-2 rounded-2xl border border-mp-accent/20 bg-slate-950/60 px-3 py-3 text-[11px] text-slate-300 md:gap-x-2 md:px-4 md:text-sm"
       >
         <span className="font-semibold text-mp-accent">1</span>
-        <span>cuenta</span>
+        <span>account</span>
         <span className="text-mp-accent/70">→</span>
-        <span className="font-semibold text-white">muchas</span>
-        <span>filas en tu lista</span>
+        <span className="font-semibold text-white">many</span>
+        <span>library rows</span>
         <span className="text-mp-accent/70">→</span>
-        <span>cada una apunta a</span>
-        <span className="font-semibold text-mp-accent">1 ficha</span>
-        <span>del catálogo (compartida)</span>
+        <span>each points to</span>
+        <span className="font-semibold text-mp-accent">1 catalogue entry</span>
+        <span>(shared)</span>
       </motion.div>
 
       <motion.div
@@ -337,43 +336,27 @@ export function SlideSchema() {
         className="mx-auto w-full max-w-5xl space-y-4"
       >
         <div className="rounded-3xl border border-mp-accent/25 bg-mp-panel/30 p-4 ring-1 ring-white/5 backdrop-blur-sm md:p-5">
-          <p className="mb-3 text-center text-xs font-bold uppercase tracking-[0.2em] text-mp-accent/90">Las tres tablas del núcleo</p>
-          {/* Barra tipo “pista” visual */}
+          <p className="mb-3 text-center text-xs font-bold uppercase tracking-[0.2em] text-mp-accent/90">Core tables</p>
           <div className="mx-auto mb-3 hidden h-1 max-w-md rounded-full bg-gradient-to-r from-mp-accent/80 via-mp-accent/30 to-mp-accent/80 md:block" aria-hidden />
           <div className="grid grid-cols-1 items-stretch gap-2 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:gap-1">
-            <SchemaBlock
-              badge="①"
-              title="Tu cuenta"
-              tech="usuarios"
-              micro="Quién eres: login, perfil, rol."
-            />
-            <SchemaRel label="tiene" sub="muchas filas" />
-            <SchemaBlock
-              badge="②"
-              title="Tu biblioteca"
-              tech="juegos"
-              micro="Cada fila: un juego añadido + tu estado y notas."
-            />
-            <SchemaRel label="comparten" sub="la ficha del juego" />
-            <SchemaBlock
-              badge="③"
-              title="Catálogo"
-              tech="catalogo_juegos"
-              micro="La ficha del juego: título y portada (Steam/RAWG)."
-            />
+            <SchemaBlock badge="①" title="Your account" tech="usuarios" micro="Who you are: login, profile, role." />
+            <SchemaRel label="has" sub="many rows" />
+            <SchemaBlock badge="②" title="Your library" tech="juegos" micro="Each row: one added game + your status and notes." />
+            <SchemaRel label="share" sub="game record" />
+            <SchemaBlock badge="③" title="Catalogue" tech="catalogo_juegos" micro="Canonical game: title and cover (Steam/RAWG)." />
           </div>
         </div>
 
         <div className="rounded-3xl border border-white/10 bg-slate-950/50 p-4 md:p-5">
-          <p className="mb-1 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Comunidad</p>
-          <p className="mb-3 text-center text-[11px] text-slate-500">Cosas sociales enlazadas a usuarios y a fichas de juego</p>
+          <p className="mb-1 text-center text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Community</p>
+          <p className="mb-3 text-center text-[11px] text-slate-500">Social features linked to users and game entries</p>
           <motion.div variants={fadeUp} className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {(
               [
-                { k: 'Comentarios · votos', s: 'Sobre la ficha pública' },
-                { k: 'Seguimientos', s: 'Usuario ↔ usuario' },
-                { k: 'Recomendaciones', s: 'A la bandeja' },
-                { k: 'LFG', s: 'Desde un juego tuyo' },
+                { k: 'Comments · votes', s: 'On the public entry' },
+                { k: 'Follows', s: 'User ↔ user' },
+                { k: 'Recommendations', s: 'To the inbox' },
+                { k: 'LFG', s: 'From your library' },
               ] as const
             ).map((row) => (
               <div
@@ -401,7 +384,7 @@ export function SlideFeatures() {
         className="mb-8 text-center font-[family-name:var(--font-display)] text-3xl font-bold text-white md:text-4xl"
         style={{ fontFamily: '"Syne", sans-serif' }}
       >
-        Funciones principales
+        Main features
       </motion.h2>
       <motion.div
         initial="hidden"
@@ -412,18 +395,18 @@ export function SlideFeatures() {
         {SLIDE_FEATURES_DATA.map((f) => {
           const I = f.Icon
           return (
-          <motion.div
-            key={f.title}
-            variants={fadeUp}
-            whileHover={{ y: -5, transition: spring }}
-            className="rounded-2xl border border-white/10 bg-mp-panel/80 p-5 ring-1 ring-white/5 backdrop-blur-sm"
-          >
-            <div className="mp-icon-hud mb-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-mp-accent/20 bg-mp-panel/80">
-              <I className="h-9 w-9" />
-            </div>
-            <p className="font-semibold text-white">{f.title}</p>
-            <p className="mt-1 text-sm text-slate-400">{f.text}</p>
-          </motion.div>
+            <motion.div
+              key={f.title}
+              variants={fadeUp}
+              whileHover={{ y: -5, transition: spring }}
+              className="rounded-2xl border border-white/10 bg-mp-panel/80 p-5 ring-1 ring-white/5 backdrop-blur-sm"
+            >
+              <div className="mp-icon-hud mb-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-mp-accent/20 bg-mp-panel/80">
+                <I className="h-9 w-9" />
+              </div>
+              <p className="font-semibold text-white">{f.title}</p>
+              <p className="mt-1 text-sm text-slate-400">{f.text}</p>
+            </motion.div>
           )
         })}
       </motion.div>
@@ -434,14 +417,15 @@ export function SlideFeatures() {
 export function SlideDemo() {
   const homeHref = `${APP_DEMO_URL}/`
   const communityHref = `${APP_DEMO_URL}/community`
+  const docsHref = 'https://ikrame-ih.github.io/my-playthrough/'
 
   const steps = [
     <>
-      <strong className="text-white">Colección</strong> — Alta de juego, elegir portada y aviso al volver a la lista.
+      <strong className="text-white">Collection</strong> — Add a game, pick cover art, confirmation when returning to the list.
     </>,
     <>
-      <strong className="text-white">Comunidad y social</strong> — Perfil, seguir, recomendar con confirmación en el modal; campana y
-      bandeja de recomendaciones; publicar o mostrar LFG si encaja en el guion · turno de preguntas.
+      <strong className="text-white">Community & social</strong> — Profiles, follows, recommendations with modal confirmation; bell and
+      recommendation inbox; LFG posts when they fit the demo flow.
     </>,
   ]
 
@@ -454,7 +438,7 @@ export function SlideDemo() {
         className="text-center font-[family-name:var(--font-display)] text-3xl font-bold text-white md:text-4xl"
         style={{ fontFamily: '"Syne", sans-serif' }}
       >
-        Demo en vivo
+        Walkthrough
       </motion.h2>
 
       <motion.div
@@ -465,14 +449,14 @@ export function SlideDemo() {
       >
         <motion.a
           variants={fadeUp}
-          href={homeHref}
+          href={docsHref}
           target="_blank"
           rel="noopener noreferrer"
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
           className="inline-flex flex-1 items-center justify-center rounded-2xl bg-gradient-to-r from-mp-accent to-mp-cta px-6 py-4 text-center text-base font-bold text-slate-950 shadow-[0_12px_40px_rgba(45,212,191,0.35)] transition-shadow hover:shadow-[0_16px_48px_rgba(45,212,191,0.45)]"
         >
-          Inicio · tu colección
+          Project docs & screenshots
         </motion.a>
         <motion.a
           variants={fadeUp}
@@ -483,13 +467,13 @@ export function SlideDemo() {
           whileTap={{ scale: 0.98 }}
           className="inline-flex flex-1 items-center justify-center rounded-2xl border-2 border-mp-accent/50 bg-mp-panel/80 px-6 py-4 text-center text-base font-semibold text-mp-accent backdrop-blur-sm"
         >
-          Comunidad
+          Local community view
         </motion.a>
       </motion.div>
 
       <p className="mx-auto max-w-lg text-center font-mono text-[10px] leading-relaxed text-slate-600 md:text-[11px]">
-        <span className="block break-all">{homeHref}</span>
-        <span className="block break-all">{communityHref}</span>
+        <span className="block break-all">{docsHref}</span>
+        <span className="block text-slate-500">Run locally: {homeHref}</span>
       </p>
 
       <motion.ol
@@ -511,7 +495,7 @@ export function SlideDemo() {
         transition={{ delay: 0.35 }}
         className="text-center text-sm text-slate-500"
       >
-        Defensa · <strong className="text-slate-400">5 mayo 2026 · 18:15</strong> · Cuenta demo en README («Rellenar cuenta demo»).
+        Project defense · <strong className="text-slate-400">5 May 2026 · 18:15</strong> · Demo account in README.
       </motion.p>
     </div>
   )
@@ -537,23 +521,23 @@ export function SlideClosing() {
           variants={fadeUp}
           className="mb-5 inline-flex rounded-full border border-mp-accent/35 bg-mp-panel/80 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-mp-accent"
         >
-          Cierre
+          Closing
         </motion.span>
         <motion.h2
           variants={fadeUp}
           className="mb-4 font-[family-name:var(--font-display)] text-5xl font-extrabold text-white md:text-6xl"
           style={{ fontFamily: '"Syne", sans-serif' }}
         >
-          ¿Preguntas?
+          Questions?
         </motion.h2>
         <motion.p variants={fadeUp} className="text-lg text-slate-400">
-          Gracias por su atención
+          Thank you for your attention
         </motion.p>
         <motion.div
           variants={fadeUp}
           className="mt-10 w-full max-w-lg rounded-2xl border border-white/10 bg-mp-panel/90 px-6 py-5 text-left text-sm text-slate-400 shadow-2xl ring-1 ring-mp-accent/20 backdrop-blur-md"
         >
-          <p className="font-semibold text-mp-accent">Código y documentación</p>
+          <p className="font-semibold text-mp-accent">Code & documentation</p>
           <motion.a
             href={REPO_PUBLIC_URL}
             target="_blank"
@@ -564,9 +548,10 @@ export function SlideClosing() {
             {REPO_PUBLIC_URL}
           </motion.a>
           <p className="mt-4 text-xs font-normal text-slate-500">
-            README · carpeta <span className="font-mono text-slate-500">docs/</span> ·{' '}
-            <span className="font-mono text-slate-500">DESIGN_ES.md</span> · esquema SQL
+            README · <span className="font-mono text-slate-500">docs/</span> ·{' '}
+            <span className="font-mono text-slate-500">DESIGN.md</span> · SQL schema
           </p>
+          <p className="mt-4 text-sm font-medium text-mp-gold">Ikrame Ibn Hayoun · 2025/2026</p>
         </motion.div>
       </motion.div>
     </div>
