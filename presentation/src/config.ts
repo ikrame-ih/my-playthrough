@@ -14,4 +14,4 @@ export const API_BASE_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:3
 /** Repositorio público (cambiar en .env si el remoto cambia). */
 export const REPO_PUBLIC_URL =
   import.meta.env.VITE_REPO_URL?.replace(/\/$/, '') ??
-  'https://github.com/ikihga2223-create/my-playthrough'
+  'https://github.com/ikrame-ih/my-playthrough'

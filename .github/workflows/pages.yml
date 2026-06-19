@@ -29,6 +29,7 @@ jobs:
       - name: Build project defense deck
         env:
           GITHUB_PAGES: "true"
+          VITE_PAGES_BASE: "/${{ github.event.repository.name }}/defense/"
         run: |
           npm ci
           npm run build

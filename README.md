@@ -1,12 +1,12 @@
 # MyPlaythrough
 
-[![Project documentation](https://img.shields.io/badge/Project%20docs-GitHub%20Pages-00F5FF?style=for-the-badge&logo=github)](https://ikihga2223-create.github.io/MyPlaythrough/)
+[![Project documentation](https://img.shields.io/badge/Project%20docs-GitHub%20Pages-00F5FF?style=for-the-badge&logo=github)](https://ikrame-ih.github.io/my-playthrough/)
 
 A full-stack web app to manage your personal video game library — track what you are playing, what you have finished, and what is still on your backlog. Optional community features let you follow other players, share recommendations, and find teammates (LFG).
 
 Developed as the **final intermodular project** for the **Higher Technical Degree in Web Application Development (DAW)** at CESUR Málaga Este (2025/2026), **awarded the maximum grade**.
 
-**Project documentation** (defense deck, architecture diagrams, database model, test plan, screenshots): **[GitHub Pages](https://ikihga2223-create.github.io/MyPlaythrough/)** — start with the [defense presentation](https://ikihga2223-create.github.io/MyPlaythrough/defense/).
+**Project documentation** (animated defense deck, architecture diagrams, database model, test plan, screenshots): **[GitHub Pages](https://ikrame-ih.github.io/my-playthrough/)** — start with the [defense presentation](https://ikrame-ih.github.io/my-playthrough/defense/) (arrow keys / space to navigate; animations included).
 
 ---
 
@@ -45,7 +45,7 @@ Captured at 1440×900 from the local stack. Regenerate with `node scripts/captur
 </tr>
 </table>
 
-More captures live in [`docs/screenshots/`](docs/screenshots/) and on [GitHub Pages](https://ikihga2223-create.github.io/MyPlaythrough/).
+More captures live in [`docs/screenshots/`](docs/screenshots/) and on [GitHub Pages](https://ikrame-ih.github.io/my-playthrough/).
 
 </details>
 
@@ -151,13 +151,13 @@ Full route definitions live under `server/routes/`.
 ## Design
 
 UI design tokens and component patterns: [`DESIGN.md`](DESIGN.md).  
-Architecture and diagrams: [GitHub Pages](https://ikihga2223-create.github.io/MyPlaythrough/).
+Architecture and diagrams: [GitHub Pages](https://ikrame-ih.github.io/my-playthrough/).
 
 ---
 
 ## Status
 
-Core features are implemented and documented in the [manual test plan](docs/test-plan.md) (printable HTML on [GitHub Pages](https://ikihga2223-create.github.io/MyPlaythrough/abrir-en-navegador/plan_pruebas.html)).
+Core features are implemented and documented in the [manual test plan](docs/test-plan.md) (printable HTML on [GitHub Pages](https://ikrame-ih.github.io/my-playthrough/abrir-en-navegador/plan_pruebas.html)).
 
 ## License
 
