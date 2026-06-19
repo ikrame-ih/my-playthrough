@@ -5,19 +5,7 @@ import { estadoBadgeClass, labelEstado } from "../gameLabels";
 import { IconGift, IconImage, IconPencil, IconTrash } from "./icons";
 
 /**
- * Tarjeta visual de un juego. Muestra la portada (vía proxy), plataforma,
- * título, badge de estado, horas y puntuación. En modo `showActions` añade
- * botones de editar y eliminar para la colección propia del usuario.
- * El `imgError` permite caer a un placeholder con la inicial cuando la imagen
- * no carga correctamente o el proxy devuelve un error.
- *
- * @component
- * @param {object}   props
- * @param {object}   props.game             - Datos del juego.
- * @param {boolean}  [props.showActions]    - Si es `true`, muestra los botones de editar/borrar.
- * @param {Function} [props.onDelete]       - Callback `(id, titulo) => void` para el botón borrar.
- * @param {Function} [props.onRecommend]     - Si existe, muestra botón para abrir el modal de recomendar.
- * @param {string}   [props.discussionTo]   - Ruta de la discusión del juego para el enlace inferior.
+ * Game card: cover art, platform, status, hours, score, and optional actions.
  */
 export default function GameCard({
   game,
@@ -33,43 +21,56 @@ export default function GameCard({
   const showCover = Boolean(coverUrl) && !imgError;
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-white/[0.06] bg-brand-panel shadow-figma ring-1 ring-white/[0.04] transition hover:-translate-y-0.5 hover:border-brand-accent/20 hover:shadow-figma-lg">
-      <div className="relative h-44 overflow-hidden bg-gradient-to-br from-slate-800 to-slate-950">
-        <div
-          className="absolute inset-0 bg-card-shine opacity-60"
-          aria-hidden
-        />
+    <article className="group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-brand-panel/90 shadow-figma ring-1 ring-white/[0.04] transition-all duration-300 hover:-translate-y-1 hover:border-brand-accent/50 hover:shadow-glow-cyan">
+      <span aria-hidden className="pointer-events-none absolute left-2 top-2 z-20 h-3 w-3 border-l border-t border-brand-accent/60" />
+      <span aria-hidden className="pointer-events-none absolute right-2 top-2 z-20 h-3 w-3 border-r border-t border-brand-accent/60" />
+
+      <div className="scanline relative h-48 overflow-hidden bg-gradient-to-br from-slate-900 via-slate-950 to-black">
+        <div className="absolute inset-0 bg-card-shine opacity-70" aria-hidden />
         {showCover ? (
           <img
             src={coverUrl}
             alt=""
             referrerPolicy="no-referrer"
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
             onError={() => setImgError(true)}
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
-              <IconImage className="h-12 w-12 text-slate-600" />
-              <span className="text-4xl font-black text-white/[0.08] select-none">
+              <IconImage className="h-12 w-12 text-slate-700" />
+              <span
+                className="select-none text-5xl font-black text-white/[0.06]"
+                style={{ fontFamily: '"Space Grotesk", sans-serif' }}
+              >
                 {initial}
               </span>
             </div>
           </div>
         )}
+        <div
+          aria-hidden
+          className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-brand-panel via-brand-panel/60 to-transparent"
+        />
 
-        <span className="absolute left-3 top-3 z-10 rounded-md bg-black/55 px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-slate-200 backdrop-blur-sm">
+        <span
+          className="absolute left-3 top-3 z-10 rounded-md border border-brand-accent/30 bg-black/60 px-2 py-1 text-[0.65rem] font-bold uppercase tracking-[0.15em] text-brand-accent backdrop-blur-sm"
+          style={{ fontFamily: '"JetBrains Mono", monospace' }}
+        >
           {game.plataforma?.trim() || "No platform"}
         </span>
       </div>
 
       <div className="space-y-4 p-5">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="line-clamp-2 min-w-0 flex-1 text-base font-bold leading-snug tracking-tight text-white">
+          <h3
+            className="line-clamp-2 min-w-0 flex-1 text-base font-bold leading-snug tracking-tight text-white"
+            style={{ fontFamily: '"Space Grotesk", "Plus Jakarta Sans", sans-serif' }}
+          >
             {game.titulo}
           </h3>
           <span
-            className={`inline-flex shrink-0 rounded-md border px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wide ${estadoBadgeClass(game.estado)}`}
+            className={`inline-flex shrink-0 rounded-md border px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] ${estadoBadgeClass(game.estado)}`}
           >
             {labelEstado(game.estado)}
           </span>
@@ -79,7 +80,8 @@ export default function GameCard({
           <div className="border-t border-white/[0.06] pt-3">
             <Link
               to={discussionTo}
-              className="text-xs font-semibold text-brand-accent transition hover:text-teal-300"
+              className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-accent transition hover:text-white"
+              style={{ fontFamily: '"JetBrains Mono", monospace' }}
             >
               View discussion →
             </Link>
@@ -88,19 +90,28 @@ export default function GameCard({
 
         <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] pt-4 text-sm">
           <span className="flex items-center gap-1.5 text-slate-400">
-            <span aria-hidden className="text-base opacity-90">
-              ⏱
+            <span
+              aria-hidden
+              className="text-[0.7rem] uppercase tracking-wider text-slate-500"
+              style={{ fontFamily: '"JetBrains Mono", monospace' }}
+            >
+              HRS
             </span>
-            <span className="font-medium tabular-nums text-slate-300">
-              {game.horas_jugadas ?? 0}h
+            <span className="font-semibold tabular-nums text-slate-200">
+              {game.horas_jugadas ?? 0}
             </span>
           </span>
           <span className="flex items-center gap-1.5">
-            <span aria-hidden className="text-base text-amber-400/90">
-              ★
+            <span
+              aria-hidden
+              className="text-[0.7rem] uppercase tracking-wider text-brand-magenta"
+              style={{ fontFamily: '"JetBrains Mono", monospace' }}
+            >
+              SCR
             </span>
-            <span className="font-semibold tabular-nums text-amber-400">
-              {game.puntuacion ?? "—"}/10
+            <span className="font-bold tabular-nums text-brand-magenta">
+              {game.puntuacion ?? "—"}
+              <span className="text-slate-500">/10</span>
             </span>
           </span>
           {showActions && (
@@ -109,7 +120,7 @@ export default function GameCard({
                 <button
                   type="button"
                   onClick={() => onRecommend(game)}
-                  className="rounded-lg p-2 text-slate-500 transition hover:bg-white/[0.06] hover:text-brand-accent"
+                  className="rounded-lg p-2 text-slate-500 transition hover:bg-brand-accent/10 hover:text-brand-accent"
                   title="Recommend to someone"
                   aria-label={`Recommend ${game.titulo}`}
                 >
@@ -118,7 +129,7 @@ export default function GameCard({
               )}
               <Link
                 to={`/edit/${game.id}`}
-                className="rounded-lg p-2 text-slate-500 transition hover:bg-white/[0.06] hover:text-brand-accent"
+                className="rounded-lg p-2 text-slate-500 transition hover:bg-brand-accent/10 hover:text-brand-accent"
                 title="Edit"
               >
                 <IconPencil />
@@ -126,7 +137,7 @@ export default function GameCard({
               <button
                 type="button"
                 onClick={() => onDelete?.(game.id, game.titulo)}
-                className="rounded-lg p-2 text-slate-500 transition hover:bg-red-500/10 hover:text-red-400"
+                className="rounded-lg p-2 text-slate-500 transition hover:bg-brand-magenta/10 hover:text-brand-magenta"
                 title="Delete"
               >
                 <IconTrash />
