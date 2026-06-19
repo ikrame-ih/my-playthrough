@@ -1,10 +1,12 @@
 # MyPlaythrough
 
+[![Project documentation](https://img.shields.io/badge/Project%20docs-GitHub%20Pages-00F5FF?style=for-the-badge&logo=github)](https://ikihga2223-create.github.io/MyPlaythrough/)
+
 A full-stack web app to manage your personal video game library — track what you are playing, what you have finished, and what is still on your backlog. Optional community features let you follow other players, share recommendations, and find teammates (LFG).
 
 Developed as the **final intermodular project** for the **Higher Technical Degree in Web Application Development (DAW)** at CESUR Málaga Este (2025/2026), **awarded the maximum grade**.
 
-**Live demo:** [GitHub Pages](https://ikihga2223-create.github.io/my-playthrough/) (set repo variable `VITE_API_URL` to your Render API) or deploy the client to Vercel (see [Deployment](#deployment)).
+**Project documentation** (architecture diagrams, database model, test plan, screenshots): **[GitHub Pages](https://ikihga2223-create.github.io/MyPlaythrough/)**
 
 ---
 
@@ -17,7 +19,7 @@ Developed as the **final intermodular project** for the **Higher Technical Degre
 | **Security** | Parameterized SQL, CORS, rate-limited auth, 50 KB JSON limit, image proxy allowlist |
 | **UX** | Skeleton loading, accessible skip link, grid/list collection views, onboarding tour |
 | **Social** | Follow users, game recommendations inbox, threaded discussions with Steam-style votes, LFG posts |
-| **DevOps** | Docker Compose for local API + Postgres, `render.yaml` for cloud API |
+| **DevOps** | Docker Compose for local API + Postgres, `render.yaml` for optional cloud API |
 
 ---
 
@@ -43,7 +45,7 @@ Captured at 1440×900 from the local stack. Regenerate with `node scripts/captur
 </tr>
 </table>
 
-More captures (settings, search, LFG, admin, …) live in [`docs/screenshots/`](docs/screenshots/).
+More captures live in [`docs/screenshots/`](docs/screenshots/) and on [GitHub Pages](https://ikihga2223-create.github.io/MyPlaythrough/).
 
 </details>
 
@@ -59,7 +61,7 @@ More captures (settings, search, LFG, admin, …) live in [`docs/screenshots/`](
 - **Avatars** — 10 preset robot SVGs, chosen in Profile settings.
 - **Discussions** — nested comments per game entry with helpful / not recommended votes.
 - **Admin panel** — user/game/LFG moderation with strict account deletion confirmation.
-- **Demo account** — one-click sign-in after running the seed script (see below).
+- **Demo account** — one-click sign-in after running the seed script (local development only).
 
 ---
 
@@ -80,9 +82,8 @@ More captures (settings, search, LFG, admin, …) live in [`docs/screenshots/`](
 my-playthrough/
 ├── client/          # React SPA (Vite)
 ├── server/          # Express REST API
-├── docs/            # SQL schema, test plan, HTML docs, screenshots
-├── brand/           # Brand book export
-└── presentation/    # Slide deck (academic defense)
+├── docs/            # SQL schema, test plan, HTML diagrams, screenshots
+└── brand/           # Brand book export
 ```
 
 ---
@@ -111,40 +112,11 @@ From `server/`:
 
 ```bash
 npm run seed:demo          # demo user + 3 games (idempotent)
-npm run seed:presentation  # full sample dataset for demos
+npm run seed:presentation  # full sample dataset for local demos
 ```
 
 Demo credentials after seed: **`demo@myplaythrough.local`** / **`Presentacion2026!`**  
-Or use **Try demo account** on the login screen (requires `seed:demo`).
-
----
-
-## Deployment
-
-### Backend (Render)
-
-1. Connect the repo and apply `render.yaml` (web service + Postgres).
-2. Set **`CORS_ORIGIN`** to your Vercel client URL(s).
-3. Optionally set **`RAWG_API_KEY`**.
-4. Run `docs/sql/schema.sql` on the Postgres instance after first deploy.
-
-### Frontend (Vercel or GitHub Pages)
-
-**Vercel**
-
-1. Import the repo; set **Root Directory** to `client`.
-2. Build command: `npm run build` · Output: `dist`.
-3. Environment variable: **`VITE_API_URL`** = your Render API URL (e.g. `https://myplaythrough-api.onrender.com`).
-
-**GitHub Pages**
-
-1. In the repo: **Settings → Pages → Build and deployment → GitHub Actions**.
-2. Add repository variable **`VITE_API_URL`** (same Render URL as above).
-3. Push to `main`; the workflow in `.github/workflows/pages.yml` publishes the client to `https://<user>.github.io/my-playthrough/`.
-
-`client/vite.config.js` sets `base: '/my-playthrough/'` when `GITHUB_PAGES=true` (handled by the workflow).
-
-`client/vercel.json` provides SPA fallback rewrites on Vercel.
+Or use **Use demo account** on the login screen (requires `seed:demo`).
 
 ---
 
@@ -178,14 +150,14 @@ Full route definitions live under `server/routes/`.
 ## Design
 
 UI design tokens and component patterns: [`DESIGN.md`](DESIGN.md).  
-The app UI is **English**. Code identifiers and API paths remain English; internal docs under `docs/` may still include Spanish academic material.
+Architecture and diagrams: [GitHub Pages](https://ikihga2223-create.github.io/MyPlaythrough/).
 
 ---
 
 ## Status
 
-Core features implemented and covered by a manual test plan in `docs/pruebas.md`.
+Core features are implemented and documented in the [manual test plan](docs/test-plan.md) (printable HTML on [GitHub Pages](https://ikihga2223-create.github.io/MyPlaythrough/abrir-en-navegador/plan_pruebas.html)).
 
 ## License
 
-Academic project — contact the author for reuse terms.
+© 2026 Ikrame Ibn Hayoun. Source code available in this repository for academic and portfolio review.

@@ -1,61 +1,61 @@
-# Plan de pruebas — MyPlaythrough
+# Test plan — MyPlaythrough
 
-**Proyecto:** MyPlaythrough  
-**Alumna:** Ikrame Ibn Hayoun  
-**Ciclo:** Desarrollo de Aplicaciones Web — CESUR Málaga Este  
-**Curso:** 2025/2026
+**Project:** MyPlaythrough  
+**Author:** Ikrame Ibn Hayoun  
+**Programme:** Web Application Development (DAW) — CESUR Málaga Este  
+**Academic year:** 2025/2026
 
-**Consulta recomendada para la evaluación:** el plan completo se visualiza con más claridad en **`docs/abrir-en-navegador/plan_pruebas.html`** (navegador): tablas maquetadas, secciones diferenciadas e impresión o exportación a **PDF** desde el menú de imprimir del propio navegador. Este fichero **`docs/pruebas.md`** es la fuente en texto del mismo contenido.
-
----
-
-## 1. Finalidad y alcance
-
-Este documento describe **qué se ha probado**, **cómo** y **con qué resultado** en la aplicación MyPlaythrough. Incluye pruebas **manuales** (interfaz y API con Thunder Client) y **unitarias automáticas** (Vitest), sin sustituir la revisión funcional completa del código en el repositorio.
+**Recommended view:** the full plan reads best in the browser at **`abrir-en-navegador/plan_pruebas.html`** (formatted tables, print / PDF export). This **`test-plan.md`** file is the Markdown source of the same content.
 
 ---
 
-## 2. Tipos de prueba realizadas
+## 1. Purpose and scope
 
-| Tipo                  | Descripción breve                                                                                                                                |
+This document describes **what was tested**, **how**, and **with what result** in MyPlaythrough. It covers **manual** tests (UI and API with Thunder Client) and **automated unit** tests (Vitest). It does not replace a full functional code review.
+
+---
+
+## 2. Test types
+
+| Type | Brief description |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Manuales funcionales  | Comprobación de flujos de usuario (registro, colección, comunidad, social ampliado, admin, comentarios).                                         |
-| Seguridad básica      | Acceso a rutas protegidas sin token, permisos, límites de cuerpo, límite de frecuencia en login/registro, endpoint de diagnóstico en producción. |
-| Validación de datos   | Normalización de entradas (email, título, estado, plataforma) coherente con el backend.                                                          |
-| Unitarias automáticas | Tests repetibles sobre lógica pura (sin navegador ni base de datos), ejecutados con Vitest 3.                                                    |
+| Functional manual | User flows: registration, collection, community, extended social features, admin, comments. |
+| Basic security | Protected routes without token, permissions, body limits, auth rate limiting, diagnostic endpoint in production. |
+| Data validation | Input normalisation (email, title, status, platform) aligned with the backend. |
+| Automated unit | Repeatable pure-logic tests (no browser or database), run with Vitest 3. |
 
 ---
 
-## 3. Entorno de prueba
+## 3. Test environment
 
-| Parámetro         | Valor                                     |
+| Parameter | Value |
 | ----------------- | ----------------------------------------- |
-| Sistema operativo | Windows 11                                |
-| Navegador         | Google Chrome 124                         |
-| Backend           | Node.js 20, Express 5, puerto 3000        |
-| Frontend          | Vite, React 18, puerto 5173               |
-| Base de datos     | PostgreSQL 16 (local o contenedor Docker) |
-| Cliente API       | Thunder Client (extensión de VS Code)     |
+| Operating system | Windows 11 |
+| Browser | Google Chrome 124 |
+| Backend | Node.js 20, Express 5, port 3000 |
+| Frontend | Vite, React 18, port 5173 |
+| Database | PostgreSQL 16 (local or Docker) |
+| API client | Thunder Client (VS Code extension) |
 
 ---
 
-## 4. Pruebas automáticas unitarias (Vitest)
+## 4. Automated unit tests (Vitest)
 
-Se ejecutan en terminal, desde la carpeta de cada paquete, **sin** levantar obligatoriamente Docker ni PostgreSQL para los tests del `normalize` y utilidades del cliente.
+Run from each package folder in the terminal. Docker and PostgreSQL are **not** required for `normalize` and client utility tests.
 
-| Ubicación            | Comando    | Ficheros / ámbito                                                                                                                           |
+| Location | Command | Scope |
 | -------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Backend (`server/`)  | `npm test` | `server/utils/normalize.js` (email, contraseña fuerte, título, plataforma, estado, referencia catálogo, payload de error según `NODE_ENV`). |
-| Frontend (`client/`) | `npm test` | `gameLabels.js`, `coverUrl.js`, `passwordPolicy.js`.                                                                                        |
+| Backend (`server/`) | `npm test` | `server/utils/normalize.js` (email, strong password, title, platform, status, catalogue reference, error payload per `NODE_ENV`). |
+| Frontend (`client/`) | `npm test` | `gameLabels.js`, `coverUrl.js`, `passwordPolicy.js`. |
 
-- Modo vigilancia (opcional): `npm run test:watch` en `server` o `client`.
-- **Herramienta:** Vitest 3 (compatible con Vite en el cliente y con Node en el servidor).
+- Optional watch mode: `npm run test:watch` in `server` or `client`.
+- **Tool:** Vitest 3 (Vite-compatible on the client, Node on the server).
 
-**Relación con validación manual:** los casos V-01 a V-04 del apartado 8 están alineados con la lógica probada en `normalize.js`.
+**Link to manual validation:** cases V-01 to V-04 in section 7 align with logic tested in `normalize.js`.
 
 ---
 
-## 5. Pruebas manuales funcionales
+## 5. Manual functional tests
 
 ### 5.1. RF-01 — Gestión de usuarios (autenticación)
 
@@ -150,7 +150,7 @@ Se ejecutan en terminal, desde la carpeta de cada paquete, **sin** levantar obli
 
 ---
 
-## 6. Pruebas de seguridad (API / configuración)
+## 6. Security tests (API / configuration)
 
 | ID   | Caso                  | Herramienta / condición                                                                                                                   | Esperado | Obtenido                | Estado |
 | ---- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------- | ------ |
@@ -165,7 +165,7 @@ Se ejecutan en terminal, desde la carpeta de cada paquete, **sin** levantar obli
 
 ---
 
-## 7. Validación de datos (coherencia con backend)
+## 7. Data validation (backend alignment)
 
 | ID   | Caso             | Entrada / acción          | Esperado                                 | Estado |
 | ---- | ---------------- | ------------------------- | ---------------------------------------- | ------ |
@@ -176,7 +176,7 @@ Se ejecutan en terminal, desde la carpeta de cada paquete, **sin** levantar obli
 
 ---
 
-## 8. Resumen numérico
+## 8. Summary
 
 **Comprobación del recuento (por filas en tablas de este documento):**
 
@@ -198,7 +198,7 @@ _Las 27 pruebas unitarias corresponden a 17 tests en `server` y 10 en `client` (
 
 ---
 
-## 9. Cosas que dejaría para más adelante (no están hechas)
+## 9. Future improvements (not implemented)
 
 1. **Mensajes de error más uniformes:** según la ruta el JSON de error puede cambiar un poco de forma; lo suyo sería centralizarlo (p. ej. middleware) y que en producción no se envíen al cliente detalles técnicos largos.
 2. **Campana sin ir preguntando cada X segundos:** hoy la campana usa *polling*; en un producto grande habría que valorar **WebSockets** o **SSE** para avisos al momento (más trabajo de despliegue y reconexión).

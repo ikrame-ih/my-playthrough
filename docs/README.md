@@ -1,41 +1,37 @@
-# Documentación del proyecto (MyPlaythrough)
+# Project documentation (`docs/`)
 
-Índice de la carpeta `docs/` para la evaluación del trabajo y para quien consulte el repositorio. La guía de instalación, variables de entorno y descripción general de la API figuran en el [`README.md`](../README.md) de la raíz del proyecto.
+Index for evaluation materials and repository readers. Installation, environment variables, and API overview are in the root [`README.md`](../README.md).
 
-**Para revisar el plan de pruebas completo**, lo más cómodo es abrir en el navegador [`abrir-en-navegador/plan_pruebas.html`](abrir-en-navegador/plan_pruebas.html) (mejor lectura que el Markdown e impresión a PDF). El texto fuente es [`pruebas.md`](pruebas.md). El recuento cerrado en ese documento es **58 pruebas manuales** (46 con prefijo **P-**, 8 **S-**, 4 **V-**) más **27 pruebas unitarias** (Vitest).
+**Browse online:** [Project documentation on GitHub Pages](https://ikihga2223-create.github.io/MyPlaythrough/) — diagrams, test plan, schema, and screenshots.
 
----
-
-## Documentación en HTML (`abrir-en-navegador/`)
-
-Los ficheros maquetados para **visualización en navegador** (estilos propios; el plan de pruebas admite impresión o exportación a PDF desde el propio navegador) se encuentran en esta subcarpeta:
-
-| Ruta                                                                                             | Contenido                                                                                                           |
-| ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| [`abrir-en-navegador/diagrama_bd.html`](abrir-en-navegador/diagrama_bd.html)                     | Modelo de datos: diagramas por bloques, tabla de claves foráneas y detalle de columnas.                             |
-| [`abrir-en-navegador/flujo_pern_tres_capas.html`](abrir-en-navegador/flujo_pern_tres_capas.html) | Tres **capas apiladas** (presentación / negocio / persistencia), flujo **1–8** y leyenda a la derecha.              |
-| [`abrir-en-navegador/funciones_principales.html`](abrir-en-navegador/funciones_principales.html) | Funciones relevantes del código, temario de apoyo del ciclo (JWT, middleware, HTTP, etc.) y referencias a ficheros. |
-| [`abrir-en-navegador/plan_pruebas.html`](abrir-en-navegador/plan_pruebas.html)                   | Plan de pruebas en formato página.                                                                                  |
-
-La **fuente en texto** del plan de pruebas es [`pruebas.md`](pruebas.md); su contenido es el mismo que el HTML anterior.
+For the full test plan, open [`abrir-en-navegador/plan_pruebas.html`](abrir-en-navegador/plan_pruebas.html) in a browser (print to PDF). Markdown source: [`test-plan.md`](test-plan.md). Totals: **58 manual tests** (46 **P-**, 8 **S-**, 4 **V-**) plus **27 unit tests** (Vitest).
 
 ---
 
-## Scripts SQL (`sql/`)
+## HTML documentation (`abrir-en-navegador/`)
 
-| Contenido                            | Ubicación                                                        |
-| ------------------------------------ | ---------------------------------------------------------------- |
-| Esquema completo de la base de datos | [`sql/schema.sql`](sql/schema.sql)                               |
-| Migraciones y ajustes puntuales      | `sql/add-*.sql`, `sql/fix-*.sql`, `sql/promover-admin.sql`, etc. |
+Browser-ready pages with their own styles:
 
-En `schema.sql` figuran **ocho tablas** del modelo actual: núcleo (`usuarios`, `catalogo_juegos`, `juegos`), comentarios y votos (`juego_comentarios`, `juego_comentario_votos`) y bloque social (`usuario_seguimientos`, `juego_recomendaciones`, `lfg_publicaciones`).
-
-**Relación entre documentos:** el esquema definido en `sql/schema.sql` es el referenciado por el diagrama en `abrir-en-navegador/diagrama_bd.html`. El plan de pruebas en [`pruebas.md`](pruebas.md) y la versión en `abrir-en-navegador/plan_pruebas.html` describen el mismo contenido.
-
-Las migraciones ejecutables desde `server/` mediante `npm run migrate:*` aplican los scripts SQL correspondientes bajo `docs/sql/`.
+| File | Content |
+| ---- | ------- |
+| [`diagrama_bd.html`](abrir-en-navegador/diagrama_bd.html) | Data model: entity blocks, foreign keys, column detail |
+| [`flujo_pern_tres_capas.html`](abrir-en-navegador/flujo_pern_tres_capas.html) | Three stacked layers (presentation / business / persistence), flow steps 1–8 |
+| [`funciones_principales.html`](abrir-en-navegador/funciones_principales.html) | Key code functions, DAW course topics (JWT, middleware, HTTP), file references |
+| [`plan_pruebas.html`](abrir-en-navegador/plan_pruebas.html) | Full test plan — printable layout |
 
 ---
 
-**Interfaz y diseño:** [`DESIGN_ES.md`](../DESIGN_ES.md) y [`DESIGN.md`](../DESIGN.md) (raíz del repositorio).
+## SQL scripts (`sql/`)
 
-La documentación en prosa está redactada en **español**; los **nombres de archivo** siguen convenciones habituales en código (`schema.sql`, `plan_pruebas.html`).
+| Content | Path |
+| ------- | ---- |
+| Full database schema | [`sql/schema.sql`](sql/schema.sql) |
+| Migrations | `sql/add-*.sql`, `sql/fix-*.sql`, `sql/promover-admin.sql`, etc. |
+
+The schema in `sql/schema.sql` matches the diagram in `diagrama_bd.html`. Migrations can be applied from `server/` via `npm run migrate:*`.
+
+---
+
+**UI design:** [`DESIGN.md`](../DESIGN.md) and [`DESIGN_ES.md`](../DESIGN_ES.md) at the repository root.
+
+The app UI is **English**. Academic HTML pages may still include Spanish labels where they were written for the defence.

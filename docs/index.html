@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MyPlaythrough — docs</title>
+    <title>MyPlaythrough — project documentation</title>
     <meta
       name="description"
-      content="Documentation hub for MyPlaythrough: design system, screenshots, and test plan."
+      content="Architecture diagrams, database schema, test plan, and UI screenshots for MyPlaythrough."
     />
     <style>
       :root {
@@ -25,19 +25,22 @@
         margin: 0;
         min-height: 100vh;
         font-family: "Segoe UI", system-ui, sans-serif;
-        background: var(--bg);
+        background:
+          radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 245, 255, 0.08), transparent),
+          radial-gradient(ellipse 60% 40% at 100% 0%, rgba(112, 0, 255, 0.06), transparent),
+          var(--bg);
         color: var(--text);
-        line-height: 1.6;
+        line-height: 1.55;
       }
       main {
-        max-width: 42rem;
+        max-width: 52rem;
         margin: 0 auto;
-        padding: 2.5rem 1.25rem 3rem;
+        padding: 2.5rem 1.25rem 3.5rem;
       }
       h1 {
-        font-size: 1.75rem;
-        letter-spacing: -0.02em;
-        margin: 0 0 0.5rem;
+        font-size: 1.85rem;
+        letter-spacing: -0.03em;
+        margin: 0 0 0.35rem;
       }
       h1 span {
         color: var(--accent);
@@ -45,15 +48,24 @@
       p.lead {
         color: var(--muted);
         margin: 0 0 2rem;
+        max-width: 38rem;
+      }
+      h2 {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin: 2rem 0 0.75rem;
       }
       ul {
         list-style: none;
         padding: 0;
         margin: 0;
         display: grid;
-        gap: 0.75rem;
+        gap: 0.65rem;
       }
-      a {
+      a.card {
         display: block;
         padding: 1rem 1.15rem;
         border-radius: 12px;
@@ -61,29 +73,40 @@
         background: var(--panel);
         color: var(--text);
         text-decoration: none;
-        transition: border-color 0.2s;
+        transition:
+          border-color 0.2s,
+          transform 0.2s;
       }
-      a:hover {
+      a.card:hover {
         border-color: rgba(0, 245, 255, 0.35);
+        transform: translateY(-1px);
       }
-      a strong {
+      a.card strong {
         display: block;
         margin-bottom: 0.15rem;
       }
-      a span {
+      a.card span {
         font-size: 0.875rem;
         color: var(--muted);
       }
-      .cta {
-        margin-top: 2rem;
-        text-align: center;
+      a.card.featured {
+        border-color: rgba(0, 245, 255, 0.22);
+        background: linear-gradient(135deg, rgba(0, 245, 255, 0.06), rgba(112, 0, 255, 0.08));
       }
-      .cta a.primary {
-        display: inline-block;
-        background: linear-gradient(135deg, var(--accent), var(--violet));
-        color: #0b0e14;
-        font-weight: 700;
-        border: none;
+      .footer {
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--line);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.875rem;
+        color: var(--muted);
+      }
+      .footer a {
+        color: var(--accent);
       }
     </style>
   </head>
@@ -91,54 +114,91 @@
     <main>
       <h1>My<span>Play</span>through</h1>
       <p class="lead">
-        Project documentation and assets. The live app is deployed separately
-        (GitHub Pages or Vercel) and talks to the Render API.
+        DAW final project documentation — architecture, database model, test plan,
+        and UI screenshots. Open the HTML pages below for diagrams formatted for
+        the browser (print to PDF if needed).
       </p>
+
+      <h2>Architecture &amp; diagrams</h2>
       <ul>
         <li>
-          <a href="../README.md">
-            <strong>README</strong>
-            <span>Setup, deployment, and feature overview</span>
+          <a class="card featured" href="abrir-en-navegador/flujo_pern_tres_capas.html">
+            <strong>PERN three-layer flow</strong>
+            <span>Presentation, business, and persistence — request path 1–8</span>
           </a>
         </li>
         <li>
-          <a href="../DESIGN.md">
+          <a class="card featured" href="abrir-en-navegador/diagrama_bd.html">
+            <strong>Database model</strong>
+            <span>Entity blocks, foreign keys, and column reference</span>
+          </a>
+        </li>
+        <li>
+          <a class="card featured" href="abrir-en-navegador/funciones_principales.html">
+            <strong>Key functions &amp; course topics</strong>
+            <span>JWT, middleware, HTTP, and file references in the codebase</span>
+          </a>
+        </li>
+      </ul>
+
+      <h2>Quality assurance</h2>
+      <ul>
+        <li>
+          <a class="card featured" href="abrir-en-navegador/plan_pruebas.html">
+            <strong>Test plan (HTML)</strong>
+            <span>58 manual cases + 27 unit tests — printable layout</span>
+          </a>
+        </li>
+        <li>
+          <a class="card" href="test-plan.md">
+            <strong>Test plan (Markdown source)</strong>
+            <span>Same content as plain text for the repository</span>
+          </a>
+        </li>
+      </ul>
+
+      <h2>Schema &amp; design</h2>
+      <ul>
+        <li>
+          <a class="card" href="sql/schema.sql">
+            <strong>SQL schema</strong>
+            <span>Full PostgreSQL DDL (`docs/sql/schema.sql`)</span>
+          </a>
+        </li>
+        <li>
+          <a class="card" href="DESIGN.md">
             <strong>Design system (EN)</strong>
             <span>Colors, typography, component patterns</span>
           </a>
         </li>
         <li>
-          <a href="../DESIGN_ES.md">
+          <a class="card" href="DESIGN_ES.md">
             <strong>Sistema de diseño (ES)</strong>
             <span>Referencia visual en español</span>
           </a>
         </li>
         <li>
-          <a href="../brand/brand-book.html">
+          <a class="card" href="brand/brand-book.html">
             <strong>Brand book</strong>
-            <span>Logo export and color reference</span>
-          </a>
-        </li>
-        <li>
-          <a href="screenshots/">
-            <strong>Screenshots</strong>
-            <span>UI captures for the README gallery</span>
-          </a>
-        </li>
-        <li>
-          <a href="pruebas.md">
-            <strong>Test plan</strong>
-            <span>Manual QA checklist (ES)</span>
+            <span>Logo export and palette reference</span>
           </a>
         </li>
       </ul>
-      <p class="cta">
-        <a
-          class="primary"
-          href="https://github.com/ikihga2223-create/my-playthrough"
-          >View repository</a
-        >
-      </p>
+
+      <h2>UI preview</h2>
+      <ul>
+        <li>
+          <a class="card" href="screenshots/02-collection.png">
+            <strong>Screenshots</strong>
+            <span>README gallery captures — collection, community, forms, admin</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="footer">
+        <span>CESUR Málaga Este · DAW 2025/2026</span>
+        <a href="https://github.com/ikihga2223-create/MyPlaythrough">GitHub repository</a>
+      </div>
     </main>
   </body>
 </html>
