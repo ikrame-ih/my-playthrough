@@ -7,64 +7,54 @@ Use this document to ensure visual consistency across all screens and components
 
 ## 1. Visual Theme & Atmosphere
 
-MyPlaythrough uses a **dark digital library** aesthetic. The interface is intentionally quiet — the game cover art is the hero. Everything else steps back.
+MyPlaythrough uses a **dark neon HUD** aesthetic — matte panels, subtle grid, cyan/violet accents. The interface stays quiet so **cover art** remains the hero.
 
-- **Mood**: calm, focused, modern. No gradients fighting for attention.
+- **Mood**: focused, modern, slightly arcade without clutter.
 - **Density**: medium. Cards breathe; forms aren't cramped.
-- **Philosophy**: "less is more". One accent color. Two surface levels. No decorative elements that don't carry meaning.
-- **Inspiration**: the dark-mode library experience of Spotify and the technical precision of Linear — but warmer and gaming-first.
+- **Philosophy**: accent colors carry meaning (cyan = action, magenta = scores). No decorative chrome.
+- **Typography**: Space Grotesk for headings, Plus Jakarta Sans for body, JetBrains Mono for stats.
 
 ---
 
 ## 2. Color Palette
 
-All colors are defined as Tailwind custom tokens in `tailwind.config.js`.
+All colors are defined as Tailwind custom tokens in `client/tailwind.config.js`.
 
 | Token | Hex | Role |
 |---|---|---|
-| `brand-bg` | `#0B1120` | Page background — deep matte navy |
-| `brand-panel` | `#161D2F` | Card and panel surface |
-| `brand-input` | `#0F172A` | Input field and secondary button background |
-| `brand-surface` | `#1E293B` | Hover states, subtle separators |
-| `brand-surface2` | `#334155` | Borders on interactive elements |
-| `brand-accent` | `#2DD4BF` | Primary brand accent — Vibrant Teal |
-| `brand-tealBtn` | `#36D7B7` | CTA button fill (slightly brighter variant) |
-| `brand-blue` | `#007BFF` | Secondary accent — Electric Blue |
-| `white` | `#FFFFFF` | Primary text |
-| `slate-200` | `#E2E8F0` | Default body text |
-| `slate-400` | `#94A3B8` | Secondary / label text |
-| `slate-500` | `#64748B` | Placeholder and disabled text |
-| `amber-400` | `#FBBF24` | Score star — warm gold |
-| `red-400` | `#F87171` | Destructive action hover |
+| `brand-bg` | `#0B0E14` | Page background — deep matte |
+| `brand-panel` | `#11151E` | Card and panel surface |
+| `brand-input` | `#0F141C` | Input field background |
+| `brand-surface` | `#1A1F2B` | Hover states, subtle separators |
+| `brand-surface2` | `#2A3142` | Interactive borders |
+| `brand-accent` | `#00F5FF` | Primary accent — neon cyan |
+| `brand-tealBtn` | `#00F5FF` | Primary CTA fill (alias) |
+| `brand-blue` | `#7000FF` | Secondary accent — electric violet |
+| `brand-magenta` | `#FF00E5` | Scores and alerts only |
+| `brand-line` | `#1E2533` | Hairline borders |
 
 ### Semantic usage
 
-- **Teal** (`brand-accent` / `brand-tealBtn`) — primary actions, active states, score badges, brand moments.
-- **Blue** (`brand-blue`) — links, secondary interactive elements.
-- **Amber** — score display only. Never used for UI actions.
-- **Red** — destructive actions (delete button hover) only. Never informational.
-- **White** — headings and card titles only.
-- **Slate-200** — default text weight.
+- **Cyan** (`brand-accent` / `brand-tealBtn`) — primary actions, active states, focus rings, links.
+- **Violet** (`brand-blue`) — secondary CTAs (`.figma-btn-violet`).
+- **Magenta** — score display and destructive hover accents on cards. Never generic UI chrome.
+- **Red** — destructive actions (delete) only.
+- **White** — headings and card titles.
+- **Slate-200** — default body text.
 
-### Background radial glow
+### Background
 
-The page applies a subtle teal radial gradient at the top center to add depth without being distracting:
-
-```css
-background-image: radial-gradient(
-  ellipse 90% 60% at 50% -15%,
-  rgba(45, 212, 191, 0.09),
-  transparent 55%
-);
-```
+Layered cyan / magenta / violet radials plus an optional 48px grid (`body::before` in `index.css`). Cover art remains the visual hero.
 
 ---
 
 ## 3. Typography
 
-**Font stack:** `Inter`, `DM Sans`, `system-ui`, `Segoe UI`, `sans-serif`
-
-Inter is preferred. The system-ui fallback ensures the app looks clean even without web fonts.
+| Role | Stack | Usage |
+|---|---|---|
+| Display | **Space Grotesk** | h1–h3 (global rule in `index.css`) |
+| Body | **Plus Jakarta Sans** | Default UI copy |
+| Mono | **JetBrains Mono** | Stats, badges, `.tabular-nums`, `.eyebrow` |
 
 | Element | Classes | Usage |
 |---|---|---|
@@ -72,9 +62,8 @@ Inter is preferred. The system-ui fallback ensures the app looks clean even with
 | Section heading (H2) | `text-xl font-bold tracking-tight text-white` | Panel headers |
 | Card title (H3) | `text-base font-bold leading-snug tracking-tight text-white` | Game card title |
 | Body text | `text-sm text-slate-200` | Descriptions, body copy |
-| Label / caption | `text-sm font-medium text-slate-400` | Form labels, secondary info |
-| Badge / tag | `text-[0.65rem] font-bold uppercase tracking-wide` | Status badges, platform chip |
-| Nav item | `text-sm font-medium` | Sidebar navigation links |
+| Label / caption | `text-sm font-medium text-slate-400` | Form labels |
+| Badge / tag | `text-[0.65rem] font-bold uppercase tracking-wide` | Status badges |
 
 **Rules:**
 - Headings always use `tracking-tight`. Never `tracking-normal` for titles.
@@ -270,23 +259,25 @@ Touch targets: all interactive elements have a minimum of `p-2` padding. Buttons
 
 ---
 
-## 9. Agent Prompt Guide
+## 9. Quick reference
 
-When generating or editing UI components for this project, keep these rules in mind:
+When building or editing UI for this project, align with these tokens and classes.
 
-**Quick color reference:**
-- Background: `bg-brand-bg` (`#0B1120`)
-- Panel/card surface: `bg-brand-panel` (`#161D2F`)
-- Input background: `bg-brand-input` (`#0F172A`)
-- Primary accent: `brand-accent` / `brand-tealBtn` (`#2DD4BF` / `#36D7B7`)
+**Colors:**
+
+- Background: `bg-brand-bg` (`#0B0E14`)
+- Panel/card surface: `bg-brand-panel` (`#11151E`)
+- Input background: `bg-brand-input` (`#0F141C`)
+- Primary accent: `brand-accent` / `brand-tealBtn` (`#00F5FF`)
+- Secondary accent: `brand-blue` (`#7000FF`)
+- Scores only: `brand-magenta` (`#FF00E5`)
 - Text hierarchy: `text-white` → `text-slate-200` → `text-slate-400` → `text-slate-500`
 
 **Reusable CSS classes (defined in `index.css`):**
+
 - `.figma-panel` — card / panel container
 - `.figma-input` — text field
-- `.figma-btn-primary` — teal CTA button (black text)
+- `.figma-btn-primary` — cyan CTA button (dark text)
+- `.figma-btn-violet` — secondary CTA
 - `.figma-btn-outline` — secondary ghost button
 - `.figma-table-wrap` — admin table container
-
-**Prompt template for new screens:**
-> "Create a new React component for MyPlaythrough following the DESIGN.md dark theme. Use `bg-brand-bg` as the page background, `figma-panel` for content panels, `figma-input` for form fields, and `figma-btn-primary` for the main action. Text hierarchy: `text-white` for headings, `text-slate-200` for body, `text-slate-400` for labels."

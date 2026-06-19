@@ -9,64 +9,54 @@ _(Versión en español de [DESIGN.md](DESIGN.md). El contenido técnico es equiv
 
 ## 1. Tema visual y atmósfera
 
-MyPlaythrough usa una estética de **biblioteca digital oscura**. La interfaz es deliberadamente sobria: la **carátula del juego** es el protagonista; el resto queda en segundo plano.
+MyPlaythrough usa una estética **HUD neón oscuro**: paneles mate, cuadrícula sutil y acentos cian/violeta. La interfaz no compite con la **carátula**.
 
-- **Ambiente**: calma, foco, modernidad. Sin gradientes que compitan por atención.
+- **Ambiente**: foco, modernidad, un toque arcade sin ruido visual.
 - **Densidad**: media. Las tarjetas respiran; los formularios no van apretados.
-- **Filosofía**: «menos es más». Un color de acento. Dos niveles de superficie. Nada decorativo sin función.
-- **Inspiración**: la experiencia de biblioteca en modo oscuro de Spotify y la precisión técnica de Linear, pero más cálida y orientada al gaming.
+- **Filosofía**: los acentos tienen significado (cian = acción, magenta = puntuaciones). Sin adornos vacíos.
+- **Tipografía**: Space Grotesk en títulos, Plus Jakarta Sans en cuerpo, JetBrains Mono en stats.
 
 ---
 
 ## 2. Paleta de colores
 
-Todos los colores están definidos como tokens Tailwind personalizados en `tailwind.config.js`.
+Todos los colores están definidos como tokens Tailwind personalizados en `client/tailwind.config.js`.
 
-| Token            | Hex       | Función                                                |
-| ---------------- | --------- | ------------------------------------------------------ |
-| `brand-bg`       | `#0B1120` | Fondo de página — azul marino mate profundo            |
-| `brand-panel`    | `#161D2F` | Superficie de tarjetas y paneles                       |
-| `brand-input`    | `#0F172A` | Fondo de campos y botón secundario                     |
-| `brand-surface`  | `#1E293B` | Estados hover, separadores sutiles                     |
-| `brand-surface2` | `#334155` | Bordes en elementos interactivos                       |
-| `brand-accent`   | `#2DD4BF` | Acento principal — teal vibrante                       |
-| `brand-tealBtn`  | `#36D7B7` | Relleno del botón CTA (variante ligeramente más clara) |
-| `brand-blue`     | `#007BFF` | Acento secundario — azul eléctrico                     |
-| `white`          | `#FFFFFF` | Texto principal                                        |
-| `slate-200`      | `#E2E8F0` | Texto de cuerpo por defecto                            |
-| `slate-400`      | `#94A3B8` | Etiquetas / texto secundario                           |
-| `slate-500`      | `#64748B` | Placeholder y texto desactivado                        |
-| `amber-400`      | `#FBBF24` | Estrella de puntuación — dorado cálido                 |
-| `red-400`        | `#F87171` | Hover en acciones destructivas                         |
+| Token            | Hex       | Función                                           |
+| ---------------- | --------- | ------------------------------------------------- |
+| `brand-bg`       | `#0B0E14` | Fondo de página — negro mate profundo             |
+| `brand-panel`    | `#11151E` | Superficie de tarjetas y paneles                  |
+| `brand-input`    | `#0F141C` | Fondo de campos de formulario                     |
+| `brand-surface`  | `#1A1F2B` | Estados hover, separadores sutiles                |
+| `brand-surface2` | `#2A3142` | Bordes en elementos interactivos                  |
+| `brand-accent`   | `#00F5FF` | Acento principal — cian neón                      |
+| `brand-tealBtn`  | `#00F5FF` | Relleno del botón CTA (alias)                     |
+| `brand-blue`     | `#7000FF` | Acento secundario — violeta eléctrico             |
+| `brand-magenta`  | `#FF00E5` | Puntuaciones y alertas únicamente                 |
+| `brand-line`     | `#1E2533` | Bordes finos                                      |
 
 ### Uso semántico
 
-- **Teal** (`brand-accent` / `brand-tealBtn`) — acciones principales, estados activos, badges de nota, momentos de marca.
-- **Azul** (`brand-blue`) — enlaces, elementos interactivos secundarios.
-- **Ámbar** — solo para mostrar puntuación. Nunca para acciones de interfaz.
-- **Rojo** — solo hover en acciones destructivas. Nunca informativo.
-- **Blanco** — solo títulos y encabezados de tarjeta.
-- **Slate-200** — peso por defecto del texto de cuerpo.
+- **Cian** (`brand-accent` / `brand-tealBtn`) — acciones principales, estados activos, anillos de foco, enlaces.
+- **Violeta** (`brand-blue`) — CTAs secundarios (`.figma-btn-violet`).
+- **Magenta** — puntuaciones y acentos destructivos en tarjetas. Nunca cromo genérico de UI.
+- **Rojo** — solo acciones destructivas (eliminar).
+- **Blanco** — títulos y encabezados de tarjeta.
+- **Slate-200** — texto de cuerpo por defecto.
 
-### Resplandor radial de fondo
+### Fondo
 
-La página aplica un gradiente radial teal suave arriba al centro para dar profundidad sin distraer:
-
-```css
-background-image: radial-gradient(
-  ellipse 90% 60% at 50% -15%,
-  rgba(45, 212, 191, 0.09),
-  transparent 55%
-);
-```
+Radiales cian / magenta / violeta en capas más una cuadrícula opcional de 48px (`body::before` en `index.css`). La carátula sigue siendo el protagonista visual.
 
 ---
 
 ## 3. Tipografía
 
-**Pila de fuentes:** `Inter`, `DM Sans`, `system-ui`, `Segoe UI`, `sans-serif`
-
-Se prefiere Inter. El fallback `system-ui` mantiene la interfaz limpia aunque no carguen las fuentes web.
+| Rol      | Fuente               | Uso                                              |
+| -------- | -------------------- | ------------------------------------------------ |
+| Display  | **Space Grotesk**    | h1–h3 (regla global en `index.css`)              |
+| Cuerpo   | **Plus Jakarta Sans**| Texto de interfaz por defecto                    |
+| Mono     | **JetBrains Mono**   | Stats, badges, `.tabular-nums`, `.eyebrow`       |
 
 | Elemento               | Clases                                                       | Uso                                   |
 | ---------------------- | ------------------------------------------------------------ | ------------------------------------- |
@@ -76,7 +66,6 @@ Se prefiere Inter. El fallback `system-ui` mantiene la interfaz limpia aunque no
 | Texto de cuerpo        | `text-sm text-slate-200`                                     | Descripciones, párrafos               |
 | Etiqueta / pie         | `text-sm font-medium text-slate-400`                         | Labels de formulario, info secundaria |
 | Badge / etiqueta       | `text-[0.65rem] font-bold uppercase tracking-wide`           | Estados, chip de plataforma           |
-| Ítem de navegación     | `text-sm font-medium`                                        | Enlaces del sidebar                   |
 
 **Reglas:**
 
@@ -281,16 +270,19 @@ Al añadir pantallas o componentes, conviene alinear colores y utilidades con lo
 
 **Color:**
 
-- Fondo: `bg-brand-bg` (`#0B1120`)
-- Panel/tarjeta: `bg-brand-panel` (`#161D2F`)
-- Input: `bg-brand-input` (`#0F172A`)
-- Acento: `brand-accent` / `brand-tealBtn` (`#2DD4BF` / `#36D7B7`)
+- Fondo: `bg-brand-bg` (`#0B0E14`)
+- Panel/tarjeta: `bg-brand-panel` (`#11151E`)
+- Input: `bg-brand-input` (`#0F141C`)
+- Acento principal: `brand-accent` / `brand-tealBtn` (`#00F5FF`)
+- Acento secundario: `brand-blue` (`#7000FF`)
+- Puntuaciones: `brand-magenta` (`#FF00E5`)
 - Jerarquía de texto: `text-white` → `text-slate-200` → `text-slate-400` → `text-slate-500`
 
 **Clases reutilizables (`index.css`):**
 
 - `.figma-panel` — contenedor de tarjeta/panel
 - `.figma-input` — campo de texto
-- `.figma-btn-primary` — botón CTA teal (texto negro)
-- `.figma-btn-outline` — botón secundario
+- `.figma-btn-primary` — botón CTA cian (texto oscuro)
+- `.figma-btn-violet` — CTA secundario
+- `.figma-btn-outline` — botón secundario ghost
 - `.figma-table-wrap` — contenedor de tabla admin
