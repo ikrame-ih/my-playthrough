@@ -29,12 +29,7 @@ function labelLfgModo(m) {
   return "Other";
 }
 
-/**
- * Página Comunidad con pestañas internas (estado React `tab`): Miembros (lista de
- * usuarios con seguir/dejar de seguir), Estadísticas (medias SQL globales), Actividad
- * (comentarios y LFG de gente a la que sigues) y Buscar grupo (publicar y listar LFG).
- * Los datos vienen de `/api/users`, `/api/community/stats`, `/api/social/activity` y `/api/social/lfg`.
- */
+// Community tabs: members, stats, activity feed, LFG.
 export default function Community() {
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState([]);

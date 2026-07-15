@@ -1,25 +1,5 @@
-/**
- * @module games.routes
- * @description Colección de juegos por usuario y hilo de discusión por ficha.
- *
- * Colección: cada persona solo ve y edita sus propias filas en `juegos` (`usuario_id` del token).
- * Discusión: los comentarios van ligados a un `juego_id` concreto; cualquier usuario logueado
- * puede leerlos en esa ficha (sirve para la comunidad y enlaces desde actividad/LFG).
- * Borrado de comentario: autor, dueño de la ficha o administradora (consulta de rol en BD).
- *
- * Todas las rutas usan `authMiddleware` (cabecera `Authorization: Bearer <JWT>`).
- *
- * Rutas definidas:
- *   GET    /api/games                              → lista mis juegos
- *   POST   /api/games                              → añadir juego
- *   GET    /api/games/:id                          → detalle de un juego (para editar)
- *   PUT    /api/games/:id                          → actualizar juego
- *   DELETE /api/games/:id                          → eliminar juego
- *   GET    /api/games/:gameId/comments             → comentarios de una ficha
- *   POST   /api/games/:gameId/comments             → añadir comentario
- *   DELETE /api/games/:gameId/comments/:commentId  → borrar comentario
- *   PUT    /api/games/:gameId/comments/:commentId/vote → pulgar en reseña raíz
- */
+// User game collection (scoped by usuario_id) and discussion threads on game pages.
+// Comment delete: author, game owner, or admin.
 
 const express = require("express");
 const pool = require("../config/db");
@@ -41,19 +21,6 @@ const { coerceAvatarId } = require("../constants/avatars");
 
 const router = express.Router();
 
-// ---------------------------------------------------------------------------
-// COLECCIÓN PERSONAL
-// ---------------------------------------------------------------------------
-
-/**
- * Devuelve la colección completa del usuario autenticado.
- * El filtro `usuario_id = req.user.id` garantiza el aislamiento entre usuarios:
- * cada usuario solo puede ver sus propios juegos, nunca los de otros.
- *
- * @route  GET /api/games
- * @access Private (requiere JWT válido)
- * @returns {object[]} 200 – Array de fichas de juego del usuario.
- */
 router.get("/", authMiddleware, async (req, res) => {
   try {
     const rows = await queryGamesListForUser(req.user.id);
@@ -64,23 +31,6 @@ router.get("/", authMiddleware, async (req, res) => {
   }
 });
 
-/**
- * Añade un nuevo juego a la colección del usuario.
- * Hay dos caminos: si el usuario eligió el juego del buscador oficial (RAWG/Steam),
- * el body incluye `catalogo_ref` y se usa una transacción para enlazar la ficha
- * con `catalogo_juegos`. Si el título fue escrito a mano, se inserta directamente.
- *
- * @route  POST /api/games
- * @access Private (requiere JWT válido)
- * @param  {string} req.body.titulo         - Título del juego.
- * @param  {string} req.body.estado         - Estado: 'Pendiente', 'Jugando' o 'Completado'.
- * @param  {string} [req.body.plataforma]   - Plataforma (por defecto 'PC').
- * @param  {number} [req.body.puntuacion]   - Nota del 0 al 10.
- * @param  {number} [req.body.horas_jugadas]- Horas jugadas.
- * @param  {string} [req.body.url_imagen]   - URL de la portada.
- * @param  {object} [req.body.catalogo_ref] - Referencia al catálogo `{ source, id }`.
- * @returns {object} 201 – `{ success, data }` | 400 – duplicado o datos inválidos.
- */
 router.post("/", authMiddleware, async (req, res) => {
   try {
     const { titulo, estado, plataforma, puntuacion, horas_jugadas, url_imagen } =
@@ -104,7 +54,7 @@ router.post("/", authMiddleware, async (req, res) => {
       ? Math.max(0, Number(horas_jugadas))
       : 0;
 
-    // --- Camino A: viene del catálogo (RAWG/Steam) → transacción ---
+    // Catalog pick (RAWG/Steam): upsert catalogo_juegos in a transaction
     if (catalogoRef) {
       const client = await pool.connect();
       try {
@@ -151,7 +101,7 @@ router.post("/", authMiddleware, async (req, res) => {
       }
     }
 
-    // --- Camino B: título escrito a mano ---
+    // Manual title: insert without catalogo_id
     const checkJuego = await pool.query(
       `SELECT id FROM juegos
        WHERE LOWER(TRIM(REGEXP_REPLACE(titulo, '[[:space:]]+', ' ', 'g'))) = $1
@@ -181,15 +131,6 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
-/**
- * Devuelve el detalle de una ficha de juego para precargar el formulario de edición.
- * El filtro por `usuario_id` impide leer juegos ajenos aunque se conozca el ID.
- *
- * @route  GET /api/games/:id
- * @access Private (requiere JWT válido)
- * @param  {string} req.params.id - ID de la ficha de juego.
- * @returns {object} 200 – Datos del juego | 404 – no encontrado.
- */
 router.get("/:id", authMiddleware, async (req, res) => {
   try {
     const row = await queryOneGameForUser(req.user.id, req.params.id);
@@ -203,17 +144,6 @@ router.get("/:id", authMiddleware, async (req, res) => {
   }
 });
 
-/**
- * Actualiza una ficha existente. La lógica es equivalente al POST pero
- * gestiona además el caso en que el nuevo título coincida con otra ficha
- * del mismo usuario (`merge_duplicate`).
- *
- * @route  PUT /api/games/:id
- * @access Private (requiere JWT válido)
- * @param  {string}  req.params.id               - ID de la ficha a actualizar.
- * @param  {boolean} [req.body.merge_duplicate]   - Si es `true`, borra la ficha duplicada que colisione.
- * @returns {object} 200 – `{ success, data }` | 400 – conflicto de título | 404 – no encontrado.
- */
 router.put("/:id", authMiddleware, async (req, res) => {
   try {
     const gameRowId = parseInt(req.params.id, 10);
@@ -278,7 +208,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
       }
     }
 
-    // --- Camino A: viene del catálogo ---
+    // Catalog pick (RAWG/Steam)
     if (catalogoRef) {
       const client = await pool.connect();
       try {
@@ -332,7 +262,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
       }
     }
 
-    // --- Camino B: título a mano ---
+    // Manual title
     const result = await pool.query(
       `UPDATE juegos
        SET titulo = $1, estado = $2, plataforma = $3,
@@ -359,17 +289,6 @@ router.put("/:id", authMiddleware, async (req, res) => {
   }
 });
 
-/**
- * Elimina una ficha de juego. Solo funciona si el juego pertenece al usuario.
- * El `AND usuario_id = req.user.id` actúa como barrera de seguridad: si alguien
- * intenta borrar el juego de otro usuario, la query no encuentra ninguna fila
- * y devuelve 404 sin revelar que el juego existe.
- *
- * @route  DELETE /api/games/:id
- * @access Private (requiere JWT válido)
- * @param  {string} req.params.id - ID de la ficha a eliminar.
- * @returns {object} 200 – `{ success, message }` | 404 – no encontrado.
- */
 router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(
@@ -386,17 +305,6 @@ router.delete("/:id", authMiddleware, async (req, res) => {
   }
 });
 
-// ---------------------------------------------------------------------------
-// COMENTARIOS
-// ---------------------------------------------------------------------------
-
-/**
- * Devuelve todos los comentarios de una ficha ordenados cronológicamente.
- * @route  GET /api/games/:gameId/comments
- * @access Private (requiere JWT válido)
- * @param  {string} req.params.gameId - ID de la ficha.
- * @returns {object} 200 – `{ comments: [...] }` | 404 – juego no encontrado.
- */
 router.get("/:gameId/comments", authMiddleware, async (req, res) => {
   try {
     const gameId = parseInt(req.params.gameId, 10);
@@ -444,17 +352,6 @@ router.get("/:gameId/comments", authMiddleware, async (req, res) => {
   }
 });
 
-/**
- * Añade un comentario o respuesta a una ficha.
- * Soporta hilos anidados mediante `parent_id`. Se valida que el comentario
- * padre pertenezca al mismo juego para evitar comentarios "huérfanos".
- *
- * @route  POST /api/games/:gameId/comments
- * @access Private (requiere JWT válido)
- * @param  {string} req.body.cuerpo      - Texto del comentario (máx. 8000 caracteres).
- * @param  {number} [req.body.parent_id] - ID del comentario al que se responde.
- * @returns {object} 201 – `{ comment }` con datos del autor incluidos.
- */
 router.post("/:gameId/comments", authMiddleware, async (req, res) => {
   try {
     const gameId = parseInt(req.params.gameId, 10);
@@ -515,13 +412,6 @@ router.post("/:gameId/comments", authMiddleware, async (req, res) => {
   }
 });
 
-/**
- * Elimina un comentario: autor, dueño de la ficha o usuario con rol admin.
- *
- * @route  DELETE /api/games/:gameId/comments/:commentId
- * @access Private (requiere JWT válido)
- * @returns {object} 200 – `{ success }` | 403 – sin permisos | 404 – no encontrado.
- */
 router.delete("/:gameId/comments/:commentId", authMiddleware, async (req, res) => {
   try {
     const gameId = parseInt(req.params.gameId, 10);
@@ -558,13 +448,6 @@ router.delete("/:gameId/comments/:commentId", authMiddleware, async (req, res) =
   }
 });
 
-/**
- * Pulgar arriba / abajo en una reseña de primer nivel (solo `parent_id` nulo).
- * `val`: 1, -1 o 0 (quita el voto).
- *
- * @route  PUT /api/games/:gameId/comments/:commentId/vote
- * @access Private
- */
 router.put("/:gameId/comments/:commentId/vote", authMiddleware, async (req, res) => {
   try {
     const gameId = parseInt(req.params.gameId, 10);

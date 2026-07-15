@@ -195,8 +195,7 @@ const COMMENTS = [
     targetOwner: "admin2@myplaythrough.local",
     slug: "hades",
     authorEmail: "admin2@myplaythrough.local",
-    cuerpo:
-      "Each run feels different. The narrative hooks you in quickly.",
+    cuerpo: "Each run feels different. The narrative hooks you in quickly.",
   },
   {
     targetOwner: "admin2@myplaythrough.local",
@@ -216,8 +215,7 @@ const COMMENTS = [
     targetOwner: "user2@myplaythrough.local",
     slug: "elden",
     authorEmail: "user2@myplaythrough.local",
-    cuerpo:
-      "Tough bosses, fair patterns. Big victories feel earned.",
+    cuerpo: "Tough bosses, fair patterns. Big victories feel earned.",
   },
   {
     targetOwner: "user1@myplaythrough.local",
@@ -237,8 +235,7 @@ const COMMENTS = [
     targetOwner: "user3@myplaythrough.local",
     slug: "stardew",
     authorEmail: "user3@myplaythrough.local",
-    cuerpo:
-      "Easy to lose track of time. Relaxing loop with just enough goals.",
+    cuerpo: "Easy to lose track of time. Relaxing loop with just enough goals.",
   },
   {
     targetOwner: "admin2@myplaythrough.local",
@@ -258,7 +255,8 @@ const COMMENTS = [
     targetOwner: "demo@myplaythrough.local",
     slug: "hades",
     authorEmail: "demo@myplaythrough.local",
-    cuerpo: "Good sample title for demos — fast to understand and fun to replay.",
+    cuerpo:
+      "Good sample title for demos — fast to understand and fun to replay.",
   },
   {
     targetOwner: "admin1@myplaythrough.local",
@@ -271,8 +269,7 @@ const COMMENTS = [
     targetOwner: "user4@myplaythrough.local",
     slug: "hades",
     authorEmail: "user2@myplaythrough.local",
-    cuerpo:
-      "Soundtrack stands out. One-more-run pacing is hard to resist.",
+    cuerpo: "Soundtrack stands out. One-more-run pacing is hard to resist.",
   },
   {
     targetOwner: "admin2@myplaythrough.local",
@@ -375,12 +372,7 @@ async function ensureCatalog(client, row) {
     `INSERT INTO catalogo_juegos (titulo, url_imagen, rawg_id, steam_app_id)
      VALUES ($1, $2, $3, $4)
      RETURNING id`,
-    [
-      row.titulo,
-      row.url_imagen,
-      row.rawg_id,
-      row.steam_app_id,
-    ],
+    [row.titulo, row.url_imagen, row.rawg_id, row.steam_app_id],
   );
   return ins.rows[0].id;
 }
@@ -478,10 +470,9 @@ async function main() {
       `CREATE INDEX IF NOT EXISTS idx_comentario_votos_comentario
        ON juego_comentario_votos (comentario_id)`,
     );
-    await client.query(
-      `DELETE FROM juegos WHERE usuario_id = ANY($1::int[])`,
-      [seedIdList],
-    );
+    await client.query(`DELETE FROM juegos WHERE usuario_id = ANY($1::int[])`, [
+      seedIdList,
+    ]);
 
     const gameRowIds = {};
 
@@ -574,10 +565,9 @@ async function main() {
       }
     }
 
-    await client.query(
-      "UPDATE usuarios SET password_hash = $1 WHERE id > 0",
-      [hash],
-    );
+    await client.query("UPDATE usuarios SET password_hash = $1 WHERE id > 0", [
+      hash,
+    ]);
 
     await client.query("COMMIT");
     console.log("OK: datos de presentación cargados.");

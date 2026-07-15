@@ -1,15 +1,5 @@
-/**
- * Colección de iconos SVG inline usados en toda la aplicación.
- * Son componentes React puros: reciben solo la prop `className` para ajustar
- * el tamaño y color desde Tailwind CSS. Todos llevan `aria-hidden` para que
- * los lectores de pantalla los ignoren (el contexto semántico lo da el texto
- * o el `title` del elemento padre).
- */
+// Inline SVG icons — className for Tailwind sizing; aria-hidden (label comes from parent).
 
-/**
- * Icono de mando de videojuego usado en el logo de la app.
- * @param {{ className?: string }} props
- */
 export function IconController({ className = "h-6 w-6" }) {
   return (
     <svg
@@ -55,7 +45,6 @@ export function IconCollection({ className = "h-5 w-5" }) {
   );
 }
 
-/** Silueta de usuario (enlace a perfil / ajustes). */
 export function IconUser({ className = "h-5 w-5" }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -140,7 +129,6 @@ export function IconTrash({ className = "h-4 w-4" }) {
   );
 }
 
-/** Menú hamburguesa (solo móvil). */
 export function IconMenu({ className = "h-6 w-6" }) {
   return (
     <svg
@@ -159,7 +147,6 @@ export function IconMenu({ className = "h-6 w-6" }) {
   );
 }
 
-/** Campana (recomendaciones / avisos). */
 export function IconBell({ className = "h-5 w-5" }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -174,7 +161,6 @@ export function IconBell({ className = "h-5 w-5" }) {
   );
 }
 
-/** Regalo / recomendar. */
 export function IconGift({ className = "h-4 w-4" }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -227,7 +213,6 @@ export function IconImage({ className = "h-10 w-10" }) {
   );
 }
 
-/** Pulgar arriba (voto útil). */
 export function IconThumbUp({ className = "h-5 w-5" }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -236,7 +221,6 @@ export function IconThumbUp({ className = "h-5 w-5" }) {
   );
 }
 
-/** Pulgar abajo. */
 export function IconThumbDown({ className = "h-5 w-5" }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -245,7 +229,6 @@ export function IconThumbDown({ className = "h-5 w-5" }) {
   );
 }
 
-/** Ojo abierto (mostrar contraseña). */
 export function IconEye({ className = "h-5 w-5" }) {
   return (
     <svg
@@ -264,7 +247,6 @@ export function IconEye({ className = "h-5 w-5" }) {
   );
 }
 
-/** Ojo tachado (ocultar contraseña). */
 export function IconEyeOff({ className = "h-5 w-5" }) {
   return (
     <svg

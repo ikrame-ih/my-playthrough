@@ -73,22 +73,30 @@ describe("normalizeEstadoForDb", () => {
 // Cuando eliges un juego del buscador viene catalogo_ref; hay que validar que no sea basura
 describe("parseCatalogoRef", () => {
   it("RAWG con id válido ok", () => {
-    expect(parseCatalogoRef({ catalogo_ref: { source: "rawg", id: 42 } })).toEqual({
+    expect(
+      parseCatalogoRef({ catalogo_ref: { source: "rawg", id: 42 } }),
+    ).toEqual({
       source: "rawg",
       id: 42,
     });
   });
 
   it("Steam también vale y el source lo pone en minúsculas", () => {
-    expect(parseCatalogoRef({ catalogo_ref: { source: "STEAM", id: "123" } })).toEqual({
+    expect(
+      parseCatalogoRef({ catalogo_ref: { source: "STEAM", id: "123" } }),
+    ).toEqual({
       source: "steam",
       id: 123,
     });
   });
 
   it("cosas raras (epic, id 0, sin ref) = null", () => {
-    expect(parseCatalogoRef({ catalogo_ref: { source: "epic", id: 1 } })).toBeNull();
-    expect(parseCatalogoRef({ catalogo_ref: { source: "rawg", id: 0 } })).toBeNull();
+    expect(
+      parseCatalogoRef({ catalogo_ref: { source: "epic", id: 1 } }),
+    ).toBeNull();
+    expect(
+      parseCatalogoRef({ catalogo_ref: { source: "rawg", id: 0 } }),
+    ).toBeNull();
     expect(parseCatalogoRef({})).toBeNull();
   });
 });
@@ -115,7 +123,9 @@ describe("serverErrorPayload", () => {
   it("en production solo el mensaje genérico, sin el detalle", () => {
     process.env.NODE_ENV = "production";
     const err = new Error("secreto");
-    expect(serverErrorPayload(err, "Error genérico")).toEqual({ error: "Error genérico" });
+    expect(serverErrorPayload(err, "Error genérico")).toEqual({
+      error: "Error genérico",
+    });
   });
 });
 

@@ -1,27 +1,10 @@
-/**
- * @module normalize
- * @description Entrada del usuario en forma canónica antes de validar o guardar (emails en
- * minúsculas, títulos sin espacios dobles, estados de juego en español unificado, etc.).
- * Son funciones puras (sin tocar BD ni `req`), reutilizadas en rutas y en tests Vitest.
- */
+// Input normalisation before validation/DB writes. Pure helpers — no I/O.
 
-/**
- * Normaliza un email eliminando espacios y convirtiendo a minúsculas.
- * Así "  USER@Gmail.com  " y "user@gmail.com" se tratan como el mismo email.
- *
- * @param {*} email - Valor recibido del cliente (puede ser null/undefined).
- * @returns {string} Email en minúsculas y sin espacios.
- */
 const normalizeEmail = (email) =>
   String(email ?? "")
     .trim()
     .toLowerCase();
 
-/**
- * Valida contraseña para registro: longitud mínima y mezcla de tipos de carácter.
- * @param {string} password - Contraseña en texto plano.
- * @returns {string|null} Mensaje de error en español, o `null` si es válida.
- */
 function passwordPolicyMessage(password) {
   const p = String(password ?? "");
   if (p.length < 8) {
@@ -42,71 +25,35 @@ function passwordPolicyMessage(password) {
   return null;
 }
 
-/**
- * Normaliza el título de un juego colapsando espacios múltiples.
- * Ejemplo: `"  The  Witcher  3  "` → `"The Witcher 3"`.
- *
- * @param {*} t - Título recibido del cliente.
- * @returns {string} Título limpio con un solo espacio entre palabras.
- */
 function normalizeGameTitle(t) {
   return String(t ?? "")
     .trim()
     .replace(/\s+/g, " ");
 }
 
-/**
- * Genera una clave de comparación de títulos en minúsculas.
- * Usada para detectar duplicados sin importar mayúsculas/minúsculas.
- *
- * @param {string} t - Título a convertir en clave.
- * @returns {string} Título normalizado en minúsculas.
- */
 function titleMatchKey(t) {
   return normalizeGameTitle(t).toLowerCase();
 }
 
-/**
- * Normaliza la plataforma del juego. Si el usuario no indica ninguna,
- * se asigna "PC" como valor por defecto.
- *
- * @param {*} p - Plataforma recibida del cliente.
- * @returns {string} Nombre de plataforma limpio, o "PC" si estaba vacío.
- */
 function normalizePlataforma(p) {
   const s = String(p ?? "").trim();
   return s || "PC";
 }
 
-/**
- * Traduce el valor de estado del formulario al valor que espera la base de datos.
- * Acepta tanto español ("Pendiente", "Jugando", "Completado") como inglés
- * ("Backlog", "Playing", "Completed") para que la API sea flexible.
- *
- * @param {string} estado - Estado recibido del cliente.
- * @returns {string} El valor de estado correcto para guardar en la base de datos.
- */
+// Accepts Spanish DB values and English aliases from the form.
 function normalizeEstadoForDb(estado) {
   const s = String(estado ?? "").trim();
   const map = {
     Pendiente: "Pendiente",
     Jugando: "Jugando",
     Completado: "Completado",
-    Backlog: "Pendiente", // alias en inglés
+    Backlog: "Pendiente",
     Playing: "Jugando",
     Completed: "Completado",
   };
   return map[s] || s;
 }
 
-/**
- * Extrae y valida la referencia al catálogo (RAWG o Steam) del body de la petición.
- * Esta referencia se envía cuando el usuario selecciona un juego del buscador
- * y permite vincular la ficha personal con el catálogo compartido.
- *
- * @param {object} body - `req.body` de Express.
- * @returns {{ source: "rawg"|"steam", id: number } | null} Referencia validada o null.
- */
 function parseCatalogoRef(body) {
   const ref = body?.catalogo_ref;
   if (!ref || typeof ref !== "object") return null;
@@ -122,15 +69,6 @@ function parseCatalogoRef(body) {
   return { source, id: num };
 }
 
-/**
- * Prepara el objeto de error que se devuelve en la respuesta HTTP.
- * En modo desarrollo incluye el mensaje técnico del error para poder depurar.
- * En producción solo devuelve un mensaje genérico para no exponer detalles internos.
- *
- * @param {Error}  err         - El error capturado en el bloque catch.
- * @param {string} fallbackMsg - Mensaje genérico que siempre se muestra.
- * @returns {{ error: string, detail?: string, code?: string }} Objeto de error listo para enviar.
- */
 function serverErrorPayload(err, fallbackMsg) {
   const out = { error: fallbackMsg };
   if (process.env.NODE_ENV !== "production" && err?.message) {
@@ -140,14 +78,6 @@ function serverErrorPayload(err, fallbackMsg) {
   return out;
 }
 
-/**
- * Crea un temporizador para cancelar peticiones `fetch` que tarden demasiado.
- * Si el entorno lo soporta usa la forma nativa (`AbortSignal.timeout`);
- * si no, hace lo mismo de forma manual con `AbortController` y `setTimeout`.
- *
- * @param {number} ms - Tiempo máximo de espera en milisegundos.
- * @returns {AbortSignal} Señal que cancela el fetch cuando se agota el tiempo.
- */
 function fetchTimeoutMs(ms) {
   if (
     typeof AbortSignal !== "undefined" &&

@@ -10,7 +10,7 @@ import {
 import { APP_DEMO_URL, REPO_PUBLIC_URL } from './config'
 import { PRODUCT_SWATCHES, SLIDE_FEATURES_DATA } from './slidesShared'
 
-/** Mismo fondo base que la presentación (sin blur animado para PDF). */
+// Static slide deck for PDF export (no Framer Motion).
 const slideBg =
   'radial-gradient(ellipse 85% 55% at 15% -5%, rgba(45,212,191,0.14), transparent 52%), radial-gradient(ellipse 55% 40% at 92% 15%, rgba(34,211,238,0.08), transparent 42%), linear-gradient(168deg, #060a11 0%, #0b1120 42%, #0a1624 100%)'
 
@@ -24,17 +24,14 @@ function PrintPage({ children, className = '' }: { children: ReactNode; classNam
   )
 }
 
-/**
- * Réplica estática de las slides en pantalla (misma rejilla, tarjetas e iconos).
- * Sin Framer Motion para que “Guardar como PDF” siga generando archivos válidos.
- */
+// Static replica of on-screen slides for "Save as PDF".
 export function PrintDeck() {
   const homeHref = `${APP_DEMO_URL}/`
   const communityHref = `${APP_DEMO_URL}/community`
 
   return (
     <div className="print-root">
-      {/* Portada — SlideCover */}
+      {/* Cover */}
       <PrintPage className="flex flex-col items-center justify-center px-5 py-8 text-center md:px-10 md:py-10">
         <div className="flex max-w-3xl flex-col items-center">
           <span className="mb-5 inline-flex rounded-full border border-mp-accent/35 bg-mp-panel/90 px-5 py-2 text-[11px] font-bold uppercase tracking-[0.25em] text-mp-accent shadow-[0_0_32px_rgba(45,212,191,0.12)]">
@@ -69,7 +66,7 @@ export function PrintDeck() {
         </div>
       </PrintPage>
 
-      {/* Qué es — SlideProduct */}
+      {/* Product overview */}
       <PrintPage className="px-5 py-8 md:px-10 md:py-10">
         <div className="grid gap-10 md:grid-cols-2 md:items-center">
           <div className="space-y-6">
@@ -126,7 +123,7 @@ export function PrintDeck() {
         </div>
       </PrintPage>
 
-      {/* Arquitectura — SlideArch */}
+      {/* Architecture */}
       <PrintPage className="flex flex-col justify-center px-5 py-8 md:px-10 md:py-10">
         <h2 className="mb-6 text-center text-4xl font-bold text-white md:text-5xl" style={fontSyne}>
           Architecture · PERN
@@ -159,7 +156,7 @@ export function PrintDeck() {
         </div>
       </PrintPage>
 
-      {/* Modelo de datos — SlideSchema */}
+      {/* Data model */}
       <PrintPage className="flex flex-col justify-center gap-3 px-5 py-6 md:gap-4 md:px-10 md:py-8">
         <h2 className="text-center text-3xl font-bold text-white md:text-4xl" style={fontSyne}>
           Data model
@@ -226,7 +223,7 @@ export function PrintDeck() {
         </div>
       </PrintPage>
 
-      {/* Funciones — SlideFeatures */}
+      {/* Features */}
       <PrintPage className="flex flex-col justify-center px-5 py-8 md:px-10 md:py-10">
         <h2 className="mb-8 text-center text-3xl font-bold text-white md:text-4xl" style={fontSyne}>
           Main features
@@ -250,7 +247,7 @@ export function PrintDeck() {
         </div>
       </PrintPage>
 
-      {/* Demo — SlideDemo */}
+      {/* Demo */}
       <PrintPage className="flex flex-col justify-center gap-6 px-5 py-8 md:px-10 md:py-10">
         <h2 className="text-center text-3xl font-bold text-white md:text-4xl" style={fontSyne}>
           Walkthrough
@@ -287,7 +284,7 @@ export function PrintDeck() {
         </p>
       </PrintPage>
 
-      {/* Cierre — SlideClosing */}
+      {/* Closing */}
       <PrintPage className="relative flex flex-col items-center justify-center overflow-hidden px-5 py-10 text-center md:px-10 md:py-12">
         <div
           className="pointer-events-none absolute inset-0 opacity-100"

@@ -23,18 +23,7 @@ import SearchResultsPage from "./components/SearchResultsPage";
 import ProfileSettings from "./components/ProfileSettings";
 import RecommendationsPage from "./components/RecommendationsPage";
 
-/**
- * @file Raíz de la aplicación React: decide si mostrar el login o la app con menú.
- * Si `localStorage` tiene `token`, se asume sesión iniciada y se renderiza el router
- * (rutas como `/`, `/community`, `/admin`, etc.) dentro de `AppShell` (barra lateral + cabecera).
- * `SearchProvider` comparte el texto de búsqueda entre cabecera y páginas que filtran listas.
- */
-
-/**
- * Solo renderiza el panel de administración si el usuario tiene rol `admin`.
- * Evita que quien accede a `/admin` por URL, historial o sesión anterior (tras
- * cerrar sesión en esa ruta) vea siquiera la pantalla de “sin permiso”.
- */
+// Redirect /admin unless role is admin (avoids flashing the forbidden panel).
 function AdminRoute({ user }) {
   if (user?.rol !== "admin") {
     return <Navigate to="/" replace />;
@@ -42,14 +31,7 @@ function AdminRoute({ user }) {
   return <AdminUsers />;
 }
 
-/**
- * Página principal de la colección del usuario.
- * Muestra el encabezado con el botón "Añadir juego" y el grid de GameList.
- * Si se llega desde guardar un juego (`location.state.flashGameSaved`), muestra un
- * aviso visible arriba (la ficha de alta suele dejar el scroll abajo del formulario).
- *
- * @component
- */
+// Collection home — flash banner when returning from game save.
 function HomePage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -115,16 +97,6 @@ function HomePage() {
   );
 }
 
-/**
- * Componente raíz de la aplicación. Gestiona el estado de autenticación global
- * y decide qué mostrar: la pantalla de login/registro o la app completa.
- *
- * Al cargar, comprueba si hay un token en localStorage y lo valida con `/api/auth/me`
- * para obtener los datos frescos del usuario (incluyendo el rol actualizado).
- * Si el token no es válido o no existe, se muestra AuthPage.
- *
- * @component
- */
 function safeReadStoredUser() {
   const raw = localStorage.getItem("user");
   if (!raw) return null;
@@ -153,7 +125,7 @@ function App() {
     const token = localStorage.getItem("token");
     const saved = safeReadStoredUser();
 
-    // Carga inmediata desde localStorage para evitar parpadeo
+    // Hydrate from localStorage first to avoid login flash
     if (token && saved) {
       setUser(saved);
     } else if (token && !saved) {
@@ -162,7 +134,7 @@ function App() {
 
     if (!token) return;
 
-    // Verificación en servidor para obtener el rol actualizado
+    // Then refresh role/profile from server
     fetch(`${API_BASE}/api/auth/me`, { headers: authHeaders() })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
@@ -174,10 +146,6 @@ function App() {
       .catch(() => {});
   }, []);
 
-  /**
-   * Cierra la sesión del usuario limpiando el token y el objeto usuario
-   * del localStorage y reseteando el estado local.
-   */
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");

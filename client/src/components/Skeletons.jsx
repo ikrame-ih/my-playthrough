@@ -1,16 +1,5 @@
-/**
- * Componentes "esqueleto" (placeholders animados) que se muestran mientras
- * los datos están cargando. Tienen exactamente las mismas medidas que los
- * componentes reales para que el layout no cambie de golpe cuando llegan los datos.
- * Todos llevan `aria-hidden="true"` para que los lectores de pantalla los ignoren
- * y lean solo el `aria-label` descriptivo del contenedor padre.
- * La clase `animate-pulse` de Tailwind crea el efecto de "respiración" gris.
- */
+// Loading placeholders sized to match real cards (avoids layout jump).
 
-/**
- * Esqueleto de la tarjeta de juego. Replica la estructura visual de `GameCard`.
- * @component
- */
 export function GameCardSkeleton() {
   return (
     <div
@@ -37,11 +26,6 @@ export function GameCardSkeleton() {
   );
 }
 
-/**
- * Esqueleto de la tarjeta de miembro de comunidad. Replica la estructura de la
- * tarjeta de usuario con avatar circular y dos líneas de texto.
- * @component
- */
 export function CommunityMemberSkeleton() {
   return (
     <div
@@ -58,11 +42,6 @@ export function CommunityMemberSkeleton() {
   );
 }
 
-/**
- * Esqueleto del encabezado del perfil público de usuario.
- * Replica la línea decorativa, el título y el subtítulo de `UserPublicProfile`.
- * @component
- */
 export function ProfileHeaderSkeleton() {
   return (
     <div className="animate-pulse mb-10 space-y-3" aria-hidden="true">

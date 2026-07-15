@@ -29,13 +29,7 @@ export function requestWelcomeTour(userId) {
   window.dispatchEvent(new CustomEvent("myplaythrough-start-tour"));
 }
 
-/**
- * Guided tour (react-joyride): menu, search, bell, and profile.
- * Auto-starts only after **registration** for that account in this browser (`markWelcomeTourAfterRegister`).
- * Does not show on normal logins; restart from Profile → "Start guided tour" (`requestWelcomeTour`).
- *
- * @param {{ isAdmin: boolean; userId?: number }} props — If false, the Administration link step is omitted.
- */
+// react-joyride tour — auto after register only; replay from Profile.
 export default function WelcomeTour({ isAdmin, userId }) {
   const [run, setRun] = useState(false);
 

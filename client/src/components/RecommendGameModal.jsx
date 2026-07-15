@@ -1,16 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { API_BASE, apiFetch } from "../api";
 
-/**
- * Modal to send a recommendation (game from your collection → user you follow).
- * @param {object} props
- * @param {boolean} props.open
- * @param {() => void} props.onClose
- * @param {{ id: number, titulo: string } | null} props.preselectedGame — from your collection
- * @param {number | null} props.fixedRecipientId — public profile
- * @param {string} [props.fixedRecipientName]
- * @param {(detail?: { recipientName: string; gameTitle: string }) => void} [props.onSent]
- */
+// Send a library game to someone you follow.
 export default function RecommendGameModal({
   open,
   onClose,
@@ -27,9 +18,7 @@ export default function RecommendGameModal({
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadLists, setLoadLists] = useState(false);
-  /** After a successful POST: confirmation text for the sender. */
   const [sendConfirmation, setSendConfirmation] = useState(null);
-  /** Avoid clearing the message if the game id changes type or updates while the modal is open. */
   const prevOpenRef = useRef(false);
 
   const stablePreId =

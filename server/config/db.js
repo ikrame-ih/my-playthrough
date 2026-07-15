@@ -1,23 +1,8 @@
-/**
- * @module db
- * @description Configura y exporta el pool de conexiones a PostgreSQL.
- *
- * Un "pool" es un conjunto de conexiones ya abiertas y listas para usar.
- * En lugar de abrir una conexión nueva por cada petición HTTP (operación costosa),
- * el pool reutiliza las existentes, lo que mejora el rendimiento bajo carga.
- *
- * Las credenciales se leen de variables de entorno para no hardcodearlas
- * en el código y poder desplegarlas de forma segura en producción.
- */
+// Shared pg pool. Uses DATABASE_URL in cloud; DB_* vars locally.
 
 const { Pool } = require("pg");
 require("dotenv").config();
 
-/**
- * Pool de conexión a PostgreSQL reutilizado en todas las rutas.
- * En la nube (Neon, Render, Railway…) suele usarse `DATABASE_URL`;
- * en local, variables `DB_*` sueltas.
- */
 function poolConfig() {
   const url = process.env.DATABASE_URL?.trim();
   if (url) {
@@ -38,11 +23,6 @@ function poolConfig() {
   };
 }
 
-/**
- * Pool de conexión a PostgreSQL reutilizado en todas las rutas.
- * La librería `pg` gestiona automáticamente el número de conexiones activas.
- * @type {import("pg").Pool}
- */
 const pool = new Pool(poolConfig());
 
 module.exports = pool;

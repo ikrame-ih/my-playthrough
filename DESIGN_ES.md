@@ -1,13 +1,12 @@
 # DESIGN_ES.md — MyPlaythrough
 
-Referencia del sistema de diseño de la aplicación web MyPlaythrough.  
-Úsalo para mantener coherencia visual en todas las pantallas y componentes.
+Notas de UI: tokens en `client/tailwind.config.js`, clases compartidas en `client/src/index.css`.
 
-_(Versión en español de [DESIGN.md](DESIGN.md). El contenido técnico es equivalente.)_
+_(Versión en español de [DESIGN.md](DESIGN.md).)_
 
 ---
 
-## 1. Tema visual y atmósfera
+## Tema visual
 
 MyPlaythrough usa una estética **HUD neón oscuro**: paneles mate, cuadrícula sutil y acentos cian/violeta. La interfaz no compite con la **carátula**.
 
@@ -18,22 +17,22 @@ MyPlaythrough usa una estética **HUD neón oscuro**: paneles mate, cuadrícula 
 
 ---
 
-## 2. Paleta de colores
+## Paleta de colores
 
 Todos los colores están definidos como tokens Tailwind personalizados en `client/tailwind.config.js`.
 
-| Token            | Hex       | Función                                           |
-| ---------------- | --------- | ------------------------------------------------- |
-| `brand-bg`       | `#0B0E14` | Fondo de página — negro mate profundo             |
-| `brand-panel`    | `#11151E` | Superficie de tarjetas y paneles                  |
-| `brand-input`    | `#0F141C` | Fondo de campos de formulario                     |
-| `brand-surface`  | `#1A1F2B` | Estados hover, separadores sutiles                |
-| `brand-surface2` | `#2A3142` | Bordes en elementos interactivos                  |
-| `brand-accent`   | `#00F5FF` | Acento principal — cian neón                      |
-| `brand-tealBtn`  | `#00F5FF` | Relleno del botón CTA (alias)                     |
-| `brand-blue`     | `#7000FF` | Acento secundario — violeta eléctrico             |
-| `brand-magenta`  | `#FF00E5` | Puntuaciones y alertas únicamente                 |
-| `brand-line`     | `#1E2533` | Bordes finos                                      |
+| Token            | Hex       | Función                               |
+| ---------------- | --------- | ------------------------------------- |
+| `brand-bg`       | `#0B0E14` | Fondo de página — negro mate profundo |
+| `brand-panel`    | `#11151E` | Superficie de tarjetas y paneles      |
+| `brand-input`    | `#0F141C` | Fondo de campos de formulario         |
+| `brand-surface`  | `#1A1F2B` | Estados hover, separadores sutiles    |
+| `brand-surface2` | `#2A3142` | Bordes en elementos interactivos      |
+| `brand-accent`   | `#00F5FF` | Acento principal — cian neón          |
+| `brand-tealBtn`  | `#00F5FF` | Relleno del botón CTA (alias)         |
+| `brand-blue`     | `#7000FF` | Acento secundario — violeta eléctrico |
+| `brand-magenta`  | `#FF00E5` | Puntuaciones y alertas únicamente     |
+| `brand-line`     | `#1E2533` | Bordes finos                          |
 
 ### Uso semántico
 
@@ -50,13 +49,13 @@ Radiales cian / magenta / violeta en capas más una cuadrícula opcional de 48px
 
 ---
 
-## 3. Tipografía
+## Tipografía
 
-| Rol      | Fuente               | Uso                                              |
-| -------- | -------------------- | ------------------------------------------------ |
-| Display  | **Space Grotesk**    | h1–h3 (regla global en `index.css`)              |
-| Cuerpo   | **Plus Jakarta Sans**| Texto de interfaz por defecto                    |
-| Mono     | **JetBrains Mono**   | Stats, badges, `.tabular-nums`, `.eyebrow`       |
+| Rol     | Fuente                | Uso                                        |
+| ------- | --------------------- | ------------------------------------------ |
+| Display | **Space Grotesk**     | h1–h3 (regla global en `index.css`)        |
+| Cuerpo  | **Plus Jakarta Sans** | Texto de interfaz por defecto              |
+| Mono    | **JetBrains Mono**    | Stats, badges, `.tabular-nums`, `.eyebrow` |
 
 | Elemento               | Clases                                                       | Uso                                   |
 | ---------------------- | ------------------------------------------------------------ | ------------------------------------- |
@@ -67,7 +66,7 @@ Radiales cian / magenta / violeta en capas más una cuadrícula opcional de 48px
 | Etiqueta / pie         | `text-sm font-medium text-slate-400`                         | Labels de formulario, info secundaria |
 | Badge / etiqueta       | `text-[0.65rem] font-bold uppercase tracking-wide`           | Estados, chip de plataforma           |
 
-**Reglas:**
+**Reglas** (sobre todo en tarjetas de juego):
 
 - Los títulos usan siempre `tracking-tight`. Nunca `tracking-normal` en H1–H3.
 - `font-bold` en títulos y CTA. `font-medium` en labels. `font-semibold` en acciones secundarias.
@@ -76,7 +75,7 @@ Radiales cian / magenta / violeta en capas más una cuadrícula opcional de 48px
 
 ---
 
-## 4. Biblioteca de componentes
+## Componentes
 
 ### Paneles / tarjetas — `.figma-panel`
 
@@ -182,7 +181,7 @@ Incluir siempre `role="alert"` por accesibilidad.
 
 ---
 
-## 5. Principios de maquetación
+## Maquetación
 
 ### Estructura de página
 
@@ -215,7 +214,7 @@ Etiquetas siempre encima del campo, nunca solo placeholder como etiqueta.
 
 ---
 
-## 6. Profundidad y elevación
+## Profundidad y sombras
 
 | Nivel           | Token de sombra   | Uso                   |
 | --------------- | ----------------- | --------------------- |
@@ -233,7 +232,7 @@ La segunda capa (`0 0 0 1px rgba(255,255,255,...)`) crea el borde claro que hace
 
 ---
 
-## 7. Qué hacer y qué evitar
+## Qué hacer y qué evitar
 
 | ✅ Hacer                                   | ❌ Evitar                                                 |
 | ------------------------------------------ | --------------------------------------------------------- |
@@ -249,7 +248,7 @@ La segunda capa (`0 0 0 1px rgba(255,255,255,...)`) crea el borde claro que hace
 
 ---
 
-## 8. Comportamiento responsive
+## Responsive
 
 | Breakpoint     | Comportamiento                                     |
 | -------------- | -------------------------------------------------- |
@@ -264,9 +263,9 @@ El sidebar **no** se colapsa en móvil en la implementación actual (limitación
 
 ---
 
-## 9. Referencia rápida para nuevos componentes UI
+## Referencia rápida
 
-Al añadir pantallas o componentes, conviene alinear colores y utilidades con lo ya definido.
+Para pantallas nuevas — no hace falta repasar todo cada vez.
 
 **Color:**
 

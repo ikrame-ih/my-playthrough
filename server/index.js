@@ -1,18 +1,5 @@
-/**
- * @file Arranque del servidor Express: una sola app que escucha en un puerto y enruta
- * todo lo que empieza por `/api/` hacia ficheros en `routes/`.
- *
- * Orden práctico:
- * 1. `dotenv` lee `.env` (contraseña de BD, `JWT_SECRET`, `CORS_ORIGIN`, etc.).
- * 2. CORS limita qué web puede llamar a la API desde el navegador.
- * 3. express.json con tope de 50 kb evita cuerpos enormes.
- * 4. Los routers se montan por tema (`/api/auth`, `/api/games`, …). Ojo: las rutas de
- *    carátulas van antes que `/api/games/:id` para que `cover-search` no se confunda con un id numérico.
- * 5. `listen(PORT)` deja el proceso a la escucha (3000 por defecto).
- *
- * La descripción de cada endpoint está en el JSDoc de cada `*.routes.js`; las consultas SQL
- * van con parámetros (`$1`, `$2`) para no mezclar datos del usuario en el texto de la query.
- */
+// Express entry: mounts /api/* routers. Cover routes must register before /api/games/:id
+// so "cover-search" is not parsed as a numeric id.
 
 const express = require("express");
 const cors = require("cors");
@@ -31,9 +18,6 @@ const coversRoutes = require("./routes/covers.routes");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// --- Middlewares globales ---
-
-// Orígenes permitidos: uno o varios separados por coma (app + presentación en Vercel, etc.).
 const corsOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
   .split(",")
   .map((s) => s.trim())
@@ -41,19 +25,17 @@ const corsOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
 app.use(
   cors({
     origin:
-      corsOrigins.length <= 1 ? corsOrigins[0] || "http://localhost:5173" : corsOrigins,
+      corsOrigins.length <= 1
+        ? corsOrigins[0] || "http://localhost:5173"
+        : corsOrigins,
   }),
 );
 
-// Evita payloads enormes en POST/PUT (protección básica frente a abuso).
 app.use(express.json({ limit: "50kb" }));
 
-// --- Salud del servicio (despliegues / balanceadores) ---
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
 });
-
-// --- Ruta de diagnóstico (solo en desarrollo) ---
 
 app.get("/api/test-db", async (req, res) => {
   if (process.env.NODE_ENV === "production") {
@@ -67,21 +49,14 @@ app.get("/api/test-db", async (req, res) => {
   }
 });
 
-// --- Montaje de routers ---
-
 app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/community", communityRoutes);
 app.use("/api/social", socialRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/covers", coversRoutes);
-
-// cover-search va ANTES que /api/games/:id para que Express
-// no confunda "cover-search" con un ID numérico
 app.use("/api/games", coversRoutes);
 app.use("/api/games", gamesRoutes);
-
-// --- Manejo global de errores ---
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
@@ -92,8 +67,6 @@ app.use((err, req, res, next) => {
     ...(isDev && err.code ? { code: err.code } : {}),
   });
 });
-
-// --- Arranque ---
 
 app.listen(PORT, () => {
   console.log(`Servidor MyPlaythrough escuchando en el puerto ${PORT}`);

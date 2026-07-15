@@ -1,46 +1,18 @@
-/**
- * @module auth.middleware
- * @description Autenticación (¿quién eres?) y autorización admin (¿puedes gestionar a otros?).
- *
- * JWT en una frase: al hacer login el servidor devuelve un token (texto firmado con
- * `JWT_SECRET`). El navegador lo guarda y lo envía en `Authorization: Bearer …` en cada
- * petición. Si la firma es válida y no ha caducado, `req.user` lleva id, email y rol del
- * payload. Eso basta para pantallas; para el rol admin se vuelve a leer el rol en PostgreSQL
- * porque el token podría haberse emitido antes de un cambio de permisos.
- *
- * - `authMiddleware` — exige token válido (401 si falta o es inválido).
- * - `adminMiddleware` — tras auth, exige rol `admin` en BD (403 si no).
- * - `createToken` — emite el JWT al registrar o al hacer login.
- * - `usuarioEsAdmin` — consulta útil en rutas sueltas (p. ej. borrar comentario ajeno).
- */
+// JWT auth + admin checks. Token carries id/email/rol for the UI; admin role is
+// always re-read from Postgres because the token may predate a role change.
 
 const jwt = require("jsonwebtoken");
 const pool = require("../config/db");
 
-// Sin JWT_SECRET no hay firma verificable: el proceso termina al arrancar.
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
   console.error(
     "ERROR CRÍTICO: La variable de entorno JWT_SECRET no está definida. " +
-    "Añádela al fichero .env antes de arrancar el servidor.",
+      "Añádela al fichero .env antes de arrancar el servidor.",
   );
   process.exit(1);
 }
 
-/**
- * Genera un JSON Web Token firmado con los datos básicos del usuario.
- *
- * El token contiene `id`, `email` y `rol` en el payload para que el frontend
- * pueda mostrar menús según el rol sin necesidad de llamadas extra a la API.
- * Sin embargo, en las rutas protegidas siempre se re-comprueba el rol en BD
- * porque el token puede haber sido emitido antes de un cambio de permisos.
- *
- * @param {object} user          - Objeto usuario obtenido de la base de datos.
- * @param {number} user.id       - ID del usuario.
- * @param {string} user.email    - Email del usuario.
- * @param {string} [user.rol]    - Rol ('user' | 'admin'). Por defecto 'user'.
- * @returns {string} JWT firmado con `JWT_SECRET`, con expiración de 7 días.
- */
 const createToken = (user) =>
   jwt.sign(
     { id: user.id, email: user.email, rol: user.rol || "user" },
@@ -48,18 +20,6 @@ const createToken = (user) =>
     { expiresIn: "7d" },
   );
 
-/**
- * Middleware Express que comprueba que la petición lleve un JWT válido.
- *
- * Espera la cabecera `Authorization: Bearer <token>`.
- * Si el token es válido, adjunta el payload decodificado en `req.user`
- * y llama a `next()` para continuar con la siguiente función de la cadena.
- *
- * @param {import("express").Request}  req  - Objeto petición de Express.
- * @param {import("express").Response} res  - Objeto respuesta de Express.
- * @param {import("express").NextFunction} next - Función para continuar la cadena de middlewares.
- * @returns {void}
- */
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -80,16 +40,6 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-/**
- * Consulta la base de datos para saber si un usuario tiene rol 'admin'.
- *
- * Se consulta la BD en lugar de confiar solo en el token porque el token
- * puede haberse emitido antes de que se cambiara el rol del usuario.
- * Así la comprobación siempre refleja el estado actual.
- *
- * @param {number} usuarioId - ID del usuario a comprobar.
- * @returns {Promise<boolean>} `true` si el usuario tiene rol 'admin'.
- */
 async function usuarioEsAdmin(usuarioId) {
   const r = await pool.query("SELECT rol FROM usuarios WHERE id = $1", [
     usuarioId,
@@ -97,20 +47,7 @@ async function usuarioEsAdmin(usuarioId) {
   return r.rows[0]?.rol === "admin";
 }
 
-/**
- * Middleware Express que verifica que el usuario autenticado sea administrador.
- *
- * Debe colocarse siempre DESPUÉS de `authMiddleware` en la cadena de middlewares,
- * ya que depende de que `req.user.id` esté disponible.
- *
- * Devuelve 403 (Forbidden) si el usuario está logueado pero no es admin.
- * Esto es distinto de 401 (Unauthorized), que significa que no está logueado.
- *
- * @param {import("express").Request}  req  - Objeto petición (requiere `req.user.id`).
- * @param {import("express").Response} res  - Objeto respuesta de Express.
- * @param {import("express").NextFunction} next - Función para continuar la cadena.
- * @returns {Promise<void>}
- */
+// Must run after authMiddleware (needs req.user.id). 403 ≠ 401.
 const adminMiddleware = async (req, res, next) => {
   try {
     if (!(await usuarioEsAdmin(req.user.id))) {
@@ -124,4 +61,9 @@ const adminMiddleware = async (req, res, next) => {
   }
 };
 
-module.exports = { authMiddleware, adminMiddleware, createToken, usuarioEsAdmin };
+module.exports = {
+  authMiddleware,
+  adminMiddleware,
+  createToken,
+  usuarioEsAdmin,
+};

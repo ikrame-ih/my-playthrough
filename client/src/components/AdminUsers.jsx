@@ -4,21 +4,9 @@ import { API_BASE, apiFetch } from "../api";
 import { IconShield, IconTrash, IconUsers } from "./icons";
 import UserAvatar from "./UserAvatar";
 
-/**
- * Panel de administración (solo rol `admin` en base de datos).
- *
- * Aquí se concentran acciones de moderación que afectan a cualquier usuario:
- * borrar cuentas (y en cascada sus juegos y comentarios), borrar fichas de juego
- * ajenas y revisar o eliminar publicaciones LFG (buscar grupo). Los comentarios
- * concretos se moderan en la vista de discusión de cada juego (la API permite
- * borrar si eres admin, autor o dueño de la ficha).
- *
- * Los listados se filtran en el cliente con `useMemo` para no recargar la API en cada tecla.
- *
- * @component
- */
+// Admin panel: delete users/games, review LFG. Client-side search filters only.
+
 export default function AdminUsers() {
-  // --- Estado: datos de API y búsquedas locales (sin petición por tecla) ---
   const [users, setUsers] = useState([]);
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,13 +15,11 @@ export default function AdminUsers() {
   const [gameSearch, setGameSearch] = useState("");
   const [lfgPosts, setLfgPosts] = useState([]);
   const [lfgSearch, setLfgSearch] = useState("");
-  /** Modal grave: borrar cuenta de usuario (no usar window.confirm). */
   const [userDeleteModal, setUserDeleteModal] = useState(null);
   const [deleteConfirmInput, setDeleteConfirmInput] = useState("");
   const [deleteModalError, setDeleteModalError] = useState("");
   const [deleteInProgress, setDeleteInProgress] = useState(false);
 
-  // --- Carga inicial: usuarios, juegos y LFG (solo admin pasa del 403) ---
   const loadUsers = async () => {
     try {
       const res = await apiFetch(`${API_BASE}/api/admin/users`);
@@ -173,7 +159,6 @@ export default function AdminUsers() {
     }
   };
 
-  // --- Acciones destructivas: DELETE y recarga del bloque afectado ---
   const eliminarJuego = async (id, titulo) => {
     if (
       !window.confirm(
@@ -228,7 +213,7 @@ export default function AdminUsers() {
     }
   };
 
-  // --- Vista: estados de carga / sin permiso / panel con tres bloques (usuarios, juegos, LFG) ---
+
   if (loading) {
     return (
       <div className="figma-panel py-16 text-center text-lg font-medium text-brand-accent animate-pulse">

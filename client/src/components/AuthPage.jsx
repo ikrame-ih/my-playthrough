@@ -5,16 +5,7 @@ import { markWelcomeTourAfterRegister } from "./WelcomeTour";
 import { IconController, IconEye, IconEyeOff } from "./icons";
 import RobotAvatar from "./RobotAvatar";
 
-/**
- * Authentication screen combining login and registration in a single component.
- * The `mode` state controls which form is shown.
- * On successful authentication, saves the token in localStorage
- * and notifies the parent component via `onAuthSuccess`.
- *
- * @component
- * @param {object}   props
- * @param {Function} props.onAuthSuccess - Callback that receives the `user` object after authentication.
- */
+// Login + register in one screen; on success stores token and calls onAuthSuccess.
 export default function AuthPage({ onAuthSuccess }) {
   const [mode, setMode] = useState("login");
   const [formData, setFormData] = useState({

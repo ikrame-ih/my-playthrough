@@ -15,13 +15,6 @@ import UserAvatar from "./UserAvatar";
 import NotificationBell from "./NotificationBell";
 import WelcomeTour from "./WelcomeTour";
 
-/**
- * Función de clases para los enlaces de navegación del sidebar.
- * React Router DOM llama a esta función con `{ isActive }` y aplica
- * estilos distintos al enlace de la página activa.
- * @param {{ isActive: boolean }} params
- * @returns {string} Clases de Tailwind CSS para el enlace.
- */
 const sideNav = ({ isActive }) =>
   `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-out ${
     isActive
@@ -29,18 +22,7 @@ const sideNav = ({ isActive }) =>
       : "text-slate-400 hover:bg-white/[0.05] hover:text-slate-200 hover:ring-1 hover:ring-white/[0.08]"
   }`;
 
-/**
- * Estructura visual principal de la aplicación una vez el usuario está logueado.
- * Contiene el menú lateral y la barra de búsqueda superior.
- * Cada vez que el usuario navega a otra página se limpia la búsqueda
- * para que el filtro anterior no interfiera con la nueva vista.
- *
- * @component
- * @param {object}          props
- * @param {object}          props.user      - Datos del usuario logueado (`id`, `nombre_usuario`, `email`, `rol`, `avatar_id`).
- * @param {Function}        props.onLogout  - Función que se llama al pulsar "Cerrar sesión".
- * @param {React.ReactNode} props.children  - Contenido de la página activa, que se renderiza en el centro.
- */
+// Sidebar + top search. Clears query on route change so filters don't leak across pages.
 export default function AppShell({ user, onLogout, children }) {
   const name = user?.nombre_usuario?.trim() || user?.email || "?";
 

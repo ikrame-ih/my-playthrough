@@ -6,10 +6,6 @@ import { IconThumbDown, IconThumbUp } from "./icons";
 import UserAvatar from "./UserAvatar";
 import ErrorRetryPanel from "./ErrorRetryPanel";
 
-/**
- * Lee y parsea el usuario actual del localStorage.
- * @returns {object|null} Objeto de usuario o null si no hay sesión.
- */
 function parseUser() {
   try {
     const raw = localStorage.getItem("user");
@@ -19,9 +15,7 @@ function parseUser() {
   }
 }
 
-/**
- * Bloque recursivo: reseña o respuesta. Las reseñas raíz incluyen votación estilo Steam.
- */
+// Nested comment thread; root posts get Steam-style up/down votes.
 function CommentBlock({
   c,
   childrenList,
@@ -186,13 +180,7 @@ function CommentBlock({
   );
 }
 
-/**
- * Hilo de comentarios anidados de una ficha (ruta `/juego/:id/discussion`).
- * Carga cabecera pública vía `/api/community/games/:id` y mensajes vía `/api/games/:id/comments`
- * (siempre autenticado: la ficha puede ser de otro usuario). Las reseñas de primer nivel
- * admiten voto útil / no útil (`PUT .../vote`). Quién puede borrar un mensaje lo decide
- * el backend (autor, dueño de la ficha o admin); aquí solo se muestra el botón si `me.rol` o ids coinciden.
- */
+// Game discussion thread at /game/:gameId/discussion.
 export default function GameDiscussion() {
   const { gameId } = useParams();
   const [searchParams] = useSearchParams();

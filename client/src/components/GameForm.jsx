@@ -3,11 +3,6 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { API_BASE, apiFetch } from "../api";
 import ErrorRetryPanel from "./ErrorRetryPanel";
 
-/**
- * Lee el rol del usuario desde localStorage para personalizar
- * el mensaje de "no hay coincidencias" en el buscador de carátulas.
- * @returns {boolean} `true` si el usuario tiene rol 'admin'.
- */
 function isAdminUser() {
   try {
     const raw = localStorage.getItem("user");
@@ -18,11 +13,6 @@ function isAdminUser() {
   }
 }
 
-/**
- * Elimina espacios extra del título introducido por el usuario.
- * @param {string} s - Cadena a normalizar.
- * @returns {string} Cadena limpia.
- */
 function normalizeTitleText(s) {
   return String(s ?? "")
     .trim()
@@ -40,16 +30,7 @@ const PLATFORM_OPTIONS = [
   "Otra",
 ];
 
-/**
- * Formulario unificado de creación y edición de fichas de juego.
- * Detecta automáticamente si está en modo edición según si existe `:id` en la URL.
- * Al escribir en el campo de título, espera 550ms antes de buscar en RAWG y Steam
- * para no lanzar una petición por cada letra (se llama "debounce").
- * Si el usuario elige un juego del buscador, se envía su referencia de catálogo
- * para que el backend lo enlace con la tabla `catalogo_juegos`.
- *
- * @component
- */
+// Create/edit game form. Title search debounced ~550ms; catalogo_ref when picking from search.
 export default function GameForm() {
   const [formData, setFormData] = useState({
     titulo: "",

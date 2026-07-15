@@ -1,12 +1,4 @@
-/**
- * @module social.routes
- * @description Red social ligada a la biblioteca: seguir a otro usuario, recomendarle
- * un título que tú tienes en tu colección (solo si tú eres quien sigue a él), LFG
- * (buscar grupo) anclado a un juego tuyo, actividad agregada de gente a la que sigues
- * y conteo de recomendaciones no leídas para la campana del header.
- *
- * La regla “solo recomiendo a quien sigo” evita spam de mensajes a desconocidos.
- */
+// Social: follows, recommendations (followers only), LFG, activity feed, unread count.
 
 const express = require("express");
 const pool = require("../config/db");

@@ -1,13 +1,4 @@
-/**
- * @module users.routes
- * @description Datos de otros usuarios para la red social: listado en Comunidad (sin incluirte
- * a ti mismo) y colección pública de un usuario concreto (`/user/:id` en el front).
- * Cada petición exige JWT; los datos devueltos son solo lectura desde el punto de vista del visitante.
- *
- * Rutas definidas:
- *   GET /api/users              → lista de todos los usuarios excepto el propio
- *   GET /api/users/:userId/games → colección pública de un usuario concreto
- */
+// Other users for community: member list (excludes self) and public collections.
 
 const express = require("express");
 const pool = require("../config/db");
@@ -18,17 +9,7 @@ const { coerceAvatarId } = require("../constants/avatars");
 
 const router = express.Router();
 
-/**
- * Devuelve la lista de usuarios registrados para la página de comunidad.
- * Excluye al usuario que hace la petición (`WHERE u.id <> $1`) para que
- * no aparezca en su propio feed de comunidad.
- * Incluye el número de juegos y la plataforma del último juego añadido
- * como datos de contexto para la tarjeta de cada miembro.
- *
- * @route  GET /api/users
- * @access Private (requiere JWT válido)
- * @returns {object[]} 200 – Array con `id`, `nombre_usuario`, `num_juegos`, `num_seguidores`, `plataforma_ejemplo`, `siguiendo`.
- */
+/** GET / — member list (excludes self) with follow flag and quick stats. */
 router.get("/", authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(
@@ -61,16 +42,7 @@ router.get("/", authMiddleware, async (req, res) => {
   }
 });
 
-/**
- * Devuelve la colección pública de otro usuario (solo lectura).
- * Comprueba primero que el usuario exista para devolver un 404 descriptivo
- * en lugar del array vacío que devolvería `queryGamesListForUser` si no hay juegos.
- *
- * @route  GET /api/users/:userId/games
- * @access Private (requiere JWT válido)
- * @param  {string} req.params.userId - ID del usuario cuya colección se quiere ver.
- * @returns {object} 200 – `{ user, games }` | 400 – ID inválido | 404 – usuario no encontrado.
- */
+/** GET /:userId/games — read-only public collection (404 if user missing). */
 router.get("/:userId/games", authMiddleware, async (req, res) => {
   try {
     const userId = parseInt(req.params.userId, 10);

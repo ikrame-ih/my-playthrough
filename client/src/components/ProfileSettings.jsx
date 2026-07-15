@@ -5,13 +5,7 @@ import { ROBOT_AVATAR_IDS } from "../constants/avatars";
 import UserAvatar from "./UserAvatar";
 import { requestWelcomeTour } from "./WelcomeTour";
 
-/**
- * Profile settings: display name (`nombre_usuario`), avatar (`avatar_id`),
- * recommendation chime (`notificaciones_sonido`), and guided tour replay.
- * Persists via `PATCH /api/auth/me` and updates `localStorage`.
- *
- * @param {{ user: object; onUserUpdate: (u: object) => void }} props
- */
+// Profile: display name, avatar, notification sound, tour replay. PATCH /api/auth/me + localStorage sync.
 export default function ProfileSettings({ user, onUserUpdate }) {
   const [saving, setSaving] = useState(false);
   const [savingName, setSavingName] = useState(false);

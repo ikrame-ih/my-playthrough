@@ -8,11 +8,6 @@ const SIZE = {
   xl: "h-16 w-16",
 };
 
-/**
- * Avatar de usuario: robot predefinido según `avatar_id` del backend.
- *
- * @param {{ avatarId?: string|null; size?: keyof typeof SIZE; className?: string; title?: string }} props
- */
 export default function UserAvatar({
   avatarId,
   size = "md",

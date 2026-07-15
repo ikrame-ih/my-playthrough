@@ -1,37 +1,36 @@
 # DESIGN.md — MyPlaythrough
 
-Design system reference for the MyPlaythrough web application.  
-Use this document to ensure visual consistency across all screens and components.
+Notes on how the UI is supposed to look and which Tailwind tokens/classes to reuse. Tokens live in `client/tailwind.config.js`; shared component classes in `client/src/index.css`.
 
 ---
 
-## 1. Visual Theme & Atmosphere
+## Visual theme
 
-MyPlaythrough uses a **dark neon HUD** aesthetic — matte panels, subtle grid, cyan/violet accents. The interface stays quiet so **cover art** remains the hero.
+Dark neon HUD: matte panels, subtle grid, cyan/violet accents. Cover art stays the hero — the chrome stays quiet.
 
 - **Mood**: focused, modern, slightly arcade without clutter.
 - **Density**: medium. Cards breathe; forms aren't cramped.
-- **Philosophy**: accent colors carry meaning (cyan = action, magenta = scores). No decorative chrome.
-- **Typography**: Space Grotesk for headings, Plus Jakarta Sans for body, JetBrains Mono for stats.
+- **Accents**: cyan = action, magenta = scores. No decorative chrome.
+- **Fonts**: Space Grotesk (headings), Plus Jakarta Sans (body), JetBrains Mono (stats).
 
 ---
 
-## 2. Color Palette
+## Color palette
 
 All colors are defined as Tailwind custom tokens in `client/tailwind.config.js`.
 
-| Token | Hex | Role |
-|---|---|---|
-| `brand-bg` | `#0B0E14` | Page background — deep matte |
-| `brand-panel` | `#11151E` | Card and panel surface |
-| `brand-input` | `#0F141C` | Input field background |
-| `brand-surface` | `#1A1F2B` | Hover states, subtle separators |
-| `brand-surface2` | `#2A3142` | Interactive borders |
-| `brand-accent` | `#00F5FF` | Primary accent — neon cyan |
-| `brand-tealBtn` | `#00F5FF` | Primary CTA fill (alias) |
-| `brand-blue` | `#7000FF` | Secondary accent — electric violet |
-| `brand-magenta` | `#FF00E5` | Scores and alerts only |
-| `brand-line` | `#1E2533` | Hairline borders |
+| Token            | Hex       | Role                               |
+| ---------------- | --------- | ---------------------------------- |
+| `brand-bg`       | `#0B0E14` | Page background — deep matte       |
+| `brand-panel`    | `#11151E` | Card and panel surface             |
+| `brand-input`    | `#0F141C` | Input field background             |
+| `brand-surface`  | `#1A1F2B` | Hover states, subtle separators    |
+| `brand-surface2` | `#2A3142` | Interactive borders                |
+| `brand-accent`   | `#00F5FF` | Primary accent — neon cyan         |
+| `brand-tealBtn`  | `#00F5FF` | Primary CTA fill (alias)           |
+| `brand-blue`     | `#7000FF` | Secondary accent — electric violet |
+| `brand-magenta`  | `#FF00E5` | Scores and alerts only             |
+| `brand-line`     | `#1E2533` | Hairline borders                   |
 
 ### Semantic usage
 
@@ -48,24 +47,25 @@ Layered cyan / magenta / violet radials plus an optional 48px grid (`body::befor
 
 ---
 
-## 3. Typography
+## Typography
 
-| Role | Stack | Usage |
-|---|---|---|
-| Display | **Space Grotesk** | h1–h3 (global rule in `index.css`) |
-| Body | **Plus Jakarta Sans** | Default UI copy |
-| Mono | **JetBrains Mono** | Stats, badges, `.tabular-nums`, `.eyebrow` |
+| Role    | Stack                 | Usage                                      |
+| ------- | --------------------- | ------------------------------------------ |
+| Display | **Space Grotesk**     | h1–h3 (global rule in `index.css`)         |
+| Body    | **Plus Jakarta Sans** | Default UI copy                            |
+| Mono    | **JetBrains Mono**    | Stats, badges, `.tabular-nums`, `.eyebrow` |
 
-| Element | Classes | Usage |
-|---|---|---|
-| Page title (H1) | `text-3xl font-bold tracking-tight text-white sm:text-4xl` | Dashboard header |
-| Section heading (H2) | `text-xl font-bold tracking-tight text-white` | Panel headers |
-| Card title (H3) | `text-base font-bold leading-snug tracking-tight text-white` | Game card title |
-| Body text | `text-sm text-slate-200` | Descriptions, body copy |
-| Label / caption | `text-sm font-medium text-slate-400` | Form labels |
-| Badge / tag | `text-[0.65rem] font-bold uppercase tracking-wide` | Status badges |
+| Element              | Classes                                                      | Usage                   |
+| -------------------- | ------------------------------------------------------------ | ----------------------- |
+| Page title (H1)      | `text-3xl font-bold tracking-tight text-white sm:text-4xl`   | Dashboard header        |
+| Section heading (H2) | `text-xl font-bold tracking-tight text-white`                | Panel headers           |
+| Card title (H3)      | `text-base font-bold leading-snug tracking-tight text-white` | Game card title         |
+| Body text            | `text-sm text-slate-200`                                     | Descriptions, body copy |
+| Label / caption      | `text-sm font-medium text-slate-400`                         | Form labels             |
+| Badge / tag          | `text-[0.65rem] font-bold uppercase tracking-wide`           | Status badges           |
 
-**Rules:**
+**Rules** (learned the hard way on game cards):
+
 - Headings always use `tracking-tight`. Never `tracking-normal` for titles.
 - `font-bold` for titles and CTAs. `font-medium` for labels. `font-semibold` for secondary actions.
 - `line-clamp-2` on card titles to keep grids aligned.
@@ -73,7 +73,7 @@ Layered cyan / magenta / violet radials plus an optional 48px grid (`body::befor
 
 ---
 
-## 4. Component Library
+## Components
 
 ### Panels / Cards — `.figma-panel`
 
@@ -121,6 +121,7 @@ Used for secondary actions (switch auth mode, cancel).
 Structure: `rounded-2xl` container → `h-44` cover image area → `p-5` content area.
 
 States:
+
 - **Default**: `border-white/[0.06]`, `shadow-figma`
 - **Hover**: `-translate-y-0.5`, `border-brand-accent/20`, `shadow-figma-lg` (triggered by `group-hover`)
 
@@ -130,11 +131,11 @@ Platform chip: `bg-black/55 backdrop-blur-sm` — positioned `top-3 left-3` over
 
 ### Status badge
 
-| Status (DB) | Label shown | Classes |
-|---|---|---|
-| `Jugando` | JUGANDO | `bg-brand-tealBtn text-black border-transparent` |
-| `Completado` | COMPLETADO | `bg-brand-tealBtn text-black border-transparent` |
-| `Pendiente` | BACKLOG | `bg-slate-700/80 text-slate-200 border-white/10` |
+| Status (DB)  | Label shown | Classes                                          |
+| ------------ | ----------- | ------------------------------------------------ |
+| `Jugando`    | JUGANDO     | `bg-brand-tealBtn text-black border-transparent` |
+| `Completado` | COMPLETADO  | `bg-brand-tealBtn text-black border-transparent` |
+| `Pendiente`  | BACKLOG     | `bg-slate-700/80 text-slate-200 border-white/10` |
 
 Note: the UI displays "BACKLOG" for `Pendiente` entries (gameLabels.js). Teal badges = active/positive states. Grey badge = queued/inactive.
 
@@ -145,6 +146,7 @@ Background: `#0a0f1a` (slightly darker than `brand-bg`).
 Border: `border-r border-white/[0.06]`.
 
 Nav link states:
+
 - **Active**: `bg-white/[0.08] text-brand-accent shadow-inner shadow-black/20`
 - **Inactive**: `text-slate-400`
 - **Hover (inactive)**: `bg-white/[0.04] text-slate-200`
@@ -177,7 +179,7 @@ Always include `role="alert"` for accessibility.
 
 ---
 
-## 5. Layout Principles
+## Layout
 
 ### Page structure
 
@@ -210,12 +212,12 @@ Labels always above inputs, never inline or placeholder-only.
 
 ---
 
-## 6. Depth & Elevation
+## Depth and shadows
 
-| Level | Shadow token | Usage |
-|---|---|---|
-| Base card | `shadow-figma` | Default card and panel elevation |
-| Elevated card | `shadow-figma-lg` | Hover state, modals |
+| Level         | Shadow token      | Usage                            |
+| ------------- | ----------------- | -------------------------------- |
+| Base card     | `shadow-figma`    | Default card and panel elevation |
+| Elevated card | `shadow-figma-lg` | Hover state, modals              |
 
 Shadow definitions:
 
@@ -228,30 +230,30 @@ The second layer (`0 0 0 1px rgba(255,255,255,...)`) creates the subtle bright b
 
 ---
 
-## 7. Do's and Don'ts
+## Do's and don'ts
 
-| ✅ Do | ❌ Don't |
-|---|---|
-| Use `rounded-2xl` for panels and cards | Mix `rounded-lg` and `rounded-2xl` in the same context |
-| `text-white` for headings only | Use `text-white` for body text (use `text-slate-200`) |
-| Black text on teal buttons | White text on teal buttons |
-| `tracking-tight` on all headings | Default tracking on H1–H3 |
-| `tabular-nums` for scores and hours | Variable-width numbers in aligned columns |
-| `border-white/[0.06]` for card borders | Full-opacity white borders |
-| One primary CTA per screen | Two teal buttons side by side |
-| `transition` on every interactive element | Static hover states |
-| `active:scale-[0.98]` on buttons | No press feedback |
+| ✅ Do                                     | ❌ Don't                                               |
+| ----------------------------------------- | ------------------------------------------------------ |
+| Use `rounded-2xl` for panels and cards    | Mix `rounded-lg` and `rounded-2xl` in the same context |
+| `text-white` for headings only            | Use `text-white` for body text (use `text-slate-200`)  |
+| Black text on teal buttons                | White text on teal buttons                             |
+| `tracking-tight` on all headings          | Default tracking on H1–H3                              |
+| `tabular-nums` for scores and hours       | Variable-width numbers in aligned columns              |
+| `border-white/[0.06]` for card borders    | Full-opacity white borders                             |
+| One primary CTA per screen                | Two teal buttons side by side                          |
+| `transition` on every interactive element | Static hover states                                    |
+| `active:scale-[0.98]` on buttons          | No press feedback                                      |
 
 ---
 
-## 8. Responsive Behavior
+## Responsive notes
 
-| Breakpoint | Behavior |
-|---|---|
-| `sm` (640px+) | Sidebar remains fixed; content padding increases (`sm:px-8`) |
-| `md` (768px+) | Game grid switches to 2 columns |
-| `lg` (1024px+) | Game grid at 3 columns |
-| `xl` (1280px+) | Game grid at 4 columns |
+| Breakpoint     | Behavior                                                     |
+| -------------- | ------------------------------------------------------------ |
+| `sm` (640px+)  | Sidebar remains fixed; content padding increases (`sm:px-8`) |
+| `md` (768px+)  | Game grid switches to 2 columns                              |
+| `lg` (1024px+) | Game grid at 3 columns                                       |
+| `xl` (1280px+) | Game grid at 4 columns                                       |
 
 The sidebar does not collapse on mobile in the current implementation (known limitation, noted as future improvement).
 
@@ -259,9 +261,9 @@ Touch targets: all interactive elements have a minimum of `p-2` padding. Buttons
 
 ---
 
-## 9. Quick reference
+## Quick reference
 
-When building or editing UI for this project, align with these tokens and classes.
+Handy when adding a screen — not a checklist for every PR.
 
 **Colors:**
 

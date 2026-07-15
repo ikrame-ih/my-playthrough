@@ -1,7 +1,4 @@
-/**
- * Ilustraciones SVG de robots (paleta alineada con brand: teal sobre fondo oscuro).
- * Cada variante es geométrica y ligera para escalar bien en listas y cabeceras.
- */
+// Preset robot SVGs (palette matches brand tokens).
 
 import { coerceAvatarId } from "../constants/avatars";
 
@@ -11,9 +8,6 @@ const D = "#0F172A";
 const M = "#64748B";
 const L = "#94A3B8";
 
-/**
- * @param {{ robotId: string; className?: string; title?: string }} props
- */
 export default function RobotAvatar({ robotId, className = "", title }) {
   const id = coerceAvatarId(robotId);
 

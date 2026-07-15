@@ -1,17 +1,4 @@
-/**
- * @module admin.routes
- * @description Panel de moderación: operaciones que un usuario normal no puede hacer
- * (listar todo, borrar cuentas ajenas, borrar fichas ajenas, ver todas las LFG).
- * `router.use(authMiddleware, adminMiddleware)` protege todas las rutas de una vez;
- * el rol `admin` se confirma en base de datos en cada petición.
- *
- * Rutas definidas:
- *   GET    /api/admin/users      → listado de todas las cuentas
- *   DELETE /api/admin/users/:id  → eliminar una cuenta (moderación)
- *   GET    /api/admin/games      → listado de todos los juegos
- *   DELETE /api/admin/games/:id  → eliminar cualquier ficha de juego
- *   GET    /api/admin/lfg        → publicaciones «buscar grupo» (moderación)
- */
+// Admin moderation: list/delete users, games, LFG. All routes need auth + admin (role checked in DB).
 
 const express = require("express");
 const pool = require("../config/db");
@@ -24,16 +11,9 @@ const { coerceAvatarId } = require("../constants/avatars");
 
 const router = express.Router();
 
-// Todas las rutas de este router requieren login + rol admin
 router.use(authMiddleware, adminMiddleware);
 
-/**
- * Devuelve el listado completo de cuentas de usuario para el panel de administración.
- *
- * @route  GET /api/admin/users
- * @access Private – Admin only
- * @returns {object[]} 200 – Array de usuarios con `id`, `nombre_usuario`, `email`, `rol`, `fecha_registro`.
- */
+/** GET /users */
 router.get("/users", async (req, res) => {
   try {
     const result = await pool.query(
@@ -53,16 +33,7 @@ router.get("/users", async (req, res) => {
   }
 });
 
-/**
- * Elimina la cuenta de un usuario. Operación de moderación que también borra
- * todos sus juegos y comentarios (ON DELETE CASCADE en la BD).
- * El admin no puede borrarse a sí mismo para evitar quedarse sin acceso al panel.
- *
- * @route  DELETE /api/admin/users/:id
- * @access Private – Admin only
- * @param  {string} req.params.id - ID del usuario a eliminar.
- * @returns {object} 200 – `{ success, message }` | 400 – auto-borrado o ID inválido | 404 – no encontrado.
- */
+/** DELETE /users/:id — CASCADE removes their games/comments; admin cannot delete self. */
 router.delete("/users/:id", async (req, res) => {
   try {
     const targetId = parseInt(req.params.id, 10);
@@ -91,14 +62,7 @@ router.delete("/users/:id", async (req, res) => {
   }
 });
 
-/**
- * Devuelve el listado completo de fichas de juego de todos los usuarios,
- * incluyendo el nombre y email del propietario para facilitar la moderación.
- *
- * @route  GET /api/admin/games
- * @access Private – Admin only
- * @returns {object[]} 200 – Array de juegos con datos del propietario.
- */
+/** GET /games — all library entries with owner info. */
 router.get("/games", async (req, res) => {
   try {
     const result = await pool.query(
@@ -123,16 +87,7 @@ router.get("/games", async (req, res) => {
   }
 });
 
-/**
- * Elimina cualquier ficha de juego independientemente de su propietario.
- * Solo disponible para administradores, a diferencia del DELETE del usuario
- * que solo puede borrar sus propios juegos.
- *
- * @route  DELETE /api/admin/games/:id
- * @access Private – Admin only
- * @param  {string} req.params.id - ID de la ficha a eliminar.
- * @returns {object} 200 – `{ success, message }` | 400 – ID inválido | 404 – no encontrado.
- */
+/** DELETE /games/:id */
 router.delete("/games/:id", async (req, res) => {
   try {
     const gameId = parseInt(req.params.id, 10);
@@ -154,14 +109,7 @@ router.delete("/games/:id", async (req, res) => {
   }
 });
 
-/**
- * Listado de publicaciones LFG (buscar grupo) para el panel de administración.
- * El borrado sigue usando `DELETE /api/social/lfg/:id` (autor o admin).
- *
- * @route  GET /api/admin/lfg
- * @access Private – Admin only
- * @returns {object[]} 200 – Filas con id, mensaje, modo, activo, created_at, usuario, email, juego_id, juego_titulo.
- */
+/** GET /lfg — moderation list (delete still via DELETE /api/social/lfg/:id). */
 router.get("/lfg", async (req, res) => {
   try {
     const result = await pool.query(

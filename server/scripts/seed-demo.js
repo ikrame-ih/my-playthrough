@@ -89,7 +89,9 @@ async function main() {
         "UPDATE usuarios SET password_hash = $1, nombre_usuario = $2 WHERE id = $3",
         [hash, DEMO_USER, userId],
       );
-      console.log("Usuario demo actualizado (misma contraseña que seed:presentation).");
+      console.log(
+        "Usuario demo actualizado (misma contraseña que seed:presentation).",
+      );
     } else {
       const ins = await client.query(
         `INSERT INTO usuarios (nombre_usuario, email, password_hash, rol, avatar_id)
