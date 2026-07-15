@@ -21,7 +21,7 @@ export default function GameCard({
   const showCover = Boolean(coverUrl) && !imgError;
 
   return (
-    <article className="group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-brand-panel/90 shadow-figma ring-1 ring-white/[0.04] transition-all duration-300 hover:-translate-y-1 hover:border-brand-accent/50 hover:shadow-glow-cyan">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-brand-panel/90 shadow-figma ring-1 ring-white/[0.04] transition-all duration-300 hover:-translate-y-1 hover:border-brand-accent/50 hover:shadow-glow-cyan">
       <span aria-hidden className="pointer-events-none absolute left-2 top-2 z-20 h-3 w-3 border-l border-t border-brand-accent/60" />
       <span aria-hidden className="pointer-events-none absolute right-2 top-2 z-20 h-3 w-3 border-r border-t border-brand-accent/60" />
 
@@ -61,8 +61,8 @@ export default function GameCard({
         </span>
       </div>
 
-      <div className="space-y-4 p-5">
-        <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-1 flex-col p-5">
+        <div className="flex min-h-[3.25rem] items-start justify-between gap-3">
           <h3
             className="line-clamp-2 min-w-0 flex-1 text-base font-bold leading-snug tracking-tight text-white"
             style={{ fontFamily: '"Space Grotesk", "Plus Jakarta Sans", sans-serif' }}
@@ -76,74 +76,78 @@ export default function GameCard({
           </span>
         </div>
 
-        {discussionTo && (
-          <div className="border-t border-white/[0.06] pt-3">
-            <Link
-              to={discussionTo}
-              className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-accent transition hover:text-white"
-              style={{ fontFamily: '"JetBrains Mono", monospace' }}
-            >
-              View discussion →
-            </Link>
+        <div className="mt-auto">
+          <div className="flex min-h-[2.25rem] items-center border-t border-white/[0.06] pt-3">
+            {discussionTo ? (
+              <Link
+                to={discussionTo}
+                className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-accent transition hover:text-white"
+                style={{ fontFamily: '"JetBrains Mono", monospace' }}
+              >
+                View discussion →
+              </Link>
+            ) : null}
           </div>
-        )}
 
-        <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] pt-4 text-sm">
-          <span className="flex items-center gap-1.5 text-slate-400">
-            <span
-              aria-hidden
-              className="text-[0.7rem] uppercase tracking-wider text-slate-500"
-              style={{ fontFamily: '"JetBrains Mono", monospace' }}
-            >
-              HRS
+          <div className="grid grid-cols-[1fr_1fr_auto] items-center gap-3 border-t border-white/[0.06] pt-4 text-sm">
+            <span className="flex items-center gap-1.5 text-slate-400">
+              <span
+                aria-hidden
+                className="text-[0.7rem] uppercase tracking-wider text-slate-500"
+                style={{ fontFamily: '"JetBrains Mono", monospace' }}
+              >
+                HRS
+              </span>
+              <span className="font-semibold tabular-nums text-slate-200">
+                {game.horas_jugadas ?? 0}
+              </span>
             </span>
-            <span className="font-semibold tabular-nums text-slate-200">
-              {game.horas_jugadas ?? 0}
+            <span className="flex items-center justify-center gap-1.5">
+              <span
+                aria-hidden
+                className="text-[0.7rem] uppercase tracking-wider text-brand-magenta"
+                style={{ fontFamily: '"JetBrains Mono", monospace' }}
+              >
+                SCR
+              </span>
+              <span className="font-bold tabular-nums text-brand-magenta">
+                {game.puntuacion ?? "—"}
+                <span className="text-slate-500">/10</span>
+              </span>
             </span>
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span
-              aria-hidden
-              className="text-[0.7rem] uppercase tracking-wider text-brand-magenta"
-              style={{ fontFamily: '"JetBrains Mono", monospace' }}
-            >
-              SCR
-            </span>
-            <span className="font-bold tabular-nums text-brand-magenta">
-              {game.puntuacion ?? "—"}
-              <span className="text-slate-500">/10</span>
-            </span>
-          </span>
-          {showActions && (
-            <div className="flex shrink-0 items-center gap-1">
-              {onRecommend && (
+            {showActions ? (
+              <div className="flex shrink-0 items-center justify-end gap-1">
+                {onRecommend && (
+                  <button
+                    type="button"
+                    onClick={() => onRecommend(game)}
+                    className="rounded-lg p-2 text-slate-500 transition hover:bg-brand-accent/10 hover:text-brand-accent"
+                    title="Recommend to someone"
+                    aria-label={`Recommend ${game.titulo}`}
+                  >
+                    <IconGift />
+                  </button>
+                )}
+                <Link
+                  to={`/edit/${game.id}`}
+                  className="rounded-lg p-2 text-slate-500 transition hover:bg-brand-accent/10 hover:text-brand-accent"
+                  title="Edit"
+                >
+                  <IconPencil />
+                </Link>
                 <button
                   type="button"
-                  onClick={() => onRecommend(game)}
-                  className="rounded-lg p-2 text-slate-500 transition hover:bg-brand-accent/10 hover:text-brand-accent"
-                  title="Recommend to someone"
-                  aria-label={`Recommend ${game.titulo}`}
+                  onClick={() => onDelete?.(game.id, game.titulo)}
+                  className="rounded-lg p-2 text-slate-500 transition hover:bg-brand-magenta/10 hover:text-brand-magenta"
+                  title="Delete"
                 >
-                  <IconGift />
+                  <IconTrash />
                 </button>
-              )}
-              <Link
-                to={`/edit/${game.id}`}
-                className="rounded-lg p-2 text-slate-500 transition hover:bg-brand-accent/10 hover:text-brand-accent"
-                title="Edit"
-              >
-                <IconPencil />
-              </Link>
-              <button
-                type="button"
-                onClick={() => onDelete?.(game.id, game.titulo)}
-                className="rounded-lg p-2 text-slate-500 transition hover:bg-brand-magenta/10 hover:text-brand-magenta"
-                title="Delete"
-              >
-                <IconTrash />
-              </button>
-            </div>
-          )}
+              </div>
+            ) : (
+              <span aria-hidden className="block w-0" />
+            )}
+          </div>
         </div>
       </div>
     </article>

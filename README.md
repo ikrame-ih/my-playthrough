@@ -1,10 +1,11 @@
 # MyPlaythrough
 
+[![Live demo](https://img.shields.io/badge/Live_demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://my-playthrough.vercel.app)
 [![Docs](https://img.shields.io/badge/Docs-6366f1?style=for-the-badge&logo=github)](https://ikrame-ih.github.io/my-playthrough/)
 
 **Personal video game library manager** — track backlog, active play, and completions. Community features: follow players, share recommendations, threaded discussions, and LFG posts.
 
-Final intermodular project for **Higher Vocational Training in Web Application Development** (2025/2026), **awarded the maximum grade**. Full-stack PERN stack with JWT auth, Docker local stack, and a defense slide deck on GitHub Pages.
+Final intermodular project for **Higher Vocational Training in Web Application Development** (2025/2026), **awarded the maximum grade**. Full-stack PERN stack with JWT auth, Docker local stack, and production deployment on **Vercel + Render**.
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-Express_5-339933?logo=nodedotjs&logoColor=white)
@@ -13,9 +14,11 @@ Final intermodular project for **Higher Vocational Training in Web Application D
 
 | | |
 | --- | --- |
+| **Live demo** | [my-playthrough.vercel.app](https://my-playthrough.vercel.app) — use **Use demo account** or sign in with seeded users |
 | **Documentation** | [GitHub Pages](https://ikrame-ih.github.io/my-playthrough/) — [defense deck](https://ikrame-ih.github.io/my-playthrough/defense/) |
 | **Source** | [github.com/ikrame-ih/my-playthrough](https://github.com/ikrame-ih/my-playthrough) |
 | **Run locally** | Docker Compose or manual Postgres + `client/` + `server/` |
+| **Deployment** | [docs/DEPLOY.md](docs/DEPLOY.md) — Vercel (frontend) + Render (API + Postgres) |
 
 ## Highlights
 
@@ -26,7 +29,7 @@ Final intermodular project for **Higher Vocational Training in Web Application D
 - **Discussions** — nested comments with Steam-style helpful / not recommended votes
 - **Admin panel** — user, game, and LFG moderation with strict deletion confirmation
 - **Security** — JWT + bcrypt, parameterized SQL, CORS, rate-limited auth, 50 KB JSON limit
-- **Demo account** — one-click sign-in after seed script (local development only)
+- **Demo account** — one-click sign-in after `npm run seed:demo` (works locally and on the live demo)
 
 ## Preview
 
@@ -96,7 +99,21 @@ npm run seed:demo          # demo user + 3 games (idempotent)
 npm run seed:presentation  # full sample dataset for local demos
 ```
 
-Demo credentials: **`demo@myplaythrough.local`** / **`Presentacion2026!`** — or **Use demo account** on the login screen (requires `seed:demo`).
+Demo credentials: **`demo@myplaythrough.local`** / **`Presentacion2026!`** — or **Use demo account** on the login screen.
+
+For a fuller community preview (members, comments, recommendations), run `npm run seed:presentation` (same password for all seeded users).
+
+## Production deployment
+
+The app is live at **[my-playthrough.vercel.app](https://my-playthrough.vercel.app)**.
+
+| Service | Platform |
+| --- | --- |
+| Frontend (React SPA) | [Vercel](https://vercel.com) — root directory `client` |
+| API (Express) | [Render](https://render.com) — `render.yaml` Blueprint |
+| Database | Render PostgreSQL |
+
+Step-by-step setup, env vars, and seeding production: **[docs/DEPLOY.md](docs/DEPLOY.md)**.
 
 ## Scripts
 
@@ -120,10 +137,11 @@ Copy `.env.example` → `.env` in `server/` (and `client/` if the API URL differ
 
 | Variable | Purpose |
 | --- | --- |
-| `DB_*` | PostgreSQL connection |
+| `DB_*` / `DATABASE_URL` | PostgreSQL connection (local `DB_*`; cloud `DATABASE_URL`) |
 | `JWT_SECRET` | Auth token signing |
-| `CORS_ORIGIN` | Allowed frontend origin |
+| `CORS_ORIGIN` | Allowed frontend origin(s) |
 | `RAWG_API_KEY` | Cover art search (recommended) |
+| `VITE_API_URL` | API base URL in `client/` (required for Vercel builds) |
 
 Never commit `.env` files or secrets.
 

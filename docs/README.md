@@ -2,7 +2,9 @@
 
 Setup and API overview: root [`README.md`](../README.md).
 
-**Online:** [GitHub Pages](https://ikrame-ih.github.io/my-playthrough/) — defense deck, diagrams, test plan.
+**Live demo:** [my-playthrough.vercel.app](https://my-playthrough.vercel.app) · **Deployment guide:** [`DEPLOY.md`](DEPLOY.md)
+
+**Online docs:** [GitHub Pages](https://ikrame-ih.github.io/my-playthrough/) — defense deck, diagrams, test plan.
 
 Full test plan: [`abrir-en-navegador/plan_pruebas.html`](abrir-en-navegador/plan_pruebas.html) (print to PDF). Markdown source: [`test-plan.md`](test-plan.md). **58** manual cases (46 P-, 8 S-, 4 V-) plus **27** Vitest unit tests.
 
